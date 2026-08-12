@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/elliotf/Develop/Personal/trexel/build/cmake_install.cmake",
+		"/home/elliotf/Develop/Personal/trexel/build/src/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
