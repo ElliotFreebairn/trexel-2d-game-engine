@@ -4,7 +4,6 @@
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o \
   CMakeFiles/trexel_exec.dir/main.cpp.o \
   /usr/lib/libSDL2-2.0.so.0.3200.70 \
-  /usr/lib/libSDL2main.a \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libm.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libm.so \
@@ -46,8 +45,6 @@
 CMakeFiles/trexel_exec.dir/main.cpp.o:
 
 /usr/lib/libSDL2-2.0.so.0.3200.70:
-
-/usr/lib/libSDL2main.a:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.so:
 

@@ -1,1 +1,1 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/trexel_exec.dir/link.d CMakeFiles/trexel_exec.dir/main.cpp.o -o ../bin/trexel_exec  /usr/lib/libSDL2-2.0.so.0.3200.70 /usr/lib/libSDL2main.a
+/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/trexel_exec.dir/link.d CMakeFiles/trexel_exec.dir/main.cpp.o -o ../bin/trexel_exec  /usr/lib/libSDL2-2.0.so.0.3200.70

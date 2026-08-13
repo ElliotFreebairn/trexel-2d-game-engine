@@ -97,7 +97,6 @@ bin/trexel_exec: src/CMakeFiles/trexel_exec.dir/main.cpp.o
 bin/trexel_exec: src/CMakeFiles/trexel_exec.dir/build.make
 bin/trexel_exec: src/CMakeFiles/trexel_exec.dir/compiler_depend.ts
 bin/trexel_exec: /usr/lib/libSDL2-2.0.so.0.3200.70
-bin/trexel_exec: /usr/lib/libSDL2main.a
 bin/trexel_exec: src/CMakeFiles/trexel_exec.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/elliotf/Develop/Personal/trexel/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ../bin/trexel_exec"
 	cd /home/elliotf/Develop/Personal/trexel/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/trexel_exec.dir/link.txt --verbose=$(VERBOSE)
