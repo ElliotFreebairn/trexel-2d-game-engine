@@ -3,9 +3,36 @@ project(trexel
   VERSION 0.0.1
   LANGUAGES CXX
 )
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
+
+# find system deps
+find_package(SDL2 REQUIRED)
+
+# build imgui as a static library
+# - bundles imgui .cpp files into static archive `libimgui.a` instead of compiling fresh every time
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/include/imgui)
+
+add_library(imgui STATIC
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_sdl2.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_sdlrenderer2.cpp
+)
+
+target_include_directories(imgui PUBLIC
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${SDL2_INCLUDE_DIRS}
+)
+
+target_link_libraries(imgui PUBLIC ${SDL2_LIBRARIES})
 
 add_subdirectory(src)
