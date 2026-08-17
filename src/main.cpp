@@ -13,6 +13,9 @@
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
+#include "imgui_internal.h"
+
+#include <cstdlib>
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -101,6 +104,30 @@ ImGuiID setup_docking() {
     return dockspace_id;
 }
 
+
+/*
+ * Functionality to learn SDL + ImGui before fleshing out project structure
+ */
+
+// Function that places a block inside the SDL frame based on the mouse pos
+// This requires a function that can correctly determine the mouse pos inside the SDL frame inside ImGui frame
+//
+struct HoverInfo {
+    const char* window_name = "none";
+    ImVec2 relative_pos = ImVec2(0, 0);
+};
+
+
+ImVec2 GetMousePosRelativeTo(ImVec2 origin) {
+    return ImVec2(
+        ImGui::GetMousePos().x - origin.x,
+        ImGui::GetMousePos().y - origin.y
+    );
+}
+
+
+
+
 // Place imgui context within SDL window_ptr, not surface
 int main(int argc, char *argv[]) {
     SDL_Window* window_ptr = NULL;
@@ -123,6 +150,11 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     bool quit = false;
 
+    SDL_Rect game_square = { 100, 100, 100, 100};
+    int r, g, b, a = 150;
+
+    HoverInfo g_hover;
+    int viewport_click_count = 0;
     while(quit == false)
     {
         while (SDL_PollEvent(&e))
@@ -144,9 +176,8 @@ int main(int argc, char *argv[]) {
         SDL_RenderClear(renderer_ptr);
 
         // GAME
-        SDL_Rect square = { 350, 250, 100, 100 };
-        SDL_SetRenderDrawColor(renderer_ptr, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer_ptr, &square);
+        SDL_SetRenderDrawColor(renderer_ptr, r, g, b, 255);
+        SDL_RenderFillRect(renderer_ptr, &game_square);
 
         // RESET
         SDL_SetRenderTarget(renderer_ptr, NULL); // back to drawing on the window
@@ -161,14 +192,42 @@ int main(int argc, char *argv[]) {
 
         // UI BUILDING
         ImGui::Begin("Toolbar");
-        if (ImGui::Button("Change rect colour")) {
+        if (ImGui::Button("Change square")) {
+            game_square.h = rand() % 301;
+            game_square.w = rand() % 301;
+            game_square.x = (game_square.x + rand() % 300) - (game_square.x - rand() % 300);
+            game_square.y = (game_square.y + rand() % 300) - (game_square.y - rand() % 300);
             printf("Button clicked");
         }
+
+        ImGui::Text("Hovered window: %s", g_hover.window_name);
+        ImGui::Text("Relative pos = {x: %.1f, y: %.1f", g_hover.relative_pos.x, g_hover.relative_pos.y);
+        ImGui::Text("Window %s click count: %i", g_hover.window_name, viewport_click_count);
         ImGui::End();
 
-        ImGui::Begin("Viewport", nullptr);
+        ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
+        ImVec2 viewport_size = ImGui::GetContentRegionAvail();
+        ImVec2 viewport_origin = ImGui::GetCursorScreenPos();
+
         ImGui::Image((ImTextureID)(intptr_t)worldTexture,
-            ImVec2((float)VIEWPORT_WIDTH, (float)VIEWPORT_HEIGHT));
+            viewport_size);
+
+        if (ImGui::IsItemHovered()) {
+            g_hover.window_name = "Viewport";
+            g_hover.relative_pos = GetMousePosRelativeTo(viewport_origin);
+        }
+
+        if (ImGui::IsItemClicked()) {
+            viewport_click_count++;
+            float scale_x = (float)VIEWPORT_WIDTH / viewport_size.x;
+            float scale_y = (float)VIEWPORT_HEIGHT / viewport_size.y;
+
+            game_square.x = (int)(g_hover.relative_pos.x * scale_x);
+            game_square.y = (int)(g_hover.relative_pos.y * scale_y);
+            game_square.h = 50;
+            game_square.w = 50;
+
+        }
         ImGui::End();
 
         // ========================= Render SDL & ImGui  ================================/
