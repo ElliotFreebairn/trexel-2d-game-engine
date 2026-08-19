@@ -51,6 +51,13 @@ class Engine {
         void render(); // render SDL graphics and ImGui overlay
 
         /*
+         * To be moved
+         */
+        void render_game();
+        void render_imgui();
+        void build_ui();
+
+        /*
          * Helper functions
          */
         bool init_sdl();
@@ -58,8 +65,7 @@ class Engine {
 
         // TO BE CONVERTED INTO RESPECTIVE CLASSES/STRUCTURES
         void setup_imgui_frame();
-        void setup_imgui_docking();
-        const ImGuiViewport* setup_imgui_viewport();
+        void setup_imgui_host_window();
 
         /*
          * Attributes

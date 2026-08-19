@@ -72,10 +72,33 @@ void Engine::update()
 
 }
 
+/*
+ * For now lets seperate into SDL and ImGui structs
+ * Then port to a more appropiate data structure
+ *
+ * What would be an appropiate name for SDL part of render. It is the game and scnee
+ */
+
 void Engine::render()
 {
+    // 1. Render the game/scene first
+    render_game();
+
+    // 2. Render the UI
+    render_imgui();
+
+    // 3. Render the composite frame
+    ImGui::Render();
+    SDL_SetRenderDrawColor(renderer_ptr, 30, 30, 30, 255);
+    SDL_RenderClear(renderer_ptr);
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer_ptr);
+    SDL_RenderPresent(renderer_ptr);
+}
+
+void Engine::render_game()
+{
     // Split into methods (e.g. SDL & ImGui)
-    // SDL Setup
+    // SDL Setup, potentially usefull to have setup_sdl_frame() ?
     SDL_SetRenderTarget(renderer_ptr, world_texture_ptr);
     SDL_SetRenderDrawColor(renderer_ptr,
        (Uint8)0,
@@ -97,11 +120,20 @@ void Engine::render()
 
     // SDL Reset
     SDL_SetRenderTarget(renderer_ptr, NULL); // back to drawing on the imgui window
+}
 
-    //ImGui Setup
+void Engine::render_imgui()
+{
+    // 1. Setup imgui
     setup_imgui_frame();
 
-    // ImGui UI e.g. should be something such as build_ui()
+    // 2. Build the UI
+    build_ui();
+}
+
+void Engine::build_ui()
+{
+    // TOOLBAR
     ImGui::Begin("Toolbar");
 
     ImGui::Button("Add Game");
@@ -109,6 +141,7 @@ void Engine::render()
 
     ImGui::End();
 
+    // VIEWPORT
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
     ImVec2 viewport_size = ImGui::GetContentRegionAvail();
     ImVec2 viewport_origin = ImGui::GetCursorScreenPos();
@@ -116,13 +149,6 @@ void Engine::render()
         viewport_size);
 
     ImGui::End();
-
-    // Important rendering part
-    ImGui::Render();
-    SDL_SetRenderDrawColor(renderer_ptr, 30, 30, 30, 255);
-    SDL_RenderClear(renderer_ptr);
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer_ptr);
-    SDL_RenderPresent(renderer_ptr);
 }
 /*
  * These should be moved to specific class/file
@@ -138,10 +164,10 @@ void Engine::setup_imgui_frame()
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    setup_imgui_docking();
+    setup_imgui_host_window();
 }
 
-void Engine::setup_imgui_docking()
+void Engine::setup_imgui_host_window()
 {
     constexpr ImGuiWindowFlags host_flags =
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
@@ -150,27 +176,11 @@ void Engine::setup_imgui_docking()
         ImGuiWindowFlags_NoBackground;
 
     ImGui::Begin("HostWindow", nullptr, host_flags);
-
     ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
-
     ImGui::End();
 }
 
-const ImGuiViewport* Engine::setup_imgui_viewport()
-{
-    const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(main_viewport->WorkPos);
-    ImGui::SetNextWindowSize(main_viewport->WorkSize);
-    ImGui::SetNextWindowViewport(main_viewport->ID);
-
-    // Commented out: currently breaking, figure out why later
-    //ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    //ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-    return main_viewport;
-}
 // ============================================
 
 bool Engine::init_sdl()
