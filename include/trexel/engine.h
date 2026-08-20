@@ -1,21 +1,15 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+// Custom includes
+#include "sdl_context.h"
+#include "game_renderer.h"
+#include "ui_manager.h"
+
 // ImGui
 #include "imgui.h"
-#include "backends/imgui_impl_sdl2.h"
-#include "backends/imgui_impl_sdlrenderer2.h"
-
 // SDL
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_error.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_surface.h>
-#include <SDL2/SDL_video.h>
-#include <SDL_pixels.h>
-#include <SDL_render.h>
-#include <SDL_stdinc.h>
-
 // C+=
 #include <stdio.h>
 
@@ -23,13 +17,6 @@
  * Engine Responsibilities:
  *
  */
-
-constexpr int SCREEN_WIDTH = 1280;
-constexpr int SCREEN_HEIGHT = 720;
-
-constexpr int VIEWPORT_WIDTH = 800;
-constexpr int VIEWPORT_HEIGHT = 600;
-
 // Singelton
 class Engine {
     public:
@@ -43,36 +30,24 @@ class Engine {
     private:
         Engine();
         ~Engine();
+
         /*
          * SDL & ImGui
          */
         bool process_input(SDL_Event &e); // process inputs (SDL Events & ImGui inputs)
         void update(); // update the game state (Physics, Movement etc...)
         void render(); // render SDL graphics and ImGui overlay
-
         /*
-         * To be moved
+         * Engine owns the SDL & UI contexts
          */
-        void render_game();
-        void render_imgui();
-        void build_ui();
+        SdlContext sdl_context;
+        GameRenderer game_renderer;
+        UIManager ui_manager;
 
-        /*
-         * Helper functions
-         */
-        bool init_sdl();
-        bool init_imgui();
+        static constexpr int SCREEN_WIDTH = 1280;
+        static constexpr int SCREEN_HEIGHT = 720;
+        static constexpr int VIEWPORT_WIDTH = 800;
+        static constexpr int VIEWPORT_HEIGHT = 600;
 
-        // TO BE CONVERTED INTO RESPECTIVE CLASSES/STRUCTURES
-        void setup_imgui_frame();
-        void setup_imgui_host_window();
-
-        /*
-         * Attributes
-         */
-        //SDL
-        SDL_Window* window_ptr;
-        SDL_Renderer* renderer_ptr;
-        SDL_Texture* world_texture_ptr;
 };
 #endif

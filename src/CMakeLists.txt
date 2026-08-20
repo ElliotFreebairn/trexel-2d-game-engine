@@ -4,6 +4,9 @@ find_package(SDL2 REQUIRED CONFIG REQUIRED COMPONENTS SDL2)
 add_executable(trexel_exec
     main.cpp
     engine.cpp
+    sdl_context.cpp
+    game_renderer.cpp
+    ui_manager.cpp
 )
 
 # Link to actual SDL2 library
