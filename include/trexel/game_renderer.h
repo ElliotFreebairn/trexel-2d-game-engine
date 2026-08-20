@@ -1,6 +1,10 @@
 #ifndef GAME_RENDERER_H
 #define GAME_RENDERER_H
 
+// Custom includes
+#include "game.h"
+
+// SDL Includes
 #include <SDL_render.h>
 
 class GameRenderer
@@ -14,7 +18,7 @@ public:
     GameRenderer& operator=(const GameRenderer&) = delete;
 
     void resize(SDL_Renderer* renderer, int width, int height);
-    void render(SDL_Renderer* renderer); // draws the scene into world_texture_ptr
+    void render(SDL_Renderer* renderer, Game* game); // draws the scene into world_texture_ptr
     SDL_Texture* texture() const { return world_texture_ptr; }
 private:
     void create_texture(SDL_Renderer* renderer, int width, int height);

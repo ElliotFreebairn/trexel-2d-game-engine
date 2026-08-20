@@ -1,4 +1,6 @@
 #include "engine.h"
+#include "game.h"
+
 #include "imgui_impl_sdlrenderer2.h"
 #include <SDL.h>
 
@@ -56,10 +58,15 @@ void Engine::update()
 
 void Engine::render()
 {
+    /*
+     * Testing, REMOVE!!!
+     */
+    Game game;
+
     // 1. Render the game/scene first
     ImVec2 desired = ui_manager.viewport_size();
     game_renderer.resize(sdl_context.renderer(), (int)desired.x, (int)desired.y);
-    game_renderer.render(sdl_context.renderer());
+    game_renderer.render(sdl_context.renderer(), &game);
 
     // 2. Render the UI
     ui_manager.begin_frame();

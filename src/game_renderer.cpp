@@ -1,8 +1,11 @@
 #include "game_renderer.h"
+#include "game.h"
 
 #include <SDL_pixels.h>
 #include <SDL_render.h>
+#include <SDL_surface.h>
 #include <format>
+#include <numbers>
 #include <stdexcept>
 
 GameRenderer::GameRenderer(SDL_Renderer* renderer, int width, int height)
@@ -28,7 +31,11 @@ GameRenderer::~GameRenderer()
     }
 }
 
-void GameRenderer::render(SDL_Renderer* renderer)
+/*
+ * Game renderer should take in a game
+ * That game, for now, is built programatically
+ */
+void GameRenderer::render(SDL_Renderer* renderer, Game* game)
 {
     SDL_SetRenderTarget(renderer, world_texture_ptr);
 
@@ -36,9 +43,23 @@ void GameRenderer::render(SDL_Renderer* renderer)
     SDL_RenderClear(renderer);
 
     // --- scene contents go here ---
-    SDL_Rect rect = { 100, 100, 100, 100 };
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    std::vector<Entity> entities = game->get_entities();
+    std::vector<Entity>::iterator it;
+    for (it = entities.begin(); it != entities.end(); ++it)
+    {
+        SDL_Rect rect = {
+            it->position.x,
+            it->position.y,
+            it->size.width,
+            it->size.height
+        };
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+
+    // SDL_Rect rect = { 100, 100, 100, 100 };
+    // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    // SDL_RenderFillRect(renderer, &rect);
     // -------------------------------
 
     SDL_SetRenderTarget(renderer, nullptr); // restore default target

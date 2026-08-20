@@ -7,6 +7,7 @@ add_executable(trexel_exec
     sdl_context.cpp
     game_renderer.cpp
     ui_manager.cpp
+    game.cpp
 )
 
 # Link to actual SDL2 library

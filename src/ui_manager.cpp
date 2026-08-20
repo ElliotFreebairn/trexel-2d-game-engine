@@ -69,7 +69,7 @@ void UIManager::build(SDL_Texture* world_texture)
     ImGui::Begin("Toolbar");
     ImGui::End();
 
-    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoBackground);
+    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
     viewport_size_ = ImGui::GetContentRegionAvail();
     ImGui::Image((ImTextureID)(intptr_t)world_texture, viewport_size_);
     ImGui::End();
