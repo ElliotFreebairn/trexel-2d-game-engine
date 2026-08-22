@@ -1,31 +1,16 @@
 #ifndef GAME_H
 #define GAME_H
 
+// Custom includes
+#include "common.h"
+
 // C++ includes
 #include <vector>
 
-/*
- * For now!
- *  Define an entity struct
- */
-
-struct GPosition
-{
-    int x;
-    int y;
-};
-
-struct GSize
-{
-    int width;
-    int height;
-};
-
 struct Entity
 {
-    GPosition position;
-    GSize size;
-
+    Position position;
+    Size size;
     // Potential additons: sprite, text etc... especially for the renderer
 };
 

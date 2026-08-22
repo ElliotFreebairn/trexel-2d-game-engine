@@ -13,6 +13,7 @@ add_executable(trexel_exec
 # Link to actual SDL2 library
 target_link_libraries(trexel_exec PRIVATE SDL2::SDL2)
 target_link_libraries(trexel_exec PRIVATE imgui)
+target_link_libraries(trexel_exec PRIVATE glm::glm)
 
 # Include header files
 target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel)

@@ -35,4 +35,6 @@ target_include_directories(imgui PUBLIC
 
 target_link_libraries(imgui PUBLIC ${SDL2_LIBRARIES})
 
+find_package(glm CONFIG REQUIRED)
+
 add_subdirectory(src)
