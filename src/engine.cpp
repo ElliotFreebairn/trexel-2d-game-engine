@@ -3,6 +3,7 @@
 
 #include "imgui_impl_sdlrenderer2.h"
 #include "texture_manager.h"
+#include "ui_manager.h"
 #include <SDL.h>
 
 Engine::Engine()
@@ -48,7 +49,19 @@ bool Engine::process_input(SDL_Event &e)
 
 void Engine::update()
 {
+    auto commands = ui_manager.flush_commands();
 
+    for (const auto& cmd : commands)
+    {
+        switch (cmd.type)
+        {
+            case UICommandType::Spawn_Block:
+                game.spawn_block(cmd.viewport_pos);
+                break;
+        }
+    }
+
+    game.update();
 }
 
 /*

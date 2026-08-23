@@ -67,11 +67,41 @@ void UIManager::setup_host_window()
 void UIManager::build(SDL_Texture* world_texture)
 {
     ImGui::Begin("Toolbar");
+
+    if (ImGui::Button("Spawn Blocks"))
+    {
+        state.tool_spawn_block_active = true;
+    }
     ImGui::End();
 
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
     viewport_size_ = ImGui::GetContentRegionAvail();
+
+    // Top-left of the image on the screen
+    ImVec2 cursor_screen_pos = ImGui::GetCursorScreenPos();
     ImGui::Image((ImTextureID)(intptr_t)world_texture, viewport_size_);
+
+    // Check interaction inside viewport
+    if (ImGui::IsItemHovered())
+    {
+        if (state.tool_spawn_block_active && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            ImVec2 mouse_pos = ImGui::GetMousePos();
+            glm::vec2 local_viewport_pos =
+            {
+                mouse_pos.x - cursor_screen_pos.x,
+                mouse_pos.y - cursor_screen_pos.y
+            };
+
+            state.pending_commands.push_back
+            (
+                {
+                    UICommandType::Spawn_Block,
+                    local_viewport_pos
+                }
+            );
+        }
+    }
     ImGui::End();
 }
 
@@ -83,4 +113,11 @@ void UIManager::render()
 void UIManager::draw(SDL_Renderer* renderer)
 {
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+}
+
+std::vector<UICommand> UIManager::flush_commands()
+{
+    std::vector<UICommand> commands = std::move(state.pending_commands);
+    state.pending_commands.clear();
+    return commands;
 }

@@ -10,7 +10,6 @@
 #include <SDL_surface.h>
 #include <format>
 #include <memory>
-#include <numbers>
 #include <stdexcept>
 
 GameRenderer::GameRenderer(SDL_Renderer* renderer, int width, int height)

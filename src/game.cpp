@@ -22,3 +22,15 @@ Game::~Game()
 {
 
 }
+
+void Game::update()
+{
+
+}
+
+void Game::spawn_block(glm::vec2 world_pos)
+{
+    glm::vec2 size{50.0f, 50.0f};
+    GameObject obj = {world_pos, size, "grass_block"};
+    game_objects.push_back(std::make_unique<GameObject>(obj));
+}

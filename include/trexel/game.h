@@ -29,6 +29,10 @@ public:
     Game();
     ~Game();
 
+    void update();
+
+    void spawn_block(glm::vec2 world_pos);
+
     const std::vector<std::unique_ptr<GameObject>>& get_entities() const { return game_objects; };
 private:
     std::vector<std::unique_ptr<GameObject>> game_objects;

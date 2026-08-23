@@ -2,9 +2,31 @@
 #define UI_MANAGER_H
 
 #include <SDL.h>
+#include "glm/glm.hpp"
 #include "imgui.h"
 // Potentially UI Manager could be an abstract class
 //  ImGuiManager would specialised
+//
+//
+
+// move later
+enum class UICommandType
+{
+    Spawn_Block
+};
+
+struct UICommand
+{
+    UICommandType type;
+    glm::vec2 viewport_pos; // click relative to viewport (0, 0 to width, height)
+};
+
+struct UIState
+{
+    bool tool_spawn_block_active = true;
+    std::vector<UICommand> pending_commands;
+};
+
 class UIManager
 {
 public:
@@ -23,7 +45,11 @@ public:
 
     ImVec2 viewport_size() const { return viewport_size_; }
 
+    std::vector<UICommand> flush_commands();
+
 private:
+    UIState state;
+
     void setup_host_window();
 
     ImVec2 viewport_size_ = ImVec2(800.0f, 600.0f);
