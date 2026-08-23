@@ -3,6 +3,7 @@
 
 // Custom includes
 #include "game.h"
+#include "texture_manager.h"
 
 // SDL Includes
 #include <SDL_render.h>
@@ -18,7 +19,7 @@ public:
     GameRenderer& operator=(const GameRenderer&) = delete;
 
     void resize(SDL_Renderer* renderer, int width, int height);
-    void render(SDL_Renderer* renderer, Game* game); // draws the scene into world_texture_ptr
+    void render(SDL_Renderer* renderer, Game* game, const TextureManager& textures); // draws the scene into world_texture_ptr
     SDL_Texture* texture() const { return world_texture_ptr; }
 private:
     void create_texture(SDL_Renderer* renderer, int width, int height);

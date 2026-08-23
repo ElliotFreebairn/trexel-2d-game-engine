@@ -8,10 +8,13 @@ add_executable(trexel_exec
     game_renderer.cpp
     ui_manager.cpp
     game.cpp
+    game_object.cpp
+    texture_manager.cpp
 )
 
 # Link to actual SDL2 library
 target_link_libraries(trexel_exec PRIVATE SDL2::SDL2)
+target_link_libraries(trexel_exec PRIVATE SDL2_image::SDL2_image)
 target_link_libraries(trexel_exec PRIVATE imgui)
 target_link_libraries(trexel_exec PRIVATE glm::glm)
 

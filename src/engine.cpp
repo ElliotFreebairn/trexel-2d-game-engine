@@ -62,11 +62,13 @@ void Engine::render()
      * Testing, REMOVE!!!
      */
     Game game;
+    TextureManager texture_manager;
+    texture_manager.load(sdl_context.renderer(), "square", "assets/john.jpg");
 
     // 1. Render the game/scene first
     ImVec2 desired = ui_manager.viewport_size();
     game_renderer.resize(sdl_context.renderer(), (int)desired.x, (int)desired.y);
-    game_renderer.render(sdl_context.renderer(), &game);
+    game_renderer.render(sdl_context.renderer(), &game, texture_manager);
 
     // 2. Render the UI
     ui_manager.begin_frame();

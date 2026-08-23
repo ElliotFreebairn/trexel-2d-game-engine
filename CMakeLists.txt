@@ -12,6 +12,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # find system deps
 find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
 
 # build imgui as a static library
 # - bundles imgui .cpp files into static archive `libimgui.a` instead of compiling fresh every time

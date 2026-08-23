@@ -1,10 +1,12 @@
 #include "game_renderer.h"
 #include "game.h"
+#include "game_object.h"
 
 #include <SDL_pixels.h>
 #include <SDL_render.h>
 #include <SDL_surface.h>
 #include <format>
+#include <memory>
 #include <numbers>
 #include <stdexcept>
 
@@ -35,7 +37,7 @@ GameRenderer::~GameRenderer()
  * Game renderer should take in a game
  * That game, for now, is built programatically
  */
-void GameRenderer::render(SDL_Renderer* renderer, Game* game)
+void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManager& textures)
 {
     SDL_SetRenderTarget(renderer, world_texture_ptr);
 
@@ -43,19 +45,42 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game)
     SDL_RenderClear(renderer);
 
     // --- scene contents go here ---
-    std::vector<Entity> entities = game->get_entities();
-    std::vector<Entity>::iterator it;
-    for (it = entities.begin(); it != entities.end(); ++it)
+    // it should only deal with IRenderable objects
+    const std::vector<std::unique_ptr<GameObject>>& game_objects = game->get_entities();
+
+    for (const std::unique_ptr<GameObject>& obj : game_objects)
     {
         SDL_Rect rect = {
-            it->position.x,
-            it->position.y,
-            it->size.width,
-            it->size.height
+            static_cast<int>(obj->get_position().x),
+            static_cast<int>(obj->get_position().y),
+            static_cast<int>(obj->get_size().x),
+            static_cast<int>(obj->get_size().y)
         };
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_Texture* tex = textures.get(obj->get_texture_id());
+        if (tex)
+        {
+            SDL_RenderCopy(renderer, tex, nullptr, &rect);
+        }
+        else
+        {
+            // falback renderer if tex is missing
+            SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255); // Magenta error box
+            SDL_RenderFillRect(renderer, &rect);
+        }
     }
+
+    //for (it = game_objects.begin(); it != game_objects.end(); ++it)
+    //{
+    //    printf("position x %f\n", (*it)->get_position().x);
+    //    SDL_Rect rect = {
+    //        static_cast<int>((*it)->get_position().x),
+    //        static_cast<int>((*it)->get_position().y),
+    //        static_cast<int>((*it)->get_size().x),
+    //        static_cast<int>((*it)->get_size().y)
+    //    };
+    //    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    //    SDL_RenderFillRect(renderer, &rect);
+    //}
 
     // SDL_Rect rect = { 100, 100, 100, 100 };
     // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
