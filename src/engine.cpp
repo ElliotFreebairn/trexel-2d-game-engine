@@ -2,14 +2,16 @@
 #include "game.h"
 
 #include "imgui_impl_sdlrenderer2.h"
+#include "texture_manager.h"
 #include <SDL.h>
 
 Engine::Engine()
     : sdl_context("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
     , game_renderer(sdl_context.renderer(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
     , ui_manager(sdl_context.window(), sdl_context.renderer())
+    , texture_manager()
 {
-
+    texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
 }
 
 Engine::~Engine()
@@ -61,9 +63,6 @@ void Engine::render()
     /*
      * Testing, REMOVE!!!
      */
-    Game game;
-    TextureManager texture_manager;
-    texture_manager.load(sdl_context.renderer(), "square", "assets/john.jpg");
 
     // 1. Render the game/scene first
     ImVec2 desired = ui_manager.viewport_size();

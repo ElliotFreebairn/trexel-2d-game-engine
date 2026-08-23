@@ -2,8 +2,11 @@
 #include "game.h"
 #include "game_object.h"
 
+#include <SDL_blendmode.h>
+#include <SDL_image.h>
 #include <SDL_pixels.h>
 #include <SDL_render.h>
+#include <SDL_stdinc.h>
 #include <SDL_surface.h>
 #include <format>
 #include <memory>
@@ -59,33 +62,17 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
         SDL_Texture* tex = textures.get(obj->get_texture_id());
         if (tex)
         {
+            SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
             SDL_RenderCopy(renderer, tex, nullptr, &rect);
         }
         else
         {
             // falback renderer if tex is missing
-            SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255); // Magenta error box
+            glm::vec3 colour = obj->get_colour().value_or(glm::vec3(0.0f, 0.0f, 0.0f));
+            SDL_SetRenderDrawColor(renderer, (Uint8)colour.x, (Uint8)colour.y, (Uint8)colour.z, 255); // Magenta error box
             SDL_RenderFillRect(renderer, &rect);
         }
     }
-
-    //for (it = game_objects.begin(); it != game_objects.end(); ++it)
-    //{
-    //    printf("position x %f\n", (*it)->get_position().x);
-    //    SDL_Rect rect = {
-    //        static_cast<int>((*it)->get_position().x),
-    //        static_cast<int>((*it)->get_position().y),
-    //        static_cast<int>((*it)->get_size().x),
-    //        static_cast<int>((*it)->get_size().y)
-    //    };
-    //    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    //    SDL_RenderFillRect(renderer, &rect);
-    //}
-
-    // SDL_Rect rect = { 100, 100, 100, 100 };
-    // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    // SDL_RenderFillRect(renderer, &rect);
-    // -------------------------------
 
     SDL_SetRenderTarget(renderer, nullptr); // restore default target
 }
@@ -109,6 +96,8 @@ void GameRenderer::create_texture(SDL_Renderer* renderer, int width, int height)
     {
         throw std::runtime_error("Creating new texture has failed!");
     }
+    SDL_SetTextureBlendMode(new_texture, SDL_BLENDMODE_BLEND);
+
     if (world_texture_ptr) SDL_DestroyTexture(world_texture_ptr);
     world_texture_ptr = new_texture;
     this->width = width;

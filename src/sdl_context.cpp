@@ -2,6 +2,7 @@
 
 // C++ includes
 #include <SDL_error.h>
+#include <SDL_image.h>
 #include <stdexcept>
 #include <format>
 
@@ -29,6 +30,12 @@ SdlContext::SdlContext(const char* title, int width, int height)
         SDL_Quit();
 
         std::string error_message = std::format("Renderer could not initialise! SDL_ERROR: {}\n", SDL_GetError());
+        throw std::runtime_error(error_message);
+    }
+
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
+    {
+        std::string error_message = std::format("IMG_INIT failed: {}", IMG_GetError());
         throw std::runtime_error(error_message);
     }
 }

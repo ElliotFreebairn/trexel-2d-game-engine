@@ -4,6 +4,7 @@
 // Custom includes
 #include "sdl_context.h"
 #include "game_renderer.h"
+#include "texture_manager.h"
 #include "ui_manager.h"
 
 // ImGui
@@ -43,11 +44,14 @@ class Engine {
         SdlContext sdl_context;
         GameRenderer game_renderer;
         UIManager ui_manager;
+        TextureManager texture_manager;
+
+        // Should this live here?
+        Game game;
 
         static constexpr int SCREEN_WIDTH = 1280;
         static constexpr int SCREEN_HEIGHT = 720;
         static constexpr int VIEWPORT_WIDTH = 800;
         static constexpr int VIEWPORT_HEIGHT = 600;
-
 };
 #endif

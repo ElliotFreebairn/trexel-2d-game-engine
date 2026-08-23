@@ -1,5 +1,5 @@
 #ifndef TEXTURE_MANAGER_H
-#define TEXTURE_MANAGAER_H
+#define TEXTURE_MANAGER_H
 
 // Library includes
 #include <SDL.h>
@@ -15,6 +15,17 @@
 class TextureManager
 {
     public:
+        ~TextureManager()
+        {
+            for (auto& [id, tex] : textures)
+            {
+                SDL_DestroyTexture(tex);
+            }
+        }
+        TextureManager() = default;
+        TextureManager(const TextureManager&) = delete;
+        TextureManager& operator=(const TextureManager&) = delete;
+
         void load(SDL_Renderer* renderer, const std::string& id, const std::string& filePath)
         {
             SDL_Texture* tex = IMG_LoadTexture(renderer, filePath.c_str());
