@@ -28,6 +28,8 @@ class Engine {
 
         void run();
 
+        void registerGame(Game* aGameClass);
+
     private:
         Engine();
         ~Engine();
@@ -47,7 +49,7 @@ class Engine {
         TextureManager texture_manager;
 
         // Should this live here?
-        Game game;
+        Game* game;
 
         static constexpr int SCREEN_WIDTH = 1280;
         static constexpr int SCREEN_HEIGHT = 720;

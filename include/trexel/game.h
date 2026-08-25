@@ -3,6 +3,7 @@
 
 
 // Library includes
+#include "IRenderable.h"
 #include "glm/glm.hpp"
 
 // Custom includes
@@ -26,15 +27,18 @@ struct Entity
 class Game
 {
 public:
-    Game();
-    ~Game();
+    virtual ~Game() = default;
 
-    void update();
+    virtual void onInit() = 0;
+    virtual void onUpdate(float deltaTime) = 0;
+    virtual void onShutdown() = 0;
 
-    void spawn_block(glm::vec2 world_pos);
+    // game bundles up the visual state of the world into a dumb data structure
+    virtual std::vector<const IRenderable*> getRenderables() const = 0;
 
-    const std::vector<std::unique_ptr<GameObject>>& get_entities() const { return game_objects; };
-private:
-    std::vector<std::unique_ptr<GameObject>> game_objects;
+    bool isRunning() const { return mIsRunning; }
+
+protected:
+    bool mIsRunning = true;
 };
 #endif

@@ -1,6 +1,6 @@
 #include "game_renderer.h"
+#include "IRenderable.h"
 #include "game.h"
-#include "game_object.h"
 
 #include <SDL_blendmode.h>
 #include <SDL_image.h>
@@ -47,18 +47,17 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     SDL_RenderClear(renderer);
 
     // --- scene contents go here ---
-    // it should only deal with IRenderable objects
-    const std::vector<std::unique_ptr<GameObject>>& game_objects = game->get_entities();
+    const std::vector<const IRenderable*> renderables = game->getRenderables();
 
-    for (const std::unique_ptr<GameObject>& obj : game_objects)
+    for (const IRenderable* cmd : renderables)
     {
         SDL_Rect rect = {
-            static_cast<int>(obj->get_position().x),
-            static_cast<int>(obj->get_position().y),
-            static_cast<int>(obj->get_size().x),
-            static_cast<int>(obj->get_size().y)
+            static_cast<int>(cmd->getPosition().x),
+            static_cast<int>(cmd->getPosition().y),
+            static_cast<int>(cmd->getSize().x),
+            static_cast<int>(cmd->getSize().y)
         };
-        SDL_Texture* tex = textures.get(obj->get_texture_id());
+        SDL_Texture* tex = textures.get(cmd->getTextureID());
         if (tex)
         {
             SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
@@ -67,7 +66,7 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
         else
         {
             // falback renderer if tex is missing
-            glm::vec3 colour = obj->get_colour().value_or(glm::vec3(0.0f, 0.0f, 0.0f));
+            glm::vec3 colour = cmd->getColour().value_or(glm::vec3(0.0f, 0.0f, 0.0f));
             SDL_SetRenderDrawColor(renderer, (Uint8)colour.x, (Uint8)colour.y, (Uint8)colour.z, 255); // Magenta error box
             SDL_RenderFillRect(renderer, &rect);
         }

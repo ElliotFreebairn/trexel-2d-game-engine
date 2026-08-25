@@ -1,10 +1,11 @@
 #include "engine.h"
-#include "game.h"
+#include "trexel.h"
 
 #include "imgui_impl_sdlrenderer2.h"
 #include "texture_manager.h"
 #include "ui_manager.h"
 #include <SDL.h>
+#include <ctime>
 
 Engine::Engine()
     : sdl_context("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -13,6 +14,11 @@ Engine::Engine()
     , texture_manager()
 {
     texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
+
+    // TEMP!
+    // Create trexel game
+    Trexel* trexel_game = new Trexel();
+    registerGame(static_cast<Game*>(trexel_game));
 }
 
 Engine::~Engine()
@@ -56,12 +62,16 @@ void Engine::update()
         switch (cmd.type)
         {
             case UICommandType::Spawn_Block:
-                game.spawn_block(cmd.viewport_pos);
+                break;
+            case UICommandType::Add_Player:
+                // Temporary code for testing out functionality
+                Trexel* trexel = dynamic_cast<Trexel*>(game);
+                trexel->spawnPlayer(cmd.viewport_pos);
                 break;
         }
     }
 
-    game.update();
+    game->onUpdate(0);
 }
 
 /*
@@ -80,7 +90,7 @@ void Engine::render()
     // 1. Render the game/scene first
     ImVec2 desired = ui_manager.viewport_size();
     game_renderer.resize(sdl_context.renderer(), (int)desired.x, (int)desired.y);
-    game_renderer.render(sdl_context.renderer(), &game, texture_manager);
+    game_renderer.render(sdl_context.renderer(), game, texture_manager);
 
     // 2. Render the UI
     ui_manager.begin_frame();
@@ -92,4 +102,9 @@ void Engine::render()
     SDL_RenderClear(sdl_context.renderer());
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), sdl_context.renderer());
     SDL_RenderPresent(sdl_context.renderer());
+}
+
+void Engine::registerGame(Game* aGameClass)
+{
+    game = aGameClass;
 }

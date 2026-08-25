@@ -72,6 +72,15 @@ void UIManager::build(SDL_Texture* world_texture)
     {
         state.tool_spawn_block_active = true;
     }
+    if (ImGui::Button("Disable block spawning"))
+    {
+        state.tool_spawn_block_active = false;
+    }
+    // Refactor ui state use
+    if (ImGui::Button("Add Player"))
+    {
+        state.tool_spawn_player_active = true;
+    }
     ImGui::End();
 
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
@@ -84,22 +93,27 @@ void UIManager::build(SDL_Texture* world_texture)
     // Check interaction inside viewport
     if (ImGui::IsItemHovered())
     {
-        if (state.tool_spawn_block_active && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        // For now calculate viewport every time mouse hovered over viewport
+        ImVec2 mouse_pos = ImGui::GetMousePos();
+        glm::vec2 local_viewport_pos =
         {
-            ImVec2 mouse_pos = ImGui::GetMousePos();
-            glm::vec2 local_viewport_pos =
-            {
-                mouse_pos.x - cursor_screen_pos.x,
-                mouse_pos.y - cursor_screen_pos.y
-            };
+            mouse_pos.x - cursor_screen_pos.x,
+            mouse_pos.y - cursor_screen_pos.y
+        };
 
-            state.pending_commands.push_back
-            (
-                {
-                    UICommandType::Spawn_Block,
-                    local_viewport_pos
-                }
-            );
+        // Add fnction that gets loacl viewport pos
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            if (state.tool_spawn_block_active)
+            {
+
+            }
+
+            if (state.tool_spawn_player_active)
+            {
+                state.pending_commands.push_back({UICommandType::Add_Player, local_viewport_pos});
+                printf("Player adding on\n");
+            }
         }
     }
     ImGui::End();

@@ -12,7 +12,8 @@
 // move later
 enum class UICommandType
 {
-    Spawn_Block
+    Spawn_Block,
+    Add_Player
 };
 
 struct UICommand
@@ -23,7 +24,8 @@ struct UICommand
 
 struct UIState
 {
-    bool tool_spawn_block_active = true;
+    bool tool_spawn_block_active = false;
+    bool tool_spawn_player_active = false;
     std::vector<UICommand> pending_commands;
 };
 

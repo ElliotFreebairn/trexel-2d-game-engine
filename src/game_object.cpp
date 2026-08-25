@@ -7,7 +7,7 @@ GameObject::GameObject(glm::vec2 position, glm::vec2 size, std::string texture_i
 {
     this->position = position;
     this->size = size;
-    this->texture_id = texture_id;
+    this->textureID = texture_id;
     this->colour = colour;
     // Better of stopping initalisation via constructor() :
 }

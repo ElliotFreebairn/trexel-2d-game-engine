@@ -10,29 +10,34 @@
 
 // Custom includes
 #include "common.h"
+#include "IRenderable.h"
 
 // C++ includes
 #include <optional>
 #include <vector>
 #include <iostream>
 
-class GameObject
+class GameObject : public IRenderable
 {
 public:
     GameObject(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour = std::nullopt);
     GameObject();
-
     ~GameObject();
 
-    glm::vec2 get_position() const { return position; }
-    glm::vec2 get_size() const { return size; }
-    const std::string& get_texture_id() const { return texture_id; }
+    /*
+     * update will be called every frame
+     */
+    virtual void update() = 0;
 
-    std::optional<glm::vec3> get_colour() const { return colour; }
-private:
+    glm::vec2 getPosition() const override { return position; }
+    glm::vec2 getSize() const override { return size; }
+    std::string getTextureID() const override { return textureID; }
+    std::optional<glm::vec3> getColour() const override { return colour; }
+
+protected:
     glm::vec2 position;
     glm::vec2 size;
-    std::string texture_id;
+    std::string textureID;
     std::optional<glm::vec3> colour;
 };
 
