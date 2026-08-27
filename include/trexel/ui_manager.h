@@ -4,10 +4,6 @@
 #include <SDL.h>
 #include "glm/glm.hpp"
 #include "imgui.h"
-// Potentially UI Manager could be an abstract class
-//  ImGuiManager would specialised
-//
-//
 
 // move later
 enum class UICommandType
@@ -24,8 +20,6 @@ struct UICommand
 
 struct UIState
 {
-    bool tool_spawn_block_active = false;
-    bool tool_spawn_player_active = false;
     std::vector<UICommand> pending_commands;
 };
 
@@ -47,6 +41,7 @@ public:
 
     ImVec2 viewport_size() const { return viewport_size_; }
 
+    void queueCommand(const UICommand& command);
     std::vector<UICommand> flush_commands();
 
 private:

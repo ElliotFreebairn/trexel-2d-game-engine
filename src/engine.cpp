@@ -1,4 +1,6 @@
 #include "engine.h"
+#include "game_object.h"
+#include "player.h"
 #include "trexel.h"
 
 #include "imgui_impl_sdlrenderer2.h"
@@ -16,7 +18,6 @@ Engine::Engine()
 {
     texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
 
-    // TEMP!
     // Create trexel game
     Trexel* trexel_game = new Trexel();
     registerGame(static_cast<Game*>(trexel_game));
@@ -62,7 +63,6 @@ bool Engine::process_input(SDL_Event &e)
 
 void Engine::update(float deltaTime)
 {
-    printf("deltaTime =  %f", deltaTime);
     auto commands = ui_manager.flush_commands();
 
     for (const auto& cmd : commands)
@@ -72,6 +72,11 @@ void Engine::update(float deltaTime)
             case UICommandType::Spawn_Block:
                 break;
             case UICommandType::Add_Player:
+                /*
+                 * Make a game object factory that bridges the ui and creating objects for a game
+                 */
+                Player* player = new Player(glm::vec2(400.0f, 400.0f), glm::vec2(50.0f, 50.0f), "grass_block");
+                game->addObject(static_cast<GameObject*>(player));
                 break;
         }
     }
@@ -79,19 +84,8 @@ void Engine::update(float deltaTime)
     game->onUpdate(deltaTime);
 }
 
-/*
- * For now lets seperate into SDL and ImGui structs
- * Then port to a more appropiate data structure
- *
- * What would be an appropiate name for SDL part of render. It is the game and scnee
- */
-
 void Engine::render()
 {
-    /*
-     * Testing, REMOVE!!!
-     */
-
     // 1. Render the game/scene first
     ImVec2 desired = ui_manager.viewport_size();
     game_renderer.resize(sdl_context.renderer(), (int)desired.x, (int)desired.y);

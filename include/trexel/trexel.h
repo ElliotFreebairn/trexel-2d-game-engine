@@ -9,6 +9,12 @@
 
 // C++ includes
 
+
+/*
+ * Temporaily house defined objects
+ */
+
+
 /*
  * Return a tReturnCode instead of void for critical functions
  */
@@ -21,8 +27,6 @@ public:
 
     std::vector<const IRenderable*> getRenderables() const override;
 
-    // temporary
-    void spawnPlayer(glm::vec2 pos);
 private:
     Player* player;
 };

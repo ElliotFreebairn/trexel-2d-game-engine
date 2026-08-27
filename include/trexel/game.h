@@ -11,14 +11,22 @@
 #include "game_object.h"
 
 // C++ includes
+#include <functional>
 #include <memory>
 #include <vector>
+#include <map>
 
 struct Entity
 {
     glm::vec2 position;
     glm::vec2 size;
     // Potential additons: sprite, text etc... especially for the renderer
+};
+
+enum class DEFINED_OBJECT
+{
+    BLOCK,
+    PLAYER
 };
 
 /*
@@ -38,7 +46,10 @@ public:
 
     bool isRunning() const { return mIsRunning; }
 
+    void addObject(GameObject* gameObject) { objects.push_back(gameObject); }
 protected:
+    std::vector<GameObject*> objects;
+
     bool mIsRunning = true;
 };
 #endif

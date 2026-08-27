@@ -5,7 +5,6 @@
 #include "game_object.h"
 
 // C++ includes
-
 class Player : public GameObject
 {
 public:

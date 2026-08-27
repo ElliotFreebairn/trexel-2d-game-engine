@@ -70,17 +70,14 @@ void UIManager::build(SDL_Texture* world_texture)
 
     if (ImGui::Button("Spawn Blocks"))
     {
-        state.tool_spawn_block_active = true;
     }
-    if (ImGui::Button("Disable block spawning"))
-    {
-        state.tool_spawn_block_active = false;
-    }
-    // Refactor ui state use
+
     if (ImGui::Button("Add Player"))
     {
-        state.tool_spawn_player_active = true;
+        UICommand cmd = {.type = UICommandType::Add_Player, .viewport_pos = {400, 400}};
+        queueCommand(cmd);
     }
+
     ImGui::End();
 
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
@@ -101,19 +98,10 @@ void UIManager::build(SDL_Texture* world_texture)
             mouse_pos.y - cursor_screen_pos.y
         };
 
-        // Add fnction that gets loacl viewport pos
+        // Add function that gets loacl viewport pos
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
-            if (state.tool_spawn_block_active)
-            {
 
-            }
-
-            if (state.tool_spawn_player_active)
-            {
-                state.pending_commands.push_back({UICommandType::Add_Player, local_viewport_pos});
-                printf("Player adding on\n");
-            }
         }
     }
     ImGui::End();
@@ -134,4 +122,9 @@ std::vector<UICommand> UIManager::flush_commands()
     std::vector<UICommand> commands = std::move(state.pending_commands);
     state.pending_commands.clear();
     return commands;
+}
+
+void UIManager::queueCommand(const UICommand& command)
+{
+    state.pending_commands.push_back(command);
 }

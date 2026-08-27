@@ -26,10 +26,10 @@ std::vector<const IRenderable*> Trexel::getRenderables() const
     {
         renderables.push_back(static_cast<IRenderable*>(player));
     }
-    return renderables;
-}
 
-void Trexel::spawnPlayer(glm::vec2 pos)
-{
-    player = new Player(pos, {50.0f, 50.0f}, "grass_block");
+    for(auto obj : objects)
+    {
+        renderables.push_back(static_cast<IRenderable*>(obj));
+    }
+    return renderables;
 }
