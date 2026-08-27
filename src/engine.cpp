@@ -5,6 +5,7 @@
 #include "texture_manager.h"
 #include "ui_manager.h"
 #include <SDL.h>
+#include <chrono>
 #include <ctime>
 
 Engine::Engine()
@@ -29,15 +30,21 @@ void Engine::run()
 {
     bool running = true;
     SDL_Event e;
+
+    auto lastFrame = std::chrono::high_resolution_clock::now();
     while(running)
     {
+        auto currentFrame = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         running = process_input(e);
         if (!running)
         {
             break;
         }
 
-        update();
+        update(deltaTime.count());
         render();
     }
 }
@@ -53,8 +60,9 @@ bool Engine::process_input(SDL_Event &e)
     return true;
 }
 
-void Engine::update()
+void Engine::update(float deltaTime)
 {
+    printf("deltaTime =  %f", deltaTime);
     auto commands = ui_manager.flush_commands();
 
     for (const auto& cmd : commands)
@@ -64,14 +72,11 @@ void Engine::update()
             case UICommandType::Spawn_Block:
                 break;
             case UICommandType::Add_Player:
-                // Temporary code for testing out functionality
-                Trexel* trexel = dynamic_cast<Trexel*>(game);
-                trexel->spawnPlayer(cmd.viewport_pos);
                 break;
         }
     }
 
-    game->onUpdate(0);
+    game->onUpdate(deltaTime);
 }
 
 /*

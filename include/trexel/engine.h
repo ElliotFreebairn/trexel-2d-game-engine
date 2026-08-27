@@ -13,6 +13,7 @@
 #include <SDL2/SDL.h>
 // C+=
 #include <stdio.h>
+#include <chrono>
 
 /*
  * Engine Responsibilities:
@@ -38,7 +39,7 @@ class Engine {
          * SDL & ImGui
          */
         bool process_input(SDL_Event &e); // process inputs (SDL Events & ImGui inputs)
-        void update(); // update the game state (Physics, Movement etc...)
+        void update(float deltaTime); // update the game state (Physics, Movement etc...)
         void render(); // render SDL graphics and ImGui overlay
         /*
          * Engine owns the SDL & UI contexts
