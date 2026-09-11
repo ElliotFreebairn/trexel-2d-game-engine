@@ -10,7 +10,6 @@ add_executable(trexel_exec
     game.cpp
     game_object.cpp
     texture_manager.cpp
-    trexel.cpp
     player.cpp
 )
 
@@ -22,3 +21,5 @@ target_link_libraries(trexel_exec PRIVATE glm::glm)
 
 # Include header files
 target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel)
+
+add_subdirectory(trexel)

@@ -78,7 +78,7 @@ void Engine::render()
 {
     // 1. Render the game/scene first
     ImVec2 desired = ui_manager.viewport_size();
-    game_renderer.resize(sdl_context.renderer(), (int)desired.x, (int)desired.y);
+    game_renderer.resize(sdl_context.renderer(), game, (int)desired.x, (int)desired.y);
     game_renderer.render(sdl_context.renderer(), game, texture_manager);
 
     // 2. Render the UI

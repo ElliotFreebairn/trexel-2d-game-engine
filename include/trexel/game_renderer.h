@@ -18,7 +18,7 @@ public:
     GameRenderer(const GameRenderer&) = delete;
     GameRenderer& operator=(const GameRenderer&) = delete;
 
-    void resize(SDL_Renderer* renderer, int width, int height);
+    void resize(SDL_Renderer* renderer, Game* game, int width, int height);
     void render(SDL_Renderer* renderer, Game* game, const TextureManager& textures); // draws the scene into world_texture_ptr
     SDL_Texture* texture() const { return world_texture_ptr; }
 private:

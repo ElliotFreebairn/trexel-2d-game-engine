@@ -36,6 +36,5 @@ private:
     void setup_host_window();
 
     ImVec2 viewport_size_ = ImVec2(800.0f, 600.0f);
-
 };
 #endif

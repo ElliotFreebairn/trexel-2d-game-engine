@@ -48,9 +48,19 @@ public:
     bool isRunning() const { return mIsRunning; }
 
     void addObject(GameObject* gameObject) { objects.push_back(gameObject); }
+
+    // getters
+    glm::vec2 getViewport() { return viewport; }
+
+    // setters
+    void setViewport(glm::vec2 viewport) { this->viewport = viewport; }
+
 protected:
     std::vector<GameObject*> objects;
 
     bool mIsRunning = true;
+
+private:
+    glm::vec2 viewport;
 };
 #endif

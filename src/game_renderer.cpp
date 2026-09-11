@@ -75,10 +75,13 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     SDL_SetRenderTarget(renderer, nullptr); // restore default target
 }
 
-void GameRenderer::resize(SDL_Renderer* renderer, int width, int height)
+void GameRenderer::resize(SDL_Renderer* renderer, Game* game, int width, int height)
 {
     if (width <= 0 || height <= 0) return;
     if(width == this->width && height == this->height) return;
+
+    game->setViewport({width, height});
+
     create_texture(renderer, width, height);
 }
 
