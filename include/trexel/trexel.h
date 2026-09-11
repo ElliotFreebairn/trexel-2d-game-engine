@@ -4,7 +4,7 @@
 // Custom includes
 #include "IRenderable.h"
 #include "game.h"
-#include "player.h"
+#include "game_actions.h"
 #include <vector>
 
 // C++ includes
@@ -25,9 +25,10 @@ public:
     void onUpdate(float deltaTime) override;
     void onShutdown() override;
 
+    void handleAction(const GameAction& action) override;
+
     std::vector<const IRenderable*> getRenderables() const override;
 
 private:
-    Player* player;
 };
 #endif

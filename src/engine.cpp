@@ -2,6 +2,7 @@
 #include "game_object.h"
 #include "player.h"
 #include "trexel.h"
+#include "game_actions.h"
 
 #include "imgui_impl_sdlrenderer2.h"
 #include "texture_manager.h"
@@ -67,18 +68,7 @@ void Engine::update(float deltaTime)
 
     for (const auto& cmd : commands)
     {
-        switch (cmd.type)
-        {
-            case UICommandType::Spawn_Block:
-                break;
-            case UICommandType::Add_Player:
-                /*
-                 * Make a game object factory that bridges the ui and creating objects for a game
-                 */
-                Player* player = new Player(glm::vec2(400.0f, 400.0f), glm::vec2(50.0f, 50.0f), "grass_block");
-                game->addObject(static_cast<GameObject*>(player));
-                break;
-        }
+        game->handleAction(cmd);
     }
 
     game->onUpdate(deltaTime);

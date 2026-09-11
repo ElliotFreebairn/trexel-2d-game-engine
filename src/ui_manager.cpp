@@ -74,7 +74,7 @@ void UIManager::build(SDL_Texture* world_texture)
 
     if (ImGui::Button("Add Player"))
     {
-        UICommand cmd = {.type = UICommandType::Add_Player, .viewport_pos = {400, 400}};
+        GameAction cmd = {.type = GameActionType::SpawnPlayer, .position = {400, 400}};
         queueCommand(cmd);
     }
 
@@ -117,14 +117,14 @@ void UIManager::draw(SDL_Renderer* renderer)
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
 }
 
-std::vector<UICommand> UIManager::flush_commands()
+std::vector<GameAction> UIManager::flush_commands()
 {
-    std::vector<UICommand> commands = std::move(state.pending_commands);
+    std::vector<GameAction> commands = std::move(state.pending_commands);
     state.pending_commands.clear();
     return commands;
 }
 
-void UIManager::queueCommand(const UICommand& command)
+void UIManager::queueCommand(const GameAction& command)
 {
     state.pending_commands.push_back(command);
 }

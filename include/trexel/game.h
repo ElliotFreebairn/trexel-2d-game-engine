@@ -9,12 +9,11 @@
 // Custom includes
 #include "common.h"
 #include "game_object.h"
+#include "game_actions.h"
 
 // C++ includes
-#include <functional>
-#include <memory>
 #include <vector>
-#include <map>
+
 
 struct Entity
 {
@@ -40,6 +39,8 @@ public:
     virtual void onInit() = 0;
     virtual void onUpdate(float deltaTime) = 0;
     virtual void onShutdown() = 0;
+
+    virtual void handleAction(const GameAction& action) = 0;
 
     // game bundles up the visual state of the world into a dumb data structure
     virtual std::vector<const IRenderable*> getRenderables() const = 0;

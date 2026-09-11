@@ -5,23 +5,7 @@
 #include "glm/glm.hpp"
 #include "imgui.h"
 
-// move later
-enum class UICommandType
-{
-    Spawn_Block,
-    Add_Player
-};
-
-struct UICommand
-{
-    UICommandType type;
-    glm::vec2 viewport_pos; // click relative to viewport (0, 0 to width, height)
-};
-
-struct UIState
-{
-    std::vector<UICommand> pending_commands;
-};
+#include "game_actions.h"
 
 class UIManager
 {
@@ -41,11 +25,13 @@ public:
 
     ImVec2 viewport_size() const { return viewport_size_; }
 
-    void queueCommand(const UICommand& command);
-    std::vector<UICommand> flush_commands();
+    void queueCommand(const GameAction& command);
+    std::vector<GameAction> flush_commands();
 
 private:
-    UIState state;
+    struct {
+        std::vector<GameAction> pending_commands;
+    } state;
 
     void setup_host_window();
 

@@ -29,10 +29,14 @@ public:
      */
     virtual void update() = 0;
 
+    // getters
     glm::vec2 getPosition() const override { return position; }
     glm::vec2 getSize() const override { return size; }
     std::string getTextureID() const override { return textureID; }
     std::optional<glm::vec3> getColour() const override { return colour; }
+
+    // setters
+    void setPosition(glm::vec2 position) { this->position = position; }
 
 protected:
     glm::vec2 position;
