@@ -74,8 +74,18 @@ void UIManager::build(SDL_Texture* world_texture)
 
     if (ImGui::Button("Add Player"))
     {
-        GameAction cmd = {.type = GameActionType::SpawnPlayer, .position = {400, 400}};
+        GameAction cmd = {.type = GameActionType::SpawnPlayer, .position = {50, 50}};
         queueCommand(cmd);
+    }
+
+    if (ImGui::Button("Enter Game Mode"))
+    {
+        turnOnGameMode();
+    }
+
+    if (ImGui::Button("Exit Game Mode"))
+    {
+        turnOffGameMode();
     }
 
     ImGui::End();

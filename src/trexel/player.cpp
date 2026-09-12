@@ -14,9 +14,10 @@ Player::Player() : GameObject()
 
 void Player::update()
 {
-    /*
-     * For now every frame, walk the player forward by one step
-     * This method will likely need a delta time
-     */
-    position.x += 1;
+
+}
+
+void Player::move(glm::vec2 delta)
+{
+    position += delta * 200.0f;
 }

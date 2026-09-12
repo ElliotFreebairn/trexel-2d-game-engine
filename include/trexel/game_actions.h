@@ -7,12 +7,14 @@ enum class GameActionType
 {
     SpawnPlayer,
     SpawnBlock,
+    MovePlayer
 };
 
 struct GameAction
 {
     GameActionType type;
     glm::vec2 position;
+    glm::vec2 direction;
 };
 
 #endif

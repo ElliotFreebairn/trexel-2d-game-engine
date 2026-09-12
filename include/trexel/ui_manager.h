@@ -28,6 +28,12 @@ public:
     void queueCommand(const GameAction& command);
     std::vector<GameAction> flush_commands();
 
+    bool getGameMode() { return gameMode; }
+
+    void turnOnGameMode() { gameMode = true; }
+    void turnOffGameMode() { gameMode = false; }
+    void switchGameMode() { gameMode = !gameMode; }
+
 private:
     struct {
         std::vector<GameAction> pending_commands;
@@ -36,5 +42,7 @@ private:
     void setup_host_window();
 
     ImVec2 viewport_size_ = ImVec2(800.0f, 600.0f);
+
+    bool gameMode = false;
 };
 #endif

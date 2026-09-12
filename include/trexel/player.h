@@ -11,6 +11,8 @@ public:
     Player(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour = std::nullopt);
     Player();
 
+    void move(glm::vec2 delta);
+
     virtual ~Player() = default;
 
     void update() override;

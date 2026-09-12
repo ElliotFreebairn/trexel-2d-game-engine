@@ -13,6 +13,7 @@
 
 // C++ includes
 #include <vector>
+#include <memory>
 
 
 struct Entity
@@ -39,15 +40,13 @@ public:
     virtual void onInit() = 0;
     virtual void onUpdate(float deltaTime) = 0;
     virtual void onShutdown() = 0;
-
     virtual void handleAction(const GameAction& action) = 0;
-
     // game bundles up the visual state of the world into a dumb data structure
-    virtual std::vector<const IRenderable*> getRenderables() const = 0;
+    virtual std::vector<const IRenderable*> getRenderables();
 
     bool isRunning() const { return mIsRunning; }
 
-    void addObject(GameObject* gameObject) { objects.push_back(gameObject); }
+    void addObject(std::unique_ptr<GameObject> gameObject) { objects.push_back(std::move(gameObject)); }
 
     // getters
     glm::vec2 getViewport() { return viewport; }
@@ -56,7 +55,7 @@ public:
     void setViewport(glm::vec2 viewport) { this->viewport = viewport; }
 
 protected:
-    std::vector<GameObject*> objects;
+    std::vector<std::unique_ptr<GameObject>> objects;
 
     bool mIsRunning = true;
 

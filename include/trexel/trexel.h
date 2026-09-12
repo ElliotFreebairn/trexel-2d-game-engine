@@ -5,6 +5,7 @@
 #include "IRenderable.h"
 #include "game.h"
 #include "game_actions.h"
+#include "player.h"
 #include <vector>
 
 // C++ includes
@@ -21,14 +22,19 @@
 class Trexel : public Game
 {
 public:
+    Trexel();
+
     void onInit() override;
     void onUpdate(float deltaTime) override;
     void onShutdown() override;
 
     void handleAction(const GameAction& action) override;
-
-    std::vector<const IRenderable*> getRenderables() const override;
-
 private:
+    Player* mPlayer = nullptr;
+
+
+    // HELPER FUNCTIONS (could be moved elsewhere)
+    void spawnPlayer();
+
 };
 #endif

@@ -8,6 +8,8 @@
 #include "texture_manager.h"
 #include "ui_manager.h"
 #include <SDL.h>
+#include <SDL_keyboard.h>
+#include <SDL_scancode.h>
 #include <chrono>
 #include <ctime>
 
@@ -18,6 +20,7 @@ Engine::Engine()
     , texture_manager()
 {
     texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
+    texture_manager.load(sdl_context.renderer(), "player", "assets/player.png");
 
     // Create trexel game
     Trexel* trexel_game = new Trexel();
@@ -71,7 +74,27 @@ void Engine::update(float deltaTime)
         game->handleAction(cmd);
     }
 
-    game->onUpdate(deltaTime);
+    /*
+     * CREATE AN GAME INPUT MANAGER THAT DEALS WITH THIS
+     */
+    if (ui_manager.getGameMode())
+    {
+        const Uint8* keys = SDL_GetKeyboardState(nullptr);
+        glm::vec2 dir{0.0f};
+
+        if (keys[SDL_SCANCODE_W]) dir.y -= 1.0f;
+        if (keys[SDL_SCANCODE_S]) dir.y += 1.0f;
+        if (keys[SDL_SCANCODE_A]) dir.x -= 1.0f;
+        if (keys[SDL_SCANCODE_D]) dir.x += 1.0f;
+
+        if (dir != glm::vec2{0.0f})
+        {
+            game->handleAction(GameAction{
+                .type = GameActionType::MovePlayer,
+                .direction = dir * deltaTime
+            });
+        }
+    }
 }
 
 void Engine::render()

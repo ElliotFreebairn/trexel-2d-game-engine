@@ -10,7 +10,6 @@ add_executable(trexel_exec
     game.cpp
     game_object.cpp
     texture_manager.cpp
-    player.cpp
 )
 
 # Link to actual SDL2 library
