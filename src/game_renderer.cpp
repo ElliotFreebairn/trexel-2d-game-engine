@@ -5,6 +5,7 @@
 #include <SDL_blendmode.h>
 #include <SDL_image.h>
 #include <SDL_pixels.h>
+#include <SDL_rect.h>
 #include <SDL_render.h>
 #include <SDL_stdinc.h>
 #include <SDL_surface.h>
@@ -63,8 +64,13 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
             SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 
             auto srcRectOpt = cmd->getSourceRect();
-            const SDL_Rect* srcRect = srcRectOpt ? &srcRectOpt.value() : nullptr;
-
+            SDL_Rect sdlSrc;
+            const SDL_Rect* srcRect = nullptr;
+            if (srcRectOpt)
+            {
+                sdlSrc = SDL_Rect {srcRectOpt->x, srcRectOpt->y, srcRectOpt->w, srcRectOpt->h};
+                srcRect = &sdlSrc;
+            }
             SDL_RenderCopy(renderer, tex, srcRect, &rect);
         }
         else

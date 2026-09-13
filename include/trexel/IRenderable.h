@@ -5,7 +5,7 @@
 #include <string>
 #include <optional>
 
-#include <SDL.h>
+#include "common.h"
 /*
  * TO:DO - set to const, also question returning by value?
  */
@@ -21,7 +21,7 @@ public:
     virtual std::optional<glm::vec3> getColour() const = 0;
 
     // nullopt = use the whole texture
-    virtual std::optional<SDL_Rect> getSourceRect() const { return std::nullopt; }
+    virtual std::optional<Rect> getSourceRect() const { return std::nullopt; }
 };
 
 #endif

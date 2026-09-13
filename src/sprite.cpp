@@ -2,11 +2,18 @@
 
 #include "iostream"
 
-Sprite::Sprite(int fw, int fh, int cols, int rows, float dur)
-: frameWidth(fw), frameHeight(fh), columns(cols), rows(rows), frameDuration(dur) {}
+Sprite::Sprite(std::string texId, int fw, int fh, int cols, int rows, float dur)
+: textureId(texId), frameWidth(fw), frameHeight(fh), columns(cols), rows(rows), frameDuration(dur) {}
 
 void Sprite::update(float deltaTime)
 {
+    if (!moving)
+    {
+        currentFrame = 0;
+        elapsed = 0.0f;
+        return;
+    }
+
     elapsed += deltaTime;
     if (elapsed >= frameDuration)
     {
@@ -15,9 +22,9 @@ void Sprite::update(float deltaTime)
     }
 }
 
-SDL_Rect Sprite::getSrcRect() const
+Rect Sprite::getSrcRect() const
 {
     int col = currentFrame % columns;
     int row = currentFrame / columns;
-    return SDL_Rect {col * frameWidth, row * frameHeight, frameWidth, frameHeight};
+    return Rect {col * frameWidth, row * frameHeight, frameWidth, frameHeight};
 }

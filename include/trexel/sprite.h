@@ -1,20 +1,30 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include <SDL2/SDL.h>
-#include <SDL_render.h>
+#include "common.h"
+
+#include <iostream>
+
+enum class Direction { UP, DOWN, LEFT, RIGHT };
 
 class Sprite
 {
 public:
-    Sprite(int frameWidth, int frameHeight, int columns, int rows, float frameDuration = 1.0f);
+    Sprite(std::string textureId, int frameWidth, int frameHeight, int columns, int rows, float frameDuration = 1.0f);
 
     void update(float deltaTime);
-    SDL_Rect getSrcRect() const;
+    void setDirection(Direction dir) { direction = dir; }
+    void setMoving(bool m) { moving = m; }
+    Rect getSrcRect() const;
+    std::string getTextureId() const { return textureId; }
 
     void setFrame(int frame) { currentFrame = frame % (columns * rows); }
 
 private:
+    Direction direction = Direction::DOWN;
+    bool moving = false;
+
+    std::string textureId;
     int frameWidth, frameHeight;
     int columns, rows;
     int currentFrame = 0;

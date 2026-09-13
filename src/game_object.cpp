@@ -1,4 +1,5 @@
 #include "game_object.h"
+#include "common.h"
 #include <optional>
 
 #include <SDL_image.h>
@@ -21,4 +22,14 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 
+}
+
+std::string GameObject::getTextureID() const
+{
+    return sprite ? sprite->getTextureId() : textureID;
+}
+
+std::optional<Rect> GameObject::getSourceRect() const
+{
+    return sprite ? std::optional(sprite->getSrcRect()) : std::nullopt;
 }

@@ -11,6 +11,7 @@
 // Custom includes
 #include "common.h"
 #include "IRenderable.h"
+#include "sprite.h"
 
 // C++ includes
 #include <optional>
@@ -32,17 +33,22 @@ public:
     // getters
     glm::vec2 getPosition() const override { return position; }
     glm::vec2 getSize() const override { return size; }
-    std::string getTextureID() const override { return textureID; }
+    std::string getTextureID() const override;
+    std::optional<Rect> getSourceRect() const override;
     std::optional<glm::vec3> getColour() const override { return colour; }
 
     // setters
     void setPosition(glm::vec2 position) { this->position = position; }
 
 protected:
+    std::optional<Sprite> sprite;
+
     glm::vec2 position;
     glm::vec2 size;
     std::string textureID;
     std::optional<glm::vec3> colour;
+
+    void updateSprite(float dt) { if (sprite) sprite->update(dt); }
 };
 
 #endif

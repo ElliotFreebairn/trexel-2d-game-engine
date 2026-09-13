@@ -25,4 +25,9 @@ typedef enum COLOUR
     BLACK
 } COLOUR;
 
+struct Rect
+{
+    int x, y, w, h;
+};
+
 #endif
