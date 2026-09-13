@@ -61,7 +61,11 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
         if (tex)
         {
             SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-            SDL_RenderCopy(renderer, tex, nullptr, &rect);
+
+            auto srcRectOpt = cmd->getSourceRect();
+            const SDL_Rect* srcRect = srcRectOpt ? &srcRectOpt.value() : nullptr;
+
+            SDL_RenderCopy(renderer, tex, srcRect, &rect);
         }
         else
         {

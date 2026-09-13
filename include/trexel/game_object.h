@@ -27,7 +27,7 @@ public:
     /*
      * update will be called every frame
      */
-    virtual void update() = 0;
+    virtual void update(float dt) = 0;
 
     // getters
     glm::vec2 getPosition() const override { return position; }

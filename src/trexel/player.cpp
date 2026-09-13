@@ -12,9 +12,9 @@ Player::Player() : GameObject()
 
 }
 
-void Player::update()
+void Player::update(float dt)
 {
-
+    sprite.update(dt);
 }
 
 void Player::move(glm::vec2 delta)

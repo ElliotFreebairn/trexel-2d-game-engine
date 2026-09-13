@@ -21,6 +21,7 @@ Engine::Engine()
 {
     texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
     texture_manager.load(sdl_context.renderer(), "player", "assets/player.png");
+    texture_manager.load(sdl_context.renderer(), "player_sheet", "assets/player_sheet.png");
 
     // Create trexel game
     Trexel* trexel_game = new Trexel();
@@ -79,6 +80,9 @@ void Engine::update(float deltaTime)
      */
     if (ui_manager.getGameMode())
     {
+        game->onUpdate(deltaTime);
+
+
         const Uint8* keys = SDL_GetKeyboardState(nullptr);
         glm::vec2 dir{0.0f};
 

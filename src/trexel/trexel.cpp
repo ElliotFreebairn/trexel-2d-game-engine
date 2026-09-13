@@ -25,6 +25,8 @@ void Trexel::onUpdate(float deltaTime)
     {
 
     }
+
+    mPlayer->update(deltaTime);
 }
 
 void Trexel::onShutdown()
