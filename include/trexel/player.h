@@ -22,5 +22,7 @@ public:
 
 private:
     bool isMoving = false;
+
+    float previousDirection = 0.0f;
 };
 #endif

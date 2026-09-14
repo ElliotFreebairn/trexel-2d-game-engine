@@ -27,6 +27,7 @@ private:
     std::string textureId;
     int frameWidth, frameHeight;
     int columns, rows;
+    int horizontalOffset = 0;
     int currentFrame = 0;
     float frameDuration;
     float elapsed = 0.0f;

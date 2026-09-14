@@ -36,9 +36,14 @@ public:
     std::string getTextureID() const override;
     std::optional<Rect> getSourceRect() const override;
     std::optional<glm::vec3> getColour() const override { return colour; }
+    double getAngle() const override { return angle; }
+    Flip getFlip() const override { return flip; }
+
 
     // setters
     void setPosition(glm::vec2 position) { this->position = position; }
+    void setAngle(double angle) { this->angle = angle; }
+    void setFlip(Flip flip) { this->flip = flip; }
 
 protected:
     std::optional<Sprite> sprite;
@@ -47,6 +52,8 @@ protected:
     glm::vec2 size;
     std::string textureID;
     std::optional<glm::vec3> colour;
+    double angle = 0.0;
+    Flip flip = Flip::NONE;
 
     void updateSprite(float dt) { if (sprite) sprite->update(dt); }
 };

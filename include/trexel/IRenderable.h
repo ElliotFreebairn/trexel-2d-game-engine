@@ -22,6 +22,11 @@ public:
 
     // nullopt = use the whole texture
     virtual std::optional<Rect> getSourceRect() const { return std::nullopt; }
+
+    virtual double getAngle() const = 0;
+    virtual Flip getFlip() const = 0;
+
+
 };
 
 #endif

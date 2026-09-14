@@ -1,5 +1,6 @@
 #include "game_renderer.h"
 #include "IRenderable.h"
+#include "common.h"
 #include "game.h"
 
 #include <SDL_blendmode.h>
@@ -71,7 +72,21 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
                 sdlSrc = SDL_Rect {srcRectOpt->x, srcRectOpt->y, srcRectOpt->w, srcRectOpt->h};
                 srcRect = &sdlSrc;
             }
-            SDL_RenderCopy(renderer, tex, srcRect, &rect);
+            SDL_RendererFlip sdlFlip = SDL_FLIP_NONE;
+            Flip f = cmd->getFlip();
+            switch (f)
+            {
+                case Flip::NONE:
+                    sdlFlip = SDL_FLIP_NONE;
+                    break;
+                case Flip::HORIZONTAL:
+                    sdlFlip = SDL_FLIP_HORIZONTAL;
+                    break;
+                case Flip::VERTICAL:
+                    sdlFlip = SDL_FLIP_VERTICAL;
+                    break;
+            }
+            SDL_RenderCopyEx(renderer, tex, srcRect, &rect, cmd->getAngle(), NULL, sdlFlip);
         }
         else
         {

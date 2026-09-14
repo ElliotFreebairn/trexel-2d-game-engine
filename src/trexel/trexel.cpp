@@ -58,7 +58,7 @@ void Trexel::spawnPlayer()
 
     player = std::make_unique<Player> (
         glm::vec2(50.0f, 50.0f),
-        glm::vec2(50.0f, 100.0f),
+        glm::vec2(128.0f, 128.0f),
         "player"
     );
 

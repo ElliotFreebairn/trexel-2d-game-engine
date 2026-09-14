@@ -30,4 +30,11 @@ struct Rect
     int x, y, w, h;
 };
 
+enum class Flip
+{
+    NONE,
+    HORIZONTAL,
+    VERTICAL
+};
+
 #endif

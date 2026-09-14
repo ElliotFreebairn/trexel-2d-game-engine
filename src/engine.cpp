@@ -22,6 +22,7 @@ Engine::Engine()
     texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
     texture_manager.load(sdl_context.renderer(), "player", "assets/player.png");
     texture_manager.load(sdl_context.renderer(), "player_sheet", "assets/player_sheet.png");
+    texture_manager.load(sdl_context.renderer(), "walking_player", "assets/vampire_walking.png");
 
     // Create trexel game
     Trexel* trexel_game = new Trexel();
