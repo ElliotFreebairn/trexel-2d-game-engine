@@ -15,6 +15,8 @@ public:
     Player();
 
     void move(glm::vec2 delta);
+    void jump();
+    void setupSprite();
 
     virtual ~Player() = default;
 
@@ -22,7 +24,10 @@ public:
 
 private:
     bool isMoving = false;
+    bool isJumping = false;
+    float jumpDuration = 0.6f;
+    float jumpElapsed = 0.0f;
 
-    float previousDirection = 0.0f;
+    void resolveAnimationState();
 };
 #endif

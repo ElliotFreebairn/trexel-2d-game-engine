@@ -7,7 +7,8 @@ enum class GameActionType
 {
     SpawnPlayer,
     SpawnBlock,
-    MovePlayer
+    MovePlayer,
+    Jump
 };
 
 struct GameAction

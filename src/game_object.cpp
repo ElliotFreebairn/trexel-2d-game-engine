@@ -26,7 +26,7 @@ GameObject::~GameObject()
 
 std::string GameObject::getTextureID() const
 {
-    return sprite ? sprite->getTextureId() : textureID;
+    return sprite ? sprite->getTextureID() : textureID;
 }
 
 std::optional<Rect> GameObject::getSourceRect() const

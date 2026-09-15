@@ -46,6 +46,9 @@ void Trexel::handleAction(const GameAction& action)
         case GameActionType::MovePlayer:
             if (mPlayer) mPlayer->move(action.direction);
             break;
+        case GameActionType::Jump:
+            if (mPlayer) mPlayer->jump();
+            break;
     }
 }
 

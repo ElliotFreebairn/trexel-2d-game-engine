@@ -1,30 +1,55 @@
 #include "sprite.h"
 
-#include "iostream"
+void Sprite::addAnimation(SpriteMovementState state, SpriteAnimation animation)
+{
+    animations[state] = std::move(animation);
+}
 
-Sprite::Sprite(std::string texId, int fw, int fh, int cols, int rows, float dur)
-: textureId(texId), frameWidth(fw), frameHeight(fh), columns(cols), rows(rows), frameDuration(dur) {}
+void Sprite::play(SpriteMovementState state)
+{
+    if (state == currentState) return;
+    if (animations.find(state) == animations.end()) return;
+    currentState = state;
+    currentFrame = 0;
+    elapsed = 0.0f;
+}
 
 void Sprite::update(float deltaTime)
 {
-    if (!moving)
-    {
-        currentFrame = 0;
-        elapsed = 0.0f;
-        return;
-    }
+    auto it = animations.find(currentState);
+    if (it == animations.end()) return;
+    const SpriteAnimation& animation = it->second;
 
     elapsed += deltaTime;
-    if (elapsed >= frameDuration)
+    if (elapsed >= animation.frameDuration)
     {
-        elapsed -= frameDuration;
-        currentFrame = (currentFrame + 1) % (columns * rows);
+        elapsed -= animation.frameDuration;
+        currentFrame = (currentFrame + 1) % animation.columns;
     }
+}
+
+std::string Sprite::getTextureID() const
+{
+    auto it = animations.find(currentState);
+    return it != animations.end() ? it->second.textureID : "";
+}
+
+int Sprite::currentRow(const SpriteAnimation &animation) const
+{
+    if (animation.rows <= 1) return 0;
+    return static_cast<int>(direction) % animation.rows;
 }
 
 Rect Sprite::getSrcRect() const
 {
-    int col = currentFrame % columns;
-    int row = currentFrame / columns;
-    return Rect {col * frameWidth, row * frameHeight, frameWidth, frameHeight};
+    auto it = animations.find(currentState);
+    if (it == animations.end()) return Rect{0, 0, 0, 0};
+
+    const SpriteAnimation& animation = it->second;
+    return Rect{
+        currentFrame * animation.frameWidth,
+        currentRow(animation) * animation.frameHeight,
+        animation.frameWidth,
+        animation.frameHeight
+    };
 }

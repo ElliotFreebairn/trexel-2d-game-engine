@@ -13,16 +13,21 @@
 #include <chrono>
 #include <ctime>
 
+static bool jumpKeyWasDown = false;
+
 Engine::Engine()
     : sdl_context("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
     , game_renderer(sdl_context.renderer(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
     , ui_manager(sdl_context.window(), sdl_context.renderer())
     , texture_manager()
 {
+    // Really need a game asset manager
     texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
     texture_manager.load(sdl_context.renderer(), "player", "assets/player.png");
     texture_manager.load(sdl_context.renderer(), "player_sheet", "assets/player_sheet.png");
+    texture_manager.load(sdl_context.renderer(), "idle_player", "assets/Idle.png");
     texture_manager.load(sdl_context.renderer(), "walking_player", "assets/vampire_walking.png");
+    texture_manager.load(sdl_context.renderer(), "jumping_player", "assets/Jump.png");
 
     // Create trexel game
     Trexel* trexel_game = new Trexel();
@@ -86,6 +91,7 @@ void Engine::update(float deltaTime)
 
         const Uint8* keys = SDL_GetKeyboardState(nullptr);
         glm::vec2 dir{0.0f};
+        bool jumping = false;
 
         if (keys[SDL_SCANCODE_W]) dir.y -= 1.0f;
         if (keys[SDL_SCANCODE_S]) dir.y += 1.0f;
@@ -98,6 +104,12 @@ void Engine::update(float deltaTime)
                 .type = GameActionType::MovePlayer,
                 .direction = dir * deltaTime
             });
+        }
+
+        bool jumpKeyIsDown = keys[SDL_SCANCODE_SPACE];
+        if (jumpKeyIsDown && !jumpKeyWasDown)
+        {
+            game->handleAction(GameAction{.type = GameActionType::Jump});
         }
     }
 }

@@ -4,32 +4,53 @@
 #include "common.h"
 
 #include <iostream>
+#include <unordered_map>
 
 enum class Direction { UP, DOWN, LEFT, RIGHT };
+
+enum class SpriteMovementState
+{
+    IDLE,
+    WALKING,
+    RUNNING,
+    JUMPING
+};
+
+struct SpriteAnimation
+{
+    std::string textureID;
+    int frameWidth;
+    int frameHeight;
+    int columns;
+    int rows = 1;
+    float frameDuration = 0.15f;
+};
 
 class Sprite
 {
 public:
-    Sprite(std::string textureId, int frameWidth, int frameHeight, int columns, int rows, float frameDuration = 1.0f);
+    Sprite() = default;
+
+    void addAnimation(SpriteMovementState state, SpriteAnimation animation);
 
     void update(float deltaTime);
     void setDirection(Direction dir) { direction = dir; }
-    void setMoving(bool m) { moving = m; }
-    Rect getSrcRect() const;
-    std::string getTextureId() const { return textureId; }
 
-    void setFrame(int frame) { currentFrame = frame % (columns * rows); }
+    // Single entry point
+    void play(SpriteMovementState state);
+
+    std::string getTextureID() const;
+    Rect getSrcRect() const;
 
 private:
-    Direction direction = Direction::DOWN;
-    bool moving = false;
+    std::unordered_map<SpriteMovementState, SpriteAnimation> animations;
+    SpriteMovementState currentState = SpriteMovementState::IDLE;
 
-    std::string textureId;
-    int frameWidth, frameHeight;
-    int columns, rows;
-    int horizontalOffset = 0;
+    Direction direction = Direction::DOWN;
+
     int currentFrame = 0;
-    float frameDuration;
     float elapsed = 0.0f;
+
+    int currentRow(const SpriteAnimation& animation) const;
 };
 #endif
