@@ -25,21 +25,13 @@ class Trexel : public Game
 {
 public:
     Trexel();
+    ~Trexel();
 
     void onInit() override;
-    void onUpdate(float deltaTime) override;
     void onShutdown() override;
 
     void handleAction(const GameAction& action) override;
 private:
     Player* mPlayer = nullptr;
-
-    std::vector<std::unique_ptr<SceneObject>> sceneObjects;
-
-
-    // HELPER FUNCTIONS (could be moved elsewhere)
-    void spawnPlayer();
-    void createScene();
-
 };
 #endif

@@ -2,4 +2,5 @@ target_sources(trexel_exec PRIVATE
     trexel.cpp
     player.cpp
     scene_object.cpp
+    main_scene.cpp
 )

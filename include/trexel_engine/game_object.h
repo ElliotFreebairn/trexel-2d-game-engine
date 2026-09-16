@@ -38,12 +38,16 @@ public:
     std::optional<glm::vec3> getColour() const override { return colour; }
     double getAngle() const override { return angle; }
     Flip getFlip() const override { return flip; }
+    bool getIsVisible() const { return isVisible; }
+    bool getIsActive() const { return isActive; }
 
 
     // setters
     void setPosition(glm::vec2 position) { this->position = position; }
     void setAngle(double angle) { this->angle = angle; }
     void setFlip(Flip flip) { this->flip = flip; }
+    void setIsVisible(bool visible) { isVisible = visible; }
+    void setIsActive(bool active) { isActive = active; }
 
 protected:
     std::optional<Sprite> sprite;
@@ -54,6 +58,9 @@ protected:
     std::optional<glm::vec3> colour;
     double angle = 0.0;
     Flip flip = Flip::NONE;
+
+    bool isVisible = true;
+    bool isActive = true;
 
     void updateSprite(float dt) { if (sprite) sprite->update(dt); }
 };

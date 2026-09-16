@@ -2,6 +2,7 @@
 #include "IRenderable.h"
 #include "game_actions.h"
 #include "game_object.h"
+#include "main_scene.h"
 #include "player.h"
 #include "scene_object.h"
 #include <memory>
@@ -12,23 +13,16 @@ Trexel::Trexel()
     onInit();
 }
 
-void Trexel::onInit()
+Trexel::~Trexel()
 {
-    /*
-     * Create a player
-     */
-    createScene();
-    spawnPlayer();
 }
 
-void Trexel::onUpdate(float deltaTime)
+void Trexel::onInit()
 {
-    for (auto& object : objects)
-    {
+    sceneManager.registerScene("main", [] { return std::make_unique<MainScene>(); });
+    sceneManager.switchTo("main");
 
-    }
-
-    mPlayer->update(deltaTime);
+    mPlayer = static_cast<MainScene*>(sceneManager.current())->getPlayer();
 }
 
 void Trexel::onShutdown()
@@ -52,34 +46,4 @@ void Trexel::handleAction(const GameAction& action)
             if (mPlayer) mPlayer->jump();
             break;
     }
-}
-
-/*
- * HELPER FUNCTIONS
- */
-void Trexel::spawnPlayer()
-{
-    std::unique_ptr<Player> player;
-
-    player = std::make_unique<Player> (
-        glm::vec2(50.0f, 50.0f),
-        glm::vec2(128.0f, 128.0f),
-        "player"
-    );
-
-    mPlayer = player.get();
-    addObject(std::move(player));
-}
-
-void Trexel::createScene()
-{
-    std::unique_ptr<SceneObject> sceneObject1;
-
-    sceneObject1 = std::make_unique<SceneObject> (
-        glm::vec2(500.0f, 500.0f),
-        glm::vec2(50.0f, 50.0f),
-        "grass_block"
-    );
-
-    addObject(std::move(sceneObject1));
 }

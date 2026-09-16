@@ -1,0 +1,47 @@
+#pragma once
+
+#include "IRenderable.h"
+#include "game_actions.h"
+#include "game_object.h"
+#include "scene_object.h"
+#include <vector>
+#include <string>
+#include <memory>
+
+class Scene
+{
+public:
+    explicit Scene(std::string name) : mName(std::move(name)) {};
+    virtual ~Scene() = default;
+
+    virtual void onEnter() {};
+    virtual void onExit() {};
+    virtual void onPause() {};
+    virtual void onResume() {};
+
+    virtual void update(float dt);
+
+    virtual void handleAction(const GameAction& action) {};
+
+    std::vector<const IRenderable*> getRenderables() const;
+
+    template <typename T, typename... Args>
+    T& createObject(Args&&... args) // Args&&... forwarding references
+    {
+        static_assert(std::is_base_of_v<GameObject, T>, "T must derive from game object");
+        auto obj = std::make_unique<T>(std::forward<Args>(args)...);
+        T& ref = *obj;
+        mObjects.push_back(std::move(obj));
+        return ref;
+    }
+
+    const std::string& getName() const { return mName; }
+
+protected:
+    std::vector<std::unique_ptr<GameObject>> mObjects;
+
+private:
+    std::string mName;
+
+    void pruneInactive();
+};
