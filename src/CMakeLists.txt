@@ -20,6 +20,7 @@ target_link_libraries(trexel_exec PRIVATE imgui)
 target_link_libraries(trexel_exec PRIVATE glm::glm)
 
 # Include header files
-target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel)
+target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel_engine)
+target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel_engine/trexel)
 
 add_subdirectory(trexel)

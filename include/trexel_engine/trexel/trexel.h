@@ -6,6 +6,8 @@
 #include "game.h"
 #include "game_actions.h"
 #include "player.h"
+#include "scene_object.h"
+#include <memory>
 #include <vector>
 
 // C++ includes
@@ -32,9 +34,12 @@ public:
 private:
     Player* mPlayer = nullptr;
 
+    std::vector<std::unique_ptr<SceneObject>> sceneObjects;
+
 
     // HELPER FUNCTIONS (could be moved elsewhere)
     void spawnPlayer();
+    void createScene();
 
 };
 #endif

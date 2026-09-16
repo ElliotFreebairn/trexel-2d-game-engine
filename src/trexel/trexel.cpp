@@ -3,6 +3,7 @@
 #include "game_actions.h"
 #include "game_object.h"
 #include "player.h"
+#include "scene_object.h"
 #include <memory>
 #include <vector>
 
@@ -16,6 +17,7 @@ void Trexel::onInit()
     /*
      * Create a player
      */
+    createScene();
     spawnPlayer();
 }
 
@@ -67,4 +69,17 @@ void Trexel::spawnPlayer()
 
     mPlayer = player.get();
     addObject(std::move(player));
+}
+
+void Trexel::createScene()
+{
+    std::unique_ptr<SceneObject> sceneObject1;
+
+    sceneObject1 = std::make_unique<SceneObject> (
+        glm::vec2(500.0f, 500.0f),
+        glm::vec2(50.0f, 50.0f),
+        "grass_block"
+    );
+
+    addObject(std::move(sceneObject1));
 }
