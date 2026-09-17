@@ -8,23 +8,18 @@
 
 // SDL
 #include <SDL2/SDL.h>
+#include <random>
 
 // C++
 
 class Engine {
     public:
-        static Engine& getInstance() {
-            static Engine engine;
-            return engine;
-        }
+        explicit Engine(std::unique_ptr<Game> game);
+        ~Engine() = default;
 
         void run();
-        void registerGame(Game* aGameClass);
 
     private:
-        Engine();
-        ~Engine();
-
         /*
          * SDL & ImGui
          */
@@ -38,9 +33,7 @@ class Engine {
         GameRenderer m_gameRenderer;
         UIManager m_uiManager;
         TextureManager m_textureManager;
-
-        // Should this live here?
-        Game* m_game;
+        std::unique_ptr<Game> m_game;
 
         static constexpr int SCREEN_WIDTH = 1280;
         static constexpr int SCREEN_HEIGHT = 720;

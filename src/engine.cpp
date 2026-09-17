@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "asset.h"
 #include "game_object.h"
 #include "player.h"
 #include "trexel.h"
@@ -15,11 +16,12 @@
 
 static bool jumpKeyWasDown = false;
 
-Engine::Engine()
+Engine::Engine(std::unique_ptr<Game> game)
     : m_sdlContext("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
     , m_gameRenderer(m_sdlContext.renderer(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
     , m_uiManager(m_sdlContext.window(), m_sdlContext.renderer())
     , m_textureManager()
+    , m_game(std::move(game))
 {
     // Really need a game asset manager
     m_textureManager.load(m_sdlContext.renderer(), "grass_block", "assets/tblock.png");
@@ -29,13 +31,15 @@ Engine::Engine()
     m_textureManager.load(m_sdlContext.renderer(), "walking_player", "assets/vampire_walking.png");
     m_textureManager.load(m_sdlContext.renderer(), "jumping_player", "assets/Jump.png");
 
-    // Create trexel game
-    Trexel* trexel_game = new Trexel();
-    registerGame(static_cast<Game*>(trexel_game));
-}
+    m_game->init();
 
-Engine::~Engine()
-{
+    for (const Asset& asset : m_game->getAssetManager().getAssets())
+    {
+        if (asset.type == AssetType::Texture)
+        {
+            m_textureManager.load(m_sdlContext.renderer(), asset.id, asset.filePath);
+        }
+    }
 }
 
 void Engine::run()
@@ -117,8 +121,8 @@ void Engine::render()
 {
     // 1. Render the game/scene first
     ImVec2 desired = m_uiManager.viewport_size();
-    m_gameRenderer.resize(m_sdlContext.renderer(), m_game, (int)desired.x, (int)desired.y);
-    m_gameRenderer.render(m_sdlContext.renderer(), m_game, m_textureManager);
+    m_gameRenderer.resize(m_sdlContext.renderer(), m_game.get(), (int)desired.x, (int)desired.y);
+    m_gameRenderer.render(m_sdlContext.renderer(), m_game.get(), m_textureManager);
 
     // 2. Render the UI
     m_uiManager.begin_frame();
@@ -130,9 +134,4 @@ void Engine::render()
     SDL_RenderClear(m_sdlContext.renderer());
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), m_sdlContext.renderer());
     SDL_RenderPresent(m_sdlContext.renderer());
-}
-
-void Engine::registerGame(Game* aGameClass)
-{
-    m_game = aGameClass;
 }
