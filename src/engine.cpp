@@ -16,18 +16,18 @@
 static bool jumpKeyWasDown = false;
 
 Engine::Engine()
-    : sdl_context("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
-    , game_renderer(sdl_context.renderer(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
-    , ui_manager(sdl_context.window(), sdl_context.renderer())
-    , texture_manager()
+    : m_sdlContext("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
+    , m_gameRenderer(m_sdlContext.renderer(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
+    , m_uiManager(m_sdlContext.window(), m_sdlContext.renderer())
+    , m_textureManager()
 {
     // Really need a game asset manager
-    texture_manager.load(sdl_context.renderer(), "grass_block", "assets/tblock.png");
-    texture_manager.load(sdl_context.renderer(), "player", "assets/player.png");
-    texture_manager.load(sdl_context.renderer(), "player_sheet", "assets/player_sheet.png");
-    texture_manager.load(sdl_context.renderer(), "idle_player", "assets/Idle.png");
-    texture_manager.load(sdl_context.renderer(), "walking_player", "assets/vampire_walking.png");
-    texture_manager.load(sdl_context.renderer(), "jumping_player", "assets/Jump.png");
+    m_textureManager.load(m_sdlContext.renderer(), "grass_block", "assets/tblock.png");
+    m_textureManager.load(m_sdlContext.renderer(), "player", "assets/player.png");
+    m_textureManager.load(m_sdlContext.renderer(), "player_sheet", "assets/player_sheet.png");
+    m_textureManager.load(m_sdlContext.renderer(), "idle_player", "assets/Idle.png");
+    m_textureManager.load(m_sdlContext.renderer(), "walking_player", "assets/vampire_walking.png");
+    m_textureManager.load(m_sdlContext.renderer(), "jumping_player", "assets/Jump.png");
 
     // Create trexel game
     Trexel* trexel_game = new Trexel();
@@ -65,7 +65,7 @@ bool Engine::process_input(SDL_Event &e)
 {
     while (SDL_PollEvent(&e))
     {
-        ui_manager.process_event(e);
+        m_uiManager.process_event(e);
         if (e.type == SDL_QUIT)
             return false;
     }
@@ -74,20 +74,19 @@ bool Engine::process_input(SDL_Event &e)
 
 void Engine::update(float deltaTime)
 {
-    auto commands = ui_manager.flush_commands();
+    auto commands = m_uiManager.flush_commands();
 
     for (const auto& cmd : commands)
     {
-        game->handleAction(cmd);
+        m_game->handleAction(cmd);
     }
 
     /*
      * CREATE AN GAME INPUT MANAGER THAT DEALS WITH THIS
      */
-    if (ui_manager.getGameMode())
+    if (m_uiManager.getGameMode())
     {
-        game->onUpdate(deltaTime);
-
+        m_game->onUpdate(deltaTime);
 
         const Uint8* keys = SDL_GetKeyboardState(nullptr);
         glm::vec2 dir{0.0f};
@@ -100,7 +99,7 @@ void Engine::update(float deltaTime)
 
         if (dir != glm::vec2{0.0f})
         {
-            game->handleAction(GameAction{
+            m_game->handleAction(GameAction{
                 .type = GameActionType::MovePlayer,
                 .direction = dir * deltaTime
             });
@@ -109,7 +108,7 @@ void Engine::update(float deltaTime)
         bool jumpKeyIsDown = keys[SDL_SCANCODE_SPACE];
         if (jumpKeyIsDown && !jumpKeyWasDown)
         {
-            game->handleAction(GameAction{.type = GameActionType::Jump});
+            m_game->handleAction(GameAction{.type = GameActionType::Jump});
         }
     }
 }
@@ -117,23 +116,23 @@ void Engine::update(float deltaTime)
 void Engine::render()
 {
     // 1. Render the game/scene first
-    ImVec2 desired = ui_manager.viewport_size();
-    game_renderer.resize(sdl_context.renderer(), game, (int)desired.x, (int)desired.y);
-    game_renderer.render(sdl_context.renderer(), game, texture_manager);
+    ImVec2 desired = m_uiManager.viewport_size();
+    m_gameRenderer.resize(m_sdlContext.renderer(), m_game, (int)desired.x, (int)desired.y);
+    m_gameRenderer.render(m_sdlContext.renderer(), m_game, m_textureManager);
 
     // 2. Render the UI
-    ui_manager.begin_frame();
-    ui_manager.build(game_renderer.texture());
-    ui_manager.render();
+    m_uiManager.begin_frame();
+    m_uiManager.build(m_gameRenderer.texture());
+    m_uiManager.render();
 
     // 3. Render the composite frame
-    SDL_SetRenderDrawColor(sdl_context.renderer(), 30, 30, 30, 255);
-    SDL_RenderClear(sdl_context.renderer());
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), sdl_context.renderer());
-    SDL_RenderPresent(sdl_context.renderer());
+    SDL_SetRenderDrawColor(m_sdlContext.renderer(), 30, 30, 30, 255);
+    SDL_RenderClear(m_sdlContext.renderer());
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), m_sdlContext.renderer());
+    SDL_RenderPresent(m_sdlContext.renderer());
 }
 
 void Engine::registerGame(Game* aGameClass)
 {
-    game = aGameClass;
+    m_game = aGameClass;
 }

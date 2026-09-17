@@ -1,10 +1,9 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#pragma once
 
 #include "common.h"
 
-#include <iostream>
 #include <unordered_map>
+#include <string>
 
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -33,8 +32,8 @@ public:
 
     void addAnimation(SpriteMovementState state, SpriteAnimation animation);
 
-    void update(float deltaTime);
-    void setDirection(Direction dir) { direction = dir; }
+    void update(float dt);
+    void setDirection(Direction dir) { m_direction = dir; }
 
     // Single entry point
     void play(SpriteMovementState state);
@@ -43,14 +42,13 @@ public:
     Rect getSrcRect() const;
 
 private:
-    std::unordered_map<SpriteMovementState, SpriteAnimation> animations;
-    SpriteMovementState currentState = SpriteMovementState::IDLE;
+    std::unordered_map<SpriteMovementState, SpriteAnimation> m_animations;
+    SpriteMovementState m_currentState = SpriteMovementState::IDLE;
 
-    Direction direction = Direction::DOWN;
+    Direction m_direction = Direction::DOWN;
 
-    int currentFrame = 0;
-    float elapsed = 0.0f;
+    int m_currentFrame = 0;
+    float m_elapsed = 0.0f;
 
     int currentRow(const SpriteAnimation& animation) const;
 };
-#endif

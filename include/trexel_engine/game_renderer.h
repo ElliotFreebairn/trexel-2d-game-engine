@@ -1,5 +1,4 @@
-#ifndef GAME_RENDERER_H
-#define GAME_RENDERER_H
+#pragma once
 
 // Custom includes
 #include "game.h"
@@ -20,13 +19,11 @@ public:
 
     void resize(SDL_Renderer* renderer, Game* game, int width, int height);
     void render(SDL_Renderer* renderer, Game* game, const TextureManager& textures); // draws the scene into world_texture_ptr
-    SDL_Texture* texture() const { return world_texture_ptr; }
+    SDL_Texture* texture() const { return m_worldTexturePtr; }
 private:
     void create_texture(SDL_Renderer* renderer, int width, int height);
 
-    SDL_Texture* world_texture_ptr = nullptr;
-    int width = 0;
-    int height = 0;
+    SDL_Texture* m_worldTexturePtr = nullptr;
+    int m_width = 0;
+    int m_height = 0;
 };
-
-#endif

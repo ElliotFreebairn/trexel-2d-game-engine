@@ -1,5 +1,4 @@
-#ifndef SDL_CONTEXT_H
-#define SDL_CONTEXT_H
+#pragma once
 
 // SDL Includes
 #include <SDL.h>
@@ -16,14 +15,12 @@ class SdlContext
         SdlContext(const char* title, int width, int height);
         ~SdlContext();
 
-        SDL_Window*   window()   { return window_ptr; }
-        SDL_Renderer* renderer() { return renderer_ptr; }
+        SDL_Window*   window()   { return m_windowPtr; }
+        SDL_Renderer* renderer() { return m_rendererPtr; }
 
     private:
         bool initialise();
 
-        SDL_Window* window_ptr;
-        SDL_Renderer* renderer_ptr;
+        SDL_Window* m_windowPtr;
+        SDL_Renderer* m_rendererPtr;
 };
-
-#endif

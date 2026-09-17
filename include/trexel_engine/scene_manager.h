@@ -13,7 +13,7 @@ public:
 
     void registerScene(std::string id, Factory factory)
     {
-        mFactories[std::move(id)] = std::move(factory);
+        m_factories[std::move(id)] = std::move(factory);
     }
 
     // Tear down everything, we need to load one scene at a time
@@ -28,11 +28,11 @@ public:
 
     std::vector<const IRenderable*> getRenderables() const;
 
-    Scene* current() const { return mStack.empty() ? nullptr : mStack.back().get(); }
+    Scene* current() const { return m_stack.empty() ? nullptr : m_stack.back().get(); }
 
 private:
     void pushInternal(const std::string& id);
 
-    std::unordered_map<std::string, Factory> mFactories;
-    std::vector<std::unique_ptr<Scene>> mStack;
+    std::unordered_map<std::string, Factory> m_factories;
+    std::vector<std::unique_ptr<Scene>> m_stack;
 };

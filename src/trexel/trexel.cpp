@@ -19,10 +19,10 @@ Trexel::~Trexel()
 
 void Trexel::onInit()
 {
-    sceneManager.registerScene("main", [] { return std::make_unique<MainScene>(); });
-    sceneManager.switchTo("main");
+    m_sceneManager.registerScene("main", [] { return std::make_unique<MainScene>(); });
+    m_sceneManager.switchTo("main");
 
-    mPlayer = static_cast<MainScene*>(sceneManager.current())->getPlayer();
+    mPlayer = static_cast<MainScene*>(m_sceneManager.current())->getPlayer();
 }
 
 void Trexel::onShutdown()

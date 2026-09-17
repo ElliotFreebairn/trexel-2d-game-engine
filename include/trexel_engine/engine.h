@@ -1,5 +1,4 @@
-#ifndef ENGINE_H
-#define ENGINE_H
+#pragma once
 
 // Custom includes
 #include "sdl_context.h"
@@ -7,19 +6,11 @@
 #include "texture_manager.h"
 #include "ui_manager.h"
 
-// ImGui
-#include "imgui.h"
 // SDL
 #include <SDL2/SDL.h>
-// C+=
-#include <stdio.h>
-#include <chrono>
 
-/*
- * Engine Responsibilities:
- *
- */
-// Singelton
+// C++
+
 class Engine {
     public:
         static Engine& getInstance() {
@@ -28,7 +19,6 @@ class Engine {
         }
 
         void run();
-
         void registerGame(Game* aGameClass);
 
     private:
@@ -44,17 +34,16 @@ class Engine {
         /*
          * Engine owns the SDL & UI contexts
          */
-        SdlContext sdl_context;
-        GameRenderer game_renderer;
-        UIManager ui_manager;
-        TextureManager texture_manager;
+        SdlContext m_sdlContext;
+        GameRenderer m_gameRenderer;
+        UIManager m_uiManager;
+        TextureManager m_textureManager;
 
         // Should this live here?
-        Game* game;
+        Game* m_game;
 
         static constexpr int SCREEN_WIDTH = 1280;
         static constexpr int SCREEN_HEIGHT = 720;
         static constexpr int VIEWPORT_WIDTH = 800;
         static constexpr int VIEWPORT_HEIGHT = 600;
 };
-#endif

@@ -1,5 +1,4 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
 #include <cstdint>
 
@@ -36,5 +35,3 @@ enum class Flip
     HORIZONTAL,
     VERTICAL
 };
-
-#endif

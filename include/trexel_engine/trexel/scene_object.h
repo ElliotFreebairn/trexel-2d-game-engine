@@ -1,8 +1,10 @@
-#ifndef SCENE_OBJECT_H
-#define SCENE_OBJECT_H
+#pragma once
 
-#include "../game_object.h"
+// Custom includes
+#include "game_object.h"
 #include "behaviour.h"
+
+// C++ includes
 #include <memory>
 #include <vector>
 
@@ -13,12 +15,9 @@ public:
     SceneObject();
     ~SceneObject() = default;
 
-    void update(float deltaTime) override;
+    void update(float dt) override;
 
-    void addBehaviour(std::unique_ptr<IBehaviour> b) { mBehaviours.push_back(std::move(b)); }
-
+    void addBehaviour(std::unique_ptr<IBehaviour> b) { m_behaviours.push_back(std::move(b)); }
 private:
-    std::vector<std::unique_ptr<IBehaviour>> mBehaviours;
+    std::vector<std::unique_ptr<IBehaviour>> m_behaviours;
 };
-
-#endif

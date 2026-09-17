@@ -1,5 +1,4 @@
-#ifndef TEXTURE_MANAGER_H
-#define TEXTURE_MANAGER_H
+#pragma once
 
 // Library includes
 #include <SDL.h>
@@ -17,7 +16,7 @@ class TextureManager
     public:
         ~TextureManager()
         {
-            for (auto& [id, tex] : textures)
+            for (auto& [id, tex] : m_textures)
             {
                 SDL_DestroyTexture(tex);
             }
@@ -31,17 +30,16 @@ class TextureManager
             SDL_Texture* tex = IMG_LoadTexture(renderer, filePath.c_str());
             if (tex)
             {
-                textures[id] = tex;
+                m_textures[id] = tex;
             }
         }
 
         SDL_Texture* get(const std::string& id) const
         {
-            auto it = textures.find(id);
-            return (it != textures.end()) ? it->second : nullptr;
+            auto it = m_textures.find(id);
+            return (it != m_textures.end()) ? it->second : nullptr;
         }
 
     private:
-        std::unordered_map<std::string, SDL_Texture*> textures;
+        std::unordered_map<std::string, SDL_Texture*> m_textures;
 };
-#endif

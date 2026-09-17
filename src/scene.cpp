@@ -1,13 +1,12 @@
 #include "scene.h"
 #include "game_object.h"
-#include "trexel/scene_object.h"
 #include <vector>
 
 void Scene::update(float dt)
 {
-    for (auto& obj : mObjects)
+    for (auto& obj : m_objects)
     {
-        if (obj->getIsActive())
+        if (obj->isActive())
         {
             obj->update(dt);
         }
@@ -19,11 +18,11 @@ void Scene::update(float dt)
 std::vector<const IRenderable*> Scene::getRenderables() const
 {
     std::vector<const IRenderable*> out;
-    out.reserve(mObjects.size());
+    out.reserve(m_objects.size());
 
-    for (auto& obj : mObjects)
+    for (auto& obj : m_objects)
     {
-        if (obj->getIsVisible())
+        if (obj->isVisible())
         {
             out.push_back(obj.get());
         }
@@ -33,7 +32,7 @@ std::vector<const IRenderable*> Scene::getRenderables() const
 
 void Scene::pruneInactive()
 {
-    mObjects.erase(
-        std::remove_if(mObjects.begin(), mObjects.end(), [](const auto& o) { return !o->getIsActive(); }),
-        mObjects.end());
+    m_objects.erase(
+        std::remove_if(m_objects.begin(), m_objects.end(), [](const auto& o) { return !o->isActive(); }),
+        m_objects.end());
 }

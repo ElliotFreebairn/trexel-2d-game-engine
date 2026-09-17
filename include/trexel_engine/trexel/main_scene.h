@@ -10,8 +10,8 @@ public:
 
     void onEnter() override;
 
-    Player* getPlayer() const { return mPlayer; }
-
+    // getters
+    Player* getPlayer() const { return m_player; }
 private:
-    Player* mPlayer = nullptr;
+    Player* m_player = nullptr;
 };

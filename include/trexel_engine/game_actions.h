@@ -1,5 +1,4 @@
-#ifndef GAME_ACTION_H
-#define GAME_ACTION_H
+#pragma once
 
 #include <glm/glm.hpp>
 
@@ -17,5 +16,3 @@ struct GameAction
     glm::vec2 position;
     glm::vec2 direction;
 };
-
-#endif

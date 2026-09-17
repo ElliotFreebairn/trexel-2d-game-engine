@@ -1,5 +1,4 @@
-#ifndef UI_MANAGER_H
-#define UI_MANAGER_H
+#pragma once
 
 #include <SDL.h>
 #include "glm/glm.hpp"
@@ -23,26 +22,21 @@ public:
     void build(SDL_Texture* world_texture);
     void draw(SDL_Renderer* renderer);
 
-    ImVec2 viewport_size() const { return viewport_size_; }
+    ImVec2 viewport_size() const { return m_viewportSize; }
 
     void queueCommand(const GameAction& command);
     std::vector<GameAction> flush_commands();
 
-    bool getGameMode() { return gameMode; }
-
-    void turnOnGameMode() { gameMode = true; }
-    void turnOffGameMode() { gameMode = false; }
-    void switchGameMode() { gameMode = !gameMode; }
+    void setGameMode(bool m) { m_inGameMode = m; }
+    bool getGameMode() { return m_inGameMode; }
 
 private:
     struct {
-        std::vector<GameAction> pending_commands;
+        std::vector<GameAction> m_pendingCommands;
     } state;
 
     void setup_host_window();
 
-    ImVec2 viewport_size_ = ImVec2(800.0f, 600.0f);
-
-    bool gameMode = false;
+    ImVec2 m_viewportSize = ImVec2(800.0f, 600.0f);
+    bool m_inGameMode = false;
 };
-#endif

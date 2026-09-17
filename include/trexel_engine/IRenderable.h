@@ -1,14 +1,13 @@
-#ifndef IRENDERABLE_H
-#define IRENDERABLE_H
+#pragma once
 
+// Custom includes
 #include <glm/glm.hpp>
+#include "common.h"
+
+// C++ includes
 #include <string>
 #include <optional>
 
-#include "common.h"
-/*
- * TO:DO - set to const, also question returning by value?
- */
 class IRenderable
 {
 public:
@@ -25,8 +24,4 @@ public:
 
     virtual double getAngle() const = 0;
     virtual Flip getFlip() const = 0;
-
-
 };
-
-#endif

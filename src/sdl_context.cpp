@@ -15,18 +15,18 @@ SdlContext::SdlContext(const char* title, int width, int height)
     }
 
     // Setup SDL Window
-    window_ptr = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
-    if (!window_ptr)
+    m_windowPtr = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+    if (!m_windowPtr)
     {
         std::string error_message = std::format("Window could not initialise! SDL_ERROR: {}\n", SDL_GetError());
         throw std::runtime_error(error_message);
     }
 
     // Setup SDL Renderer
-    renderer_ptr = SDL_CreateRenderer(window_ptr, -1, SDL_RENDERER_ACCELERATED);
-    if (!renderer_ptr)
+    m_rendererPtr = SDL_CreateRenderer(m_windowPtr, -1, SDL_RENDERER_ACCELERATED);
+    if (!m_rendererPtr)
     {
-        SDL_DestroyWindow(window_ptr);
+        SDL_DestroyWindow(m_windowPtr);
         SDL_Quit();
 
         std::string error_message = std::format("Renderer could not initialise! SDL_ERROR: {}\n", SDL_GetError());
@@ -42,7 +42,7 @@ SdlContext::SdlContext(const char* title, int width, int height)
 
 SdlContext::~SdlContext()
 {
-    SDL_DestroyRenderer(renderer_ptr);
-    SDL_DestroyWindow(window_ptr);
+    SDL_DestroyRenderer(m_rendererPtr);
+    SDL_DestroyWindow(m_windowPtr);
     SDL_Quit();
 }

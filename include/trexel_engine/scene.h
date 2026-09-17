@@ -3,7 +3,6 @@
 #include "IRenderable.h"
 #include "game_actions.h"
 #include "game_object.h"
-#include "scene_object.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -11,7 +10,7 @@
 class Scene
 {
 public:
-    explicit Scene(std::string name) : mName(std::move(name)) {};
+    explicit Scene(std::string name) : m_name(std::move(name)) {};
     virtual ~Scene() = default;
 
     virtual void onEnter() {};
@@ -31,17 +30,17 @@ public:
         static_assert(std::is_base_of_v<GameObject, T>, "T must derive from game object");
         auto obj = std::make_unique<T>(std::forward<Args>(args)...);
         T& ref = *obj;
-        mObjects.push_back(std::move(obj));
+        m_objects.push_back(std::move(obj));
         return ref;
     }
 
-    const std::string& getName() const { return mName; }
+    const std::string& getName() const { return m_name; }
 
 protected:
-    std::vector<std::unique_ptr<GameObject>> mObjects;
+    std::vector<std::unique_ptr<GameObject>> m_objects;
 
 private:
-    std::string mName;
+    std::string m_name;
 
     void pruneInactive();
 };

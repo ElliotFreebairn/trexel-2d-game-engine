@@ -1,6 +1,4 @@
-#ifndef GAME_OBJECT_H
-#define GAME_OBJECT_H
-
+#pragma once
 
 // Library includes
 #include <SDL_render.h>
@@ -15,8 +13,6 @@
 
 // C++ includes
 #include <optional>
-#include <vector>
-#include <iostream>
 
 class GameObject : public IRenderable
 {
@@ -30,39 +26,39 @@ public:
      */
     virtual void update(float dt) = 0;
 
-    // getters
-    glm::vec2 getPosition() const override { return position; }
-    glm::vec2 getSize() const override { return size; }
+    // IRenderable getters
+    glm::vec2 getPosition() const override { return m_position; }
+    glm::vec2 getSize() const override { return m_size; }
     std::string getTextureID() const override;
     std::optional<Rect> getSourceRect() const override;
-    std::optional<glm::vec3> getColour() const override { return colour; }
-    double getAngle() const override { return angle; }
-    Flip getFlip() const override { return flip; }
-    bool getIsVisible() const { return isVisible; }
-    bool getIsActive() const { return isActive; }
+    std::optional<glm::vec3> getColour() const override { return m_colour; }
+    double getAngle() const override { return m_angle; }
+    Flip getFlip() const override { return m_flip; }
 
+    // GameObject getters
+    bool isVisible() const { return m_isVisible; }
+    bool isActive() const { return m_isActive; }
 
-    // setters
-    void setPosition(glm::vec2 position) { this->position = position; }
-    void setAngle(double angle) { this->angle = angle; }
-    void setFlip(Flip flip) { this->flip = flip; }
-    void setIsVisible(bool visible) { isVisible = visible; }
-    void setIsActive(bool active) { isActive = active; }
+    // IRenderable setters
+    void setPosition(glm::vec2 position) { m_position = position; }
+    void setAngle(double angle) { m_angle = angle; }
+    void setFlip(Flip flip) { m_flip = flip; }
+
+    // GameObject setters
+    void set_isVisible(bool visible) { m_isVisible = visible; }
+    void setIsActive(bool active) { m_isActive = active; }
 
 protected:
-    std::optional<Sprite> sprite;
+    std::optional<Sprite> m_sprite;
+    bool m_isVisible = true;
+    bool m_isActive = true;
 
-    glm::vec2 position;
-    glm::vec2 size;
-    std::string textureID;
-    std::optional<glm::vec3> colour;
-    double angle = 0.0;
-    Flip flip = Flip::NONE;
+    glm::vec2 m_position;
+    glm::vec2 m_size;
+    std::string m_textureId;
+    std::optional<glm::vec3> m_colour;;
+    double m_angle = 0.0;
+    Flip m_flip = Flip::NONE;
 
-    bool isVisible = true;
-    bool isActive = true;
-
-    void updateSprite(float dt) { if (sprite) sprite->update(dt); }
+    void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
 };
-
-#endif

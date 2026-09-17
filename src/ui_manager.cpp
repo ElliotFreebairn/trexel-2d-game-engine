@@ -80,22 +80,22 @@ void UIManager::build(SDL_Texture* world_texture)
 
     if (ImGui::Button("Enter Game Mode"))
     {
-        turnOnGameMode();
+        setGameMode(true);
     }
 
     if (ImGui::Button("Exit Game Mode"))
     {
-        turnOffGameMode();
+       setGameMode(false);
     }
 
     ImGui::End();
 
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
-    viewport_size_ = ImGui::GetContentRegionAvail();
+    m_viewportSize = ImGui::GetContentRegionAvail();
 
     // Top-left of the image on the screen
     ImVec2 cursor_screen_pos = ImGui::GetCursorScreenPos();
-    ImGui::Image((ImTextureID)(intptr_t)world_texture, viewport_size_);
+    ImGui::Image((ImTextureID)(intptr_t)world_texture, m_viewportSize);
 
     // Check interaction inside viewport
     if (ImGui::IsItemHovered())
@@ -129,12 +129,12 @@ void UIManager::draw(SDL_Renderer* renderer)
 
 std::vector<GameAction> UIManager::flush_commands()
 {
-    std::vector<GameAction> commands = std::move(state.pending_commands);
-    state.pending_commands.clear();
+    std::vector<GameAction> commands = std::move(state.m_pendingCommands);
+    state.m_pendingCommands.clear();
     return commands;
 }
 
 void UIManager::queueCommand(const GameAction& command)
 {
-    state.pending_commands.push_back(command);
+    state.m_pendingCommands.push_back(command);
 }

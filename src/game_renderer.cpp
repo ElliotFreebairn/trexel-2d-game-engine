@@ -11,18 +11,17 @@
 #include <SDL_stdinc.h>
 #include <SDL_surface.h>
 #include <format>
-#include <memory>
 #include <stdexcept>
 
 GameRenderer::GameRenderer(SDL_Renderer* renderer, int width, int height)
 {
-   world_texture_ptr = SDL_CreateTexture(
+   m_worldTexturePtr = SDL_CreateTexture(
        renderer,
        SDL_PIXELFORMAT_RGBA8888,
        SDL_TEXTUREACCESS_TARGET,
        width, height
    ) ;
-   if (!world_texture_ptr)
+   if (!m_worldTexturePtr)
    {
        std::string error_message = std::format("SDL_CreateTexture failed, SDL_ERROR: {}", SDL_GetError());
        throw std::runtime_error(error_message);
@@ -31,9 +30,9 @@ GameRenderer::GameRenderer(SDL_Renderer* renderer, int width, int height)
 
 GameRenderer::~GameRenderer()
 {
-    if (world_texture_ptr)
+    if (m_worldTexturePtr)
     {
-        SDL_DestroyTexture(world_texture_ptr);
+        SDL_DestroyTexture(m_worldTexturePtr);
     }
 }
 
@@ -43,7 +42,7 @@ GameRenderer::~GameRenderer()
  */
 void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManager& textures)
 {
-    SDL_SetRenderTarget(renderer, world_texture_ptr);
+    SDL_SetRenderTarget(renderer, m_worldTexturePtr);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
@@ -103,7 +102,7 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
 void GameRenderer::resize(SDL_Renderer* renderer, Game* game, int width, int height)
 {
     if (width <= 0 || height <= 0) return;
-    if(width == this->width && height == this->height) return;
+    if(width == this->m_width && height == this->m_height) return;
 
     game->setViewport({width, height});
 
@@ -124,8 +123,8 @@ void GameRenderer::create_texture(SDL_Renderer* renderer, int width, int height)
     }
     SDL_SetTextureBlendMode(new_texture, SDL_BLENDMODE_BLEND);
 
-    if (world_texture_ptr) SDL_DestroyTexture(world_texture_ptr);
-    world_texture_ptr = new_texture;
-    this->width = width;
-    this->height = height;
+    if (m_worldTexturePtr) SDL_DestroyTexture(m_worldTexturePtr);
+    m_worldTexturePtr = new_texture;
+    this->m_width = width;
+    this->m_height = height;
 }
