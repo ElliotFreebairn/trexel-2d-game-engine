@@ -1,5 +1,6 @@
 #include "trexel.h"
 #include "IRenderable.h"
+#include "asset.h"
 #include "asset_manager.h"
 #include "game_actions.h"
 #include "game_object.h"
@@ -20,7 +21,7 @@ Trexel::~Trexel()
 
 void Trexel::onInit()
 {
-    m_sceneManager.registerScene("main", [] { return std::make_unique<MainScene>(); });
+    m_sceneManager.registerScene("main", [this] { return std::make_unique<MainScene>(this->getViewport());});
     m_sceneManager.switchTo("main");
     m_player = static_cast<MainScene*>(m_sceneManager.current())->getPlayer();
 }
@@ -50,6 +51,11 @@ void Trexel::handleAction(const GameAction& action)
 
 void Trexel::intialiseAssets(AssetManager &assets)
 {
-    assets.addAsset("player", "assets/player.png", AssetType::Texture);
-    assets.addAsset("grass_block", "assets/tblock.png", AssetType::Texture);
+    assets.addAsset("background", "assets/tree_background.png", AssetType::Texture);
+    assets.addAsset("grass_block", "assets/terraria_dirt_block.png", AssetType::Texture);
+
+    // player
+    assets.addAsset("player_idle", "assets/swordsman_idle.png", AssetType::Texture);
+    assets.addAsset("player_walking", "assets/swordsman_walk.png", AssetType::Texture);
+    assets.addAsset("player_jumping", "assets/swordsman_jump.png", AssetType::Texture);
 }

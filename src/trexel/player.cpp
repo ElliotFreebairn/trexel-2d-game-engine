@@ -20,10 +20,15 @@ void Player::update(float dt)
 {
     if (m_isJumping)
     {
-        m_jumpElapsed += dt;
-        if (m_jumpElapsed >= m_jumpDuration)
+        m_position.y += m_velocityY * dt;
+
+        m_velocityY += GRAVITY * dt;
+
+        if (m_position.y >= m_groundLevel)
         {
+            m_position.y = m_groundLevel;
             m_isJumping = false;
+            m_velocityY = 0.0f;
             m_jumpElapsed = 0.0f;
         }
     }
@@ -54,21 +59,22 @@ void Player::jump()
     if (m_isJumping) return;
     m_isJumping = true;
     m_jumpElapsed = 0.0f;
-}
 
+    m_velocityY = JUMP_FORCE;
+}
 void Player::setupSprite()
 {
     if (!m_sprite) return;
 
     m_sprite->addAnimation(SpriteMovementState::IDLE, SpriteAnimation{
-        "idle_player", 128, 128, 5, 1, 0.2f
+        "player_idle", 128, 128, 8, 1, 0.2f
     });
 
     m_sprite->addAnimation(SpriteMovementState::WALKING, SpriteAnimation{
-        "walking_player", 128, 128, 8, 1, 0.2f
+        "player_walking", 128, 128, 8, 1, 0.2f
     });
 
     m_sprite->addAnimation(SpriteMovementState::JUMPING, SpriteAnimation{
-        "jumping_player", 128, 128, 7, 1, 0.2f
+        "player_jumping", 128, 128, 8, 1, 0.2f
     });
 }

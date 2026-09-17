@@ -1,8 +1,12 @@
 #include "main_scene.h"
 #include "scene_object.h"
 
+#include <iostream>
+
 void MainScene::onEnter()
 {
+    setBackground("background");
+
     createObject<SceneObject>(
         glm::vec2(500.0f, 500.0f),
         glm::vec2(50.0f, 50.0f),

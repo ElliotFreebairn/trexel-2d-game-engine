@@ -52,6 +52,12 @@ public:
     // setters
     void setViewport(glm::vec2 viewport) { this->viewport = viewport; }
 
+    std::string getBackground() const
+    {
+        Scene* currentScene = m_sceneManager.current();
+        return currentScene ? currentScene->getBackground() : "";
+    }
+
 protected:
     virtual void intialiseAssets(AssetManager& assets) = 0;
     virtual void onInit() = 0;

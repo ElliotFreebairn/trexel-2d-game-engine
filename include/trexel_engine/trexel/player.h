@@ -23,8 +23,15 @@ public:
 private:
     bool m_isMoving = false;
     bool m_isJumping = false;
+
+    float m_velocityY = 0.0f;
+    float m_groundLevel = 50.0f;
+    const float GRAVITY = 1500.0f;
+    const float JUMP_FORCE = -600.0f;
     float m_jumpDuration = 0.6f;
     float m_jumpElapsed = 0.0f;
+
+
 
     // Sprite functions
     void setupSprite() override;

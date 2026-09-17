@@ -47,9 +47,19 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
+    std::string backgroundId = game->getBackground();
+    if (!backgroundId.empty())
+    {
+        SDL_Texture* bgTexture = textures.get(backgroundId);
+        if (bgTexture)
+        {
+            SDL_Rect destRect = {0, 0, m_width, m_height};
+            SDL_RenderCopy(renderer, bgTexture, nullptr, &destRect);
+        }
+    }
+
     // --- scene contents go here ---
     const std::vector<const IRenderable*> renderables = game->getRenderables();
-
     for (const IRenderable* cmd : renderables)
     {
         SDL_Rect rect = {

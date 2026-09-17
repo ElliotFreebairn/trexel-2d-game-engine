@@ -23,14 +23,6 @@ Engine::Engine(std::unique_ptr<Game> game)
     , m_textureManager()
     , m_game(std::move(game))
 {
-    // Really need a game asset manager
-    m_textureManager.load(m_sdlContext.renderer(), "grass_block", "assets/tblock.png");
-    m_textureManager.load(m_sdlContext.renderer(), "player", "assets/player.png");
-    m_textureManager.load(m_sdlContext.renderer(), "player_sheet", "assets/player_sheet.png");
-    m_textureManager.load(m_sdlContext.renderer(), "idle_player", "assets/Idle.png");
-    m_textureManager.load(m_sdlContext.renderer(), "walking_player", "assets/vampire_walking.png");
-    m_textureManager.load(m_sdlContext.renderer(), "jumping_player", "assets/Jump.png");
-
     m_game->init();
 
     for (const Asset& asset : m_game->getAssetManager().getAssets())

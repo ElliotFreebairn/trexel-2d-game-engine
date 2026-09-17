@@ -35,12 +35,16 @@ public:
     }
 
     const std::string& getName() const { return m_name; }
+    const std::string& getBackground() const { return m_background; }
+
+    void setBackground(std::string textureId) { m_background = std::move(textureId); }
 
 protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;
 
 private:
     std::string m_name;
+    std::string m_background = "";
 
     void pruneInactive();
 };
