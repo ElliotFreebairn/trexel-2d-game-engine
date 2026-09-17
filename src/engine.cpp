@@ -88,8 +88,6 @@ void Engine::update(float deltaTime)
         glm::vec2 dir{0.0f};
         bool jumping = false;
 
-        if (keys[SDL_SCANCODE_W]) dir.y -= 1.0f;
-        if (keys[SDL_SCANCODE_S]) dir.y += 1.0f;
         if (keys[SDL_SCANCODE_A]) dir.x -= 1.0f;
         if (keys[SDL_SCANCODE_D]) dir.x += 1.0f;
 

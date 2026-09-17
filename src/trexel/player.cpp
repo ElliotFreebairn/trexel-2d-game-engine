@@ -24,12 +24,11 @@ void Player::update(float dt)
 
         m_velocityY += GRAVITY * dt;
 
-        if (m_position.y >= m_groundLevel)
+        if (m_position.y >= m_lastJumpPoint)
         {
-            m_position.y = m_groundLevel;
+            m_position.y = m_lastJumpPoint;
             m_isJumping = false;
             m_velocityY = 0.0f;
-            m_jumpElapsed = 0.0f;
         }
     }
 
@@ -58,10 +57,10 @@ void Player::jump()
 {
     if (m_isJumping) return;
     m_isJumping = true;
-    m_jumpElapsed = 0.0f;
-
     m_velocityY = JUMP_FORCE;
+    m_lastJumpPoint = m_position.y;
 }
+
 void Player::setupSprite()
 {
     if (!m_sprite) return;

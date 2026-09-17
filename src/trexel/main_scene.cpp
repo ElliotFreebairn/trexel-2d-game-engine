@@ -14,7 +14,7 @@ void MainScene::onEnter()
     );
 
     m_player = &createObject<Player>(
-        glm::vec2(50.0f, 50.0f),
+        glm::vec2(450.0f, 375.0f),
         glm::vec2(128.0f, 128.0f),
         "player"
     );
