@@ -10,6 +10,7 @@
 #include "common.h"
 #include "IRenderable.h"
 #include "sprite.h"
+#include "collision.h"
 
 // C++ includes
 #include <optional>
@@ -26,6 +27,8 @@ public:
      */
     virtual void update(float dt) = 0;
 
+    AAB getBounds() const;
+
     // IRenderable getters
     glm::vec2 getPosition() const override { return m_position; }
     glm::vec2 getSize() const override { return m_size; }
@@ -39,6 +42,11 @@ public:
     bool isVisible() const { return m_isVisible; }
     bool isActive() const { return m_isActive; }
 
+    // Collision
+    bool hasCollider() const { return m_collider.has_value(); }
+    const std::optional<Collider>& getCollider() const { return m_collider; }
+    void addCollider(Collider c) { m_collider = c; }
+
     // IRenderable setters
     void setPosition(glm::vec2 position) { m_position = position; }
     void setAngle(double angle) { m_angle = angle; }
@@ -50,6 +58,8 @@ public:
 
 protected:
     std::optional<Sprite> m_sprite;
+    std::optional<Collider> m_collider;
+
     bool m_isVisible = true;
     bool m_isActive = true;
 

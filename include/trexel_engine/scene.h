@@ -42,6 +42,8 @@ public:
 protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;
 
+    void resolveCollisions(GameObject& mover);
+
 private:
     std::string m_name;
     std::string m_background = "";

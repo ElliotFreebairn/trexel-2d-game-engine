@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "collision.h"
 #include "game_object.h"
 #include <vector>
 
@@ -13,6 +14,41 @@ void Scene::update(float dt)
     }
 
     pruneInactive();
+}
+
+void Scene::resolveCollisions(GameObject &mover)
+{
+    if (!mover.hasCollider()) return;
+
+    for (auto& objPtr : m_objects)
+    {
+        GameObject* other = objPtr.get();
+        if (other == &mover) continue;
+        if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
+
+        AAB moverBounds = mover.getBounds();
+        AAB otherBounds = other->getBounds();
+
+        if (!aabOverlap(moverBounds, otherBounds)) continue;
+
+        float overlapX = std::min(moverBounds.max.x, otherBounds.max.x)
+            - std::max(moverBounds.min.x, otherBounds.min.x);
+        float overlapY = std::min(moverBounds.max.y, otherBounds.max.y)
+            - std::max(moverBounds.min.y, otherBounds.min.y);
+
+        glm::vec2 pos = mover.getPosition();
+
+        // Push along axis that has the smaller gap
+        if (overlapX < overlapY)
+        {
+            pos.x += (moverBounds.min.x < otherBounds.min.x) ? -overlapX : overlapX;
+        }
+        else
+        {
+            pos.y += (moverBounds.min.y < otherBounds.min.y) ? -overlapY : overlapY;
+        }
+        mover.setPosition(pos);
+    }
 }
 
 std::vector<const IRenderable*> Scene::getRenderables() const

@@ -30,3 +30,10 @@ std::optional<Rect> GameObject::getSourceRect() const
 {
     return m_sprite ? std::optional(m_sprite->getSrcRect()) : std::nullopt;
 }
+
+AAB GameObject::getBounds() const
+{
+    glm::vec2 colliderSize = (m_collider && m_collider->size) ? *m_collider->size : m_size;
+    glm::vec2 min = m_position + (m_collider ? m_collider->offset : glm::vec2{0.0f});
+    return {min, min + colliderSize};
+}

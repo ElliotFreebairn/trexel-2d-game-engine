@@ -8,6 +8,8 @@ class MainScene : public Scene
 public:
     MainScene(glm::vec2 viewportSize) : Scene("main") { m_viewportSize = viewportSize; }
 
+    void update(float dt) override;
+
     void onEnter() override;
 
     // getters

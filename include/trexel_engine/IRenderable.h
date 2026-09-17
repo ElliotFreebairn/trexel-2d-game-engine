@@ -3,6 +3,7 @@
 // Custom includes
 #include <glm/glm.hpp>
 #include "common.h"
+#include "collision.h"
 
 // C++ includes
 #include <string>
@@ -24,4 +25,8 @@ public:
 
     virtual double getAngle() const = 0;
     virtual Flip getFlip() const = 0;
+
+    // TESTING ONLY
+    //virtual bool hasCollider() const { return false; }
+    //virtual AAB getBounds() const { return { getPosition(), getPosition() + getSize() }; }};
 };

@@ -90,6 +90,8 @@ void Engine::update(float deltaTime)
 
         if (keys[SDL_SCANCODE_A]) dir.x -= 1.0f;
         if (keys[SDL_SCANCODE_D]) dir.x += 1.0f;
+        if (keys[SDL_SCANCODE_W]) dir.y -= 1.0f;
+        if (keys[SDL_SCANCODE_S]) dir.y += 1.0f;
 
         if (dir != glm::vec2{0.0f})
         {
