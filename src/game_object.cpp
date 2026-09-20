@@ -1,4 +1,5 @@
 #include "game_object.h"
+#include "collision.h"
 #include "common.h"
 #include <optional>
 
@@ -31,9 +32,12 @@ std::optional<Rect> GameObject::getSourceRect() const
     return m_sprite ? std::optional(m_sprite->getSrcRect()) : std::nullopt;
 }
 
-AAB GameObject::getBounds() const
+AABB GameObject::getBounds() const
 {
-    glm::vec2 colliderSize = (m_collider && m_collider->size) ? *m_collider->size : m_size;
-    glm::vec2 min = m_position + (m_collider ? m_collider->offset : glm::vec2{0.0f});
-    return {min, min + colliderSize};
+    AABB aabb;
+    aabb.min.x = m_position.x;
+    aabb.min.y = m_position.y;
+    aabb.max.x = m_position.x + m_size.x;
+    aabb.max.y = m_position.y + m_size.y;
+    return aabb;
 }

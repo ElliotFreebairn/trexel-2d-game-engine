@@ -3,7 +3,6 @@
 // Custom includes
 #include <glm/glm.hpp>
 #include "common.h"
-#include "collision.h"
 
 // C++ includes
 #include <string>

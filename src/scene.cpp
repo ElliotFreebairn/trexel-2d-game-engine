@@ -26,10 +26,10 @@ void Scene::resolveCollisions(GameObject &mover)
         if (other == &mover) continue;
         if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
 
-        AAB moverBounds = mover.getBounds();
-        AAB otherBounds = other->getBounds();
+        AABB moverBounds = mover.getBounds();
+        AABB otherBounds = other->getBounds();
 
-        if (!aabOverlap(moverBounds, otherBounds)) continue;
+        if (!aabbOverlap(moverBounds, otherBounds)) continue;
 
         float overlapX = std::min(moverBounds.max.x, otherBounds.max.x)
             - std::max(moverBounds.min.x, otherBounds.min.x);

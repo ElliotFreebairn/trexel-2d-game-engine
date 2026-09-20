@@ -27,7 +27,7 @@ public:
      */
     virtual void update(float dt) = 0;
 
-    AAB getBounds() const;
+    AABB getBounds() const;
 
     // IRenderable getters
     glm::vec2 getPosition() const override { return m_position; }
