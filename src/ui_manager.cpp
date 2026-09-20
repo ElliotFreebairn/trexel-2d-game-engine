@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
+#include "mydefines.h"
 #include <stdexcept>
 
 UIManager::UIManager(SDL_Window* window, SDL_Renderer* renderer)
@@ -68,24 +69,14 @@ void UIManager::build(SDL_Texture* world_texture)
 {
     ImGui::Begin("Toolbar");
 
-    if (ImGui::Button("Spawn Blocks"))
-    {
-    }
-
-    if (ImGui::Button("Add Player"))
-    {
-        GameAction cmd = {.type = GameActionType::SpawnPlayer, .position = {50, 50}};
-        queueCommand(cmd);
-    }
-
     if (ImGui::Button("Enter Game Mode"))
     {
-        setGameMode(true);
+        m_inGameMode = !m_inGameMode;
     }
 
-    if (ImGui::Button("Exit Game Mode"))
+    if (ImGui::Button("Toggle Collision Debugging"))
     {
-       setGameMode(false);
+        DEBUG_COLLISION = !DEBUG_COLLISION;
     }
 
     ImGui::End();

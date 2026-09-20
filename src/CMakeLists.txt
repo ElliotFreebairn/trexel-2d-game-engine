@@ -14,6 +14,7 @@ add_executable(trexel_exec
     scene.cpp
     scene_manager.cpp
     asset_manager.cpp
+    mydefines.cpp
 )
 
 # Link to actual SDL2 library

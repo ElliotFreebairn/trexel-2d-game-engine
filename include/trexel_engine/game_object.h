@@ -28,7 +28,7 @@ public:
      */
     virtual void update(float dt) = 0;
 
-    AABB getBounds() const override;
+    AABB getBounds() const;
 
     // IRenderable getters
     glm::vec2 getPosition() const override { return m_position; }
@@ -44,7 +44,7 @@ public:
     bool isActive() const { return m_isActive; }
 
     // Collision
-    bool hasCollider() const override { return m_collider.has_value(); }
+    bool hasCollider() const { return m_collider.has_value(); }
     const std::optional<Collider>& getCollider() const { return m_collider; }
     void addCollider(Collider c) { m_collider = c; }
     virtual void evCollided() {}

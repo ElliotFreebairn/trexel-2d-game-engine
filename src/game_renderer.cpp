@@ -108,22 +108,22 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     }
 
     //#define DEBUG_DRAW_COLLIDERS
-    #ifdef DEBUG_COLLISION
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    for (const IRenderable* cmd : renderables)
+    if (DEBUG_COLLISION)
     {
-        if (!cmd->hasCollider()) continue;
-        AABB b = cmd->getBounds();
-        SDL_Rect r{
-            static_cast<int>(b.min.x),
-            static_cast<int>(b.min.y),
-            static_cast<int>(b.max.x - b.min.x),
-            static_cast<int>(b.max.y - b.min.y)
-        };
-        SDL_RenderDrawRect(renderer, &r);
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        for (const IRenderable* cmd : renderables)
+        {
+            if (!cmd->hasCollider()) continue;
+            AABB b = cmd->getBounds();
+            SDL_Rect r{
+                static_cast<int>(b.min.x),
+                static_cast<int>(b.min.y),
+                static_cast<int>(b.max.x - b.min.x),
+                static_cast<int>(b.max.y - b.min.y)
+            };
+            SDL_RenderDrawRect(renderer, &r);
+        }
     }
-    #endif
-
     SDL_SetRenderTarget(renderer, nullptr); // restore default target
 }
 

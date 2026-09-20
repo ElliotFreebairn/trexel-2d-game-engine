@@ -27,7 +27,6 @@ public:
     void queueCommand(const GameAction& command);
     std::vector<GameAction> flush_commands();
 
-    void setGameMode(bool m) { m_inGameMode = m; }
     bool getGameMode() { return m_inGameMode; }
 
 private:

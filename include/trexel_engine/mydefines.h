@@ -1,4 +1,7 @@
 #pragma once
 
 // Custom defines
-#define DEBUG_COLLISION
+
+// per define
+extern bool DEBUG_COLLISION;
+void setDebugCollision(bool c);
