@@ -8,7 +8,6 @@
 
 // SDL
 #include <SDL2/SDL.h>
-#include <random>
 
 // C++
 

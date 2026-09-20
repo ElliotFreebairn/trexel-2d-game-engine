@@ -14,6 +14,8 @@ public:
     Player();
     virtual ~Player() = default;
 
+    void evCollided() override;
+
     // Custom player functions
     void move(glm::vec2 delta);
     void jump();

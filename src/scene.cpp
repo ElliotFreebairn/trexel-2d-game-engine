@@ -48,6 +48,7 @@ void Scene::resolveCollisions(GameObject &mover)
             pos.y += (moverBounds.min.y < otherBounds.min.y) ? -overlapY : overlapY;
         }
         mover.setPosition(pos);
+        mover.evCollided();
     }
 }
 

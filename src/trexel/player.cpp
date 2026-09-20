@@ -4,6 +4,9 @@
 #include "sprite.h"
 #include <SDL_render.h>
 
+// C++ includes
+#include <iostream>
+
 Player::Player(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour)
     : GameObject(position, size, texture_id, colour)
 {
@@ -59,6 +62,14 @@ void Player::jump()
     m_isJumping = true;
     m_velocityY = JUMP_FORCE;
     m_lastJumpPoint = m_position.y;
+}
+
+void Player::evCollided()
+{
+    if (m_isJumping)
+    {
+        m_isJumping = false;
+    }
 }
 
 void Player::setupSprite()
