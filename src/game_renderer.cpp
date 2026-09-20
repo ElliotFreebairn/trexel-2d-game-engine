@@ -2,6 +2,7 @@
 #include "IRenderable.h"
 #include "common.h"
 #include "game.h"
+#include "mydefines.h"
 
 #include <SDL_blendmode.h>
 #include <SDL_image.h>
@@ -107,12 +108,12 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     }
 
     //#define DEBUG_DRAW_COLLIDERS
-    #ifdef DEBUG_DRAW_COLLIDERS
+    #ifdef DEBUG_COLLISION
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     for (const IRenderable* cmd : renderables)
     {
         if (!cmd->hasCollider()) continue;
-        AAB b = cmd->getBounds();
+        AABB b = cmd->getBounds();
         SDL_Rect r{
             static_cast<int>(b.min.x),
             static_cast<int>(b.min.y),

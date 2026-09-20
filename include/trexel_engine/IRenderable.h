@@ -3,10 +3,15 @@
 // Custom includes
 #include <glm/glm.hpp>
 #include "common.h"
+#include "mydefines.h"
 
 // C++ includes
 #include <string>
 #include <optional>
+
+#ifdef DEBUG_COLLISION
+#include "collision.h"
+#endif
 
 class IRenderable
 {
@@ -26,6 +31,8 @@ public:
     virtual Flip getFlip() const = 0;
 
     // TESTING ONLY
-    //virtual bool hasCollider() const { return false; }
-    //virtual AAB getBounds() const { return { getPosition(), getPosition() + getSize() }; }};
+    #ifdef DEBUG_COLLISION
+    virtual bool hasCollider() const { return false; }
+    virtual AABB getBounds() const { return { getPosition(), getPosition() + getSize() }; };
+    #endif
 };
