@@ -51,11 +51,11 @@ void Trexel::handleAction(const GameAction& action)
 
 void Trexel::intialiseAssets(AssetManager &assets)
 {
-    assets.addAsset("background", "assets/tree_background.png", AssetType::Texture);
-    assets.addAsset("grass_block", "assets/terraria_dirt_block.png", AssetType::Texture);
+    assets.addAsset("background", "assets/trexel/world/background.png", AssetType::Texture);
+    assets.addAsset("grass_block", "assets/trexel/world/dirt_block.png", AssetType::Texture);
 
     // player
-    assets.addAsset("player_idle", "assets/swordsman_idle.png", AssetType::Texture);
-    assets.addAsset("player_walking", "assets/swordsman_walk.png", AssetType::Texture);
-    assets.addAsset("player_jumping", "assets/swordsman_jump.png", AssetType::Texture);
+    assets.addAsset("player_idle", "assets/trexel/player/idle.png", AssetType::Texture);
+    assets.addAsset("player_walking", "assets/trexel/player/walk.png", AssetType::Texture);
+    assets.addAsset("player_jumping", "assets/trexel/player/jump.png", AssetType::Texture);
 }
