@@ -68,7 +68,7 @@ protected:
     glm::vec2 m_position;
     glm::vec2 m_size;
     std::string m_textureId;
-    std::optional<glm::vec3> m_colour;;
+    std::optional<glm::vec3> m_colour;
     double m_angle = 0.0;
     Flip m_flip = Flip::NONE;
 

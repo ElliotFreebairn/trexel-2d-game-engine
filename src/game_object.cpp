@@ -34,10 +34,19 @@ std::optional<Rect> GameObject::getSourceRect() const
 
 AABB GameObject::getBounds() const
 {
+    glm::vec2 origin = m_position;
+    glm::vec2 size = m_size;
+
+    if (hasCollider())
+    {
+        const Collider& c = *m_collider;
+
+        origin += c.offset;
+        size = c.size.value_or(m_size);
+    }
+
     AABB aabb;
-    aabb.min.x = m_position.x;
-    aabb.min.y = m_position.y;
-    aabb.max.x = m_position.x + m_size.x;
-    aabb.max.y = m_position.y + m_size.y;
+    aabb.min = origin;
+    aabb.max = origin + size;
     return aabb;
 }

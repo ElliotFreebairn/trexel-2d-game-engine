@@ -27,7 +27,7 @@ void MainScene::onEnter()
     );
     m_player->addCollider(Collider{
         .isSolid = true,
-        .size = glm::vec2(50.0f, 70.0f),
-        .offset = glm::vec2(40.0f, 60.0f)
+        .size = glm::vec2(50.0f, 75.0f),
+        .offset = glm::vec2(40.0f, 55.0f)
     });
 }
