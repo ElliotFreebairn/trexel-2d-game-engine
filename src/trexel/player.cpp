@@ -2,17 +2,18 @@
 #include "collision.h"
 #include "common.h"
 #include "game_object.h"
+#include "object_defs.h"
 #include "sprite.h"
 #include <SDL_render.h>
 
 // C++ includes
 #include <iostream>
 
-Player::Player(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour)
-    : GameObject(position, size, texture_id, colour)
+Player::Player(glm::vec2 position)
+    : GameObject(position, ObjectDefs::Player())
+
 {
-    m_sprite = Sprite();
-    setupSprite();
+
 }
 
 Player::Player() : GameObject()
@@ -72,21 +73,4 @@ void Player::evCollided(CollisionAxis axis)
         m_isJumping = false;
         m_velocityY = 0.0f;
     }
-}
-
-void Player::setupSprite()
-{
-    if (!m_sprite) return;
-
-    m_sprite->addAnimation(SpriteMovementState::IDLE, SpriteAnimation{
-        "player_idle", 128, 128, 6, 1, 0.2f
-    });
-
-    m_sprite->addAnimation(SpriteMovementState::WALKING, SpriteAnimation{
-        "player_walking", 128, 128, 8, 1, 0.2f
-    });
-
-    m_sprite->addAnimation(SpriteMovementState::JUMPING, SpriteAnimation{
-        "player_jumping", 128, 128, 9, 1, 0.2f
-    });
 }

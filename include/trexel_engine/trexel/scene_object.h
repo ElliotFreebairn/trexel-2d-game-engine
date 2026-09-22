@@ -11,8 +11,8 @@
 class SceneObject : public GameObject
 {
 public:
-    SceneObject(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour = std::nullopt);
-    SceneObject();
+    using GameObject::GameObject;
+
     ~SceneObject() = default;
 
     void update(float dt) override;

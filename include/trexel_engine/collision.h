@@ -16,7 +16,6 @@ struct Collider
 };
 
 enum class CollisionAxis { X, Y };
-
 inline bool aabbOverlap(const AABB& a, const AABB& b)
 {
     bool aIsToTheRightOfB = a.min.x > b.max.x;

@@ -1,14 +1,24 @@
 #include "game_object.h"
 #include "collision.h"
 #include "common.h"
+#include "game_object_def.h"
 #include <optional>
 
 #include <SDL_image.h>
 
-GameObject::GameObject(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour)
-    : m_position(position), m_prevPosition(position), m_size(size), m_textureId(texture_id), m_colour(colour)
+GameObject::GameObject(glm::vec2 position, const GameObjectDef& def)
+    : m_position(position), m_prevPosition(position), m_size(def.size), m_textureId(def.textureId), m_colour(def.colour)
 {
+    if (def.collider) addCollider(*def.collider);
 
+    if (!def.animations.empty())
+    {
+        m_sprite = Sprite();
+        for (auto& [state, animation] : def.animations)
+        {
+            m_sprite->addAnimation(state, animation);
+        }
+    }
 }
 
 GameObject::GameObject()

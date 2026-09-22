@@ -11,7 +11,7 @@
 class Player : public GameObject, public ISprite
 {
 public:
-    Player(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour = std::nullopt);
+    Player(glm::vec2 position);
     Player();
     virtual ~Player() = default;
 
@@ -33,6 +33,5 @@ private:
     const float JUMP_FORCE = -600.0f;
 
     // Sprite functions
-    void setupSprite() override;
     void resolveSpriteState() override;
 };

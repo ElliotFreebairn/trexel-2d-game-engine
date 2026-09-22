@@ -9,6 +9,7 @@
 // Custom includes
 #include "common.h"
 #include "IRenderable.h"
+#include "game_object_def.h"
 #include "sprite.h"
 #include "collision.h"
 
@@ -19,7 +20,7 @@
 class GameObject : public IRenderable
 {
 public:
-    GameObject(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour = std::nullopt);
+    GameObject(glm::vec2 position, const GameObjectDef& def);
     GameObject();
     ~GameObject();
 
