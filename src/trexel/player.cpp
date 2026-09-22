@@ -1,4 +1,5 @@
 #include "player.h"
+#include "collision.h"
 #include "common.h"
 #include "game_object.h"
 #include "sprite.h"
@@ -64,11 +65,12 @@ void Player::jump()
     m_lastJumpPoint = m_position.y;
 }
 
-void Player::evCollided()
+void Player::evCollided(CollisionAxis axis)
 {
-    if (m_isJumping)
+    if(m_isJumping && axis == CollisionAxis::Y)
     {
         m_isJumping = false;
+        m_velocityY = 0.0f;
     }
 }
 
@@ -77,7 +79,7 @@ void Player::setupSprite()
     if (!m_sprite) return;
 
     m_sprite->addAnimation(SpriteMovementState::IDLE, SpriteAnimation{
-        "player_idle", 128, 128, 8, 1, 0.2f
+        "player_idle", 128, 128, 6, 1, 0.2f
     });
 
     m_sprite->addAnimation(SpriteMovementState::WALKING, SpriteAnimation{
@@ -85,6 +87,6 @@ void Player::setupSprite()
     });
 
     m_sprite->addAnimation(SpriteMovementState::JUMPING, SpriteAnimation{
-        "player_jumping", 128, 128, 8, 1, 0.2f
+        "player_jumping", 128, 128, 9, 1, 0.2f
     });
 }

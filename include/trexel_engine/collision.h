@@ -11,9 +11,11 @@ struct AABB
 struct Collider
 {
     bool isSolid = true;
-    std::optional<glm::vec2> size;
-    glm::vec2 offset = {0.0f, 0.0f};
+    glm::vec2 size {0.0f, 0.0f};
+    glm::vec2 offset {0.0f, 0.0f};
 };
+
+enum class CollisionAxis { X, Y };
 
 inline bool aabbOverlap(const AABB& a, const AABB& b)
 {

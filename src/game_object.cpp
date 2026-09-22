@@ -6,7 +6,7 @@
 #include <SDL_image.h>
 
 GameObject::GameObject(glm::vec2 position, glm::vec2 size, std::string texture_id, std::optional<glm::vec3> colour)
-    : m_position(position), m_size(size), m_textureId(texture_id), m_colour(colour)
+    : m_position(position), m_prevPosition(position), m_size(size), m_textureId(texture_id), m_colour(colour)
 {
 
 }
@@ -32,21 +32,27 @@ std::optional<Rect> GameObject::getSourceRect() const
     return m_sprite ? std::optional(m_sprite->getSrcRect()) : std::nullopt;
 }
 
-AABB GameObject::getBounds() const
+AABB GameObject::getBoundsAt(glm::vec2 position) const
 {
-    glm::vec2 origin = m_position;
-    glm::vec2 size = m_size;
-
-    if (hasCollider())
+    if (!m_collider)
     {
-        const Collider& c = *m_collider;
-
-        origin += c.offset;
-        size = c.size.value_or(m_size);
+        return AABB{m_position, m_position + m_size};
     }
 
-    AABB aabb;
-    aabb.min = origin;
-    aabb.max = origin + size;
-    return aabb;
+    const Collider& c = *m_collider;
+
+    float offsetX = c.offset.x;
+    if (m_flip == Flip::HORIZONTAL)
+    {
+        offsetX = m_size.x - c.offset.x - c.size.x;
+    }
+
+    glm::vec2 min = m_position + glm::vec2(offsetX, c.offset.y);
+    glm::vec2 max = min + c.size;
+    return AABB{min, max};
+}
+
+AABB GameObject::getBounds() const
+{
+    return getBoundsAt(m_position);
 }

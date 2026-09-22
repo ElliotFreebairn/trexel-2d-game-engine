@@ -55,7 +55,7 @@ void Trexel::intialiseAssets(AssetManager &assets)
     assets.addAsset("grass_block", "assets/trexel/world/dirt_block.png", AssetType::Texture);
 
     // player
-    assets.addAsset("player_idle", "assets/trexel/player/idle.png", AssetType::Texture);
-    assets.addAsset("player_walking", "assets/trexel/player/walk.png", AssetType::Texture);
-    assets.addAsset("player_jumping", "assets/trexel/player/jump.png", AssetType::Texture);
+    assets.addAsset("player_idle", "assets/trexel/player/idle-sheet.png", AssetType::Texture);
+    assets.addAsset("player_walking", "assets/trexel/player/walk-sheet.png", AssetType::Texture);
+    assets.addAsset("player_jumping", "assets/trexel/player/jump-sheet.png", AssetType::Texture);
 }

@@ -18,7 +18,10 @@ void MainScene::onEnter()
         glm::vec2(50.0f, 50.0f),
         "grass_block"
     );
-    block.addCollider(Collider { .isSolid = true});
+    block.addCollider(Collider {
+        .isSolid = true,
+        .size = {50.0f, 50.0f}
+    });
 
     m_player = &createObject<Player>(
         glm::vec2(450.0f, 400.0f),
@@ -27,7 +30,7 @@ void MainScene::onEnter()
     );
     m_player->addCollider(Collider{
         .isSolid = true,
-        .size = glm::vec2(50.0f, 75.0f),
-        .offset = glm::vec2(40.0f, 55.0f)
+        .size = glm::vec2(30.0f, 70.0f),
+        .offset = glm::vec2(50.0f, 55.0f)
     });
 }

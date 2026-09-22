@@ -2,6 +2,7 @@
 
 // Custom includes
 #include "ISprite.h"
+#include "collision.h"
 #include "game_object.h"
 
 #include <optional>
@@ -14,7 +15,7 @@ public:
     Player();
     virtual ~Player() = default;
 
-    void evCollided() override;
+    void evCollided(CollisionAxis axis) override;
 
     // Custom player functions
     void move(glm::vec2 delta);

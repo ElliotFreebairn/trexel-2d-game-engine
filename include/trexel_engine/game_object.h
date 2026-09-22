@@ -47,7 +47,7 @@ public:
     bool hasCollider() const { return m_collider.has_value(); }
     const std::optional<Collider>& getCollider() const { return m_collider; }
     void addCollider(Collider c) { m_collider = c; }
-    virtual void evCollided() {}
+    virtual void evCollided(CollisionAxis axis) {}
 
     // IRenderable setters
     void setPosition(glm::vec2 position) { m_position = position; }
@@ -57,6 +57,11 @@ public:
     // GameObject setters
     void set_isVisible(bool visible) { m_isVisible = visible; }
     void setIsActive(bool active) { m_isActive = active; }
+
+    // previous positioning
+    glm::vec2 getPrevPosition() const { return m_prevPosition; }
+    void setPrevPosition(glm::vec2 p) { m_prevPosition = p; }
+    AABB getBoundsAt(glm::vec2 position) const;
 
 protected:
     std::optional<Sprite> m_sprite;
@@ -71,6 +76,8 @@ protected:
     std::optional<glm::vec3> m_colour;
     double m_angle = 0.0;
     Flip m_flip = Flip::NONE;
+
+    glm::vec2 m_prevPosition;
 
     void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
 };

@@ -9,6 +9,7 @@ void Scene::update(float dt)
     {
         if (obj->isActive())
         {
+            obj->setPrevPosition(obj->getPosition());
             obj->update(dt);
         }
     }
@@ -31,15 +32,25 @@ void Scene::resolveCollisions(GameObject &mover)
 
         if (!aabbOverlap(moverBounds, otherBounds)) continue;
 
+        glm::vec2 prevPos = mover.getPrevPosition();
+        glm::vec2 currPos = mover.getPosition();
+
+        // Isolate each axis: does moving *only* on that axis explain the overlap?
+        bool xAlone = aabbOverlap(mover.getBoundsAt({currPos.x, prevPos.y}), otherBounds);
+        bool yAlone = aabbOverlap(mover.getBoundsAt({prevPos.x, currPos.y}), otherBounds);
+
         float overlapX = std::min(moverBounds.max.x, otherBounds.max.x)
             - std::max(moverBounds.min.x, otherBounds.min.x);
         float overlapY = std::min(moverBounds.max.y, otherBounds.max.y)
             - std::max(moverBounds.min.y, otherBounds.min.y);
 
-        glm::vec2 pos = mover.getPosition();
+        bool resolveX;
+        if (xAlone && !yAlone)      resolveX = true;   // clearly a side bump
+        else if (yAlone && !xAlone) resolveX = false;  // clearly a floor/ceiling hit
+        else                        resolveX = overlapX < overlapY; // ambiguous corner: fall back to old heuristic
 
-        // Push along axis that has the smaller gap
-        if (overlapX < overlapY)
+        glm::vec2 pos = currPos;
+        if (resolveX)
         {
             pos.x += (moverBounds.min.x < otherBounds.min.x) ? -overlapX : overlapX;
         }
@@ -48,7 +59,7 @@ void Scene::resolveCollisions(GameObject &mover)
             pos.y += (moverBounds.min.y < otherBounds.min.y) ? -overlapY : overlapY;
         }
         mover.setPosition(pos);
-        mover.evCollided();
+        mover.evCollided(resolveX ? CollisionAxis::X : CollisionAxis::Y);
     }
 }
 
