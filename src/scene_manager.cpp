@@ -42,10 +42,10 @@ void SceneManager::update(float dt)
 
 void SceneManager::handleAction(const GameAction &action)
 {
-    if (!m_stack.empty())
-    {
-        m_stack.back()->handleAction(action);
-    }
+   // if (!m_stack.empty())
+   // {
+   //     m_stack.back()->handleAction(action);
+   // }
 }
 
 std::vector<const IRenderable*> SceneManager::getRenderables() const

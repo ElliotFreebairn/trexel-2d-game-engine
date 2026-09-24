@@ -19,34 +19,38 @@ Trexel::~Trexel()
 {
 }
 
+Player* Trexel::getPlayer() const
+{
+    MainScene* scene = dynamic_cast<MainScene*>(m_sceneManager.current());
+    return scene ? scene->getPlayer() : nullptr;
+}
+
+void Trexel::onUpdate(float deltaTime, const InputState& input)
+{
+    if (Player* player = getPlayer())
+    {
+        if (input.move != glm::vec2(0.0f))
+        {
+            player->move(input.move * deltaTime);
+        }
+        if (input.jumpPressed)
+        {
+            player->jump();
+        }
+    }
+
+    Game::onUpdate(deltaTime, input);
+}
+
 void Trexel::onInit()
 {
     m_sceneManager.registerScene("main", [this] { return std::make_unique<MainScene>(this->getViewport());});
     m_sceneManager.switchTo("main");
-    m_player = static_cast<MainScene*>(m_sceneManager.current())->getPlayer();
 }
 
 void Trexel::onShutdown()
 {
 
-}
-
-// Change to event
-void Trexel::handleAction(const GameAction& action)
-{
-    switch(action.type)
-    {
-        case GameActionType::SpawnPlayer:
-            break;
-        case GameActionType::SpawnBlock:
-            break;
-        case GameActionType::MovePlayer:
-            if (m_player) m_player->move(action.direction);
-            break;
-        case GameActionType::Jump:
-            if (m_player) m_player->jump();
-            break;
-    }
 }
 
 void Trexel::intialiseAssets(AssetManager &assets)

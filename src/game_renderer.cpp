@@ -16,17 +16,7 @@
 
 GameRenderer::GameRenderer(SDL_Renderer* renderer, int width, int height)
 {
-   m_worldTexturePtr = SDL_CreateTexture(
-       renderer,
-       SDL_PIXELFORMAT_RGBA8888,
-       SDL_TEXTUREACCESS_TARGET,
-       width, height
-   ) ;
-   if (!m_worldTexturePtr)
-   {
-       std::string error_message = std::format("SDL_CreateTexture failed, SDL_ERROR: {}", SDL_GetError());
-       throw std::runtime_error(error_message);
-   }
+    create_texture(renderer, width, height);
 }
 
 GameRenderer::~GameRenderer()
@@ -41,7 +31,7 @@ GameRenderer::~GameRenderer()
  * Game renderer should take in a game
  * That game, for now, is built programatically
  */
-void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManager& textures)
+void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManager& textures, const RenderOptions& options)
 {
     SDL_SetRenderTarget(renderer, m_worldTexturePtr);
 
@@ -108,7 +98,7 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     }
 
     //#define DEBUG_DRAW_COLLIDERS
-    if (DEBUG_COLLISION)
+    if (options.showColliders)
     {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         for (const IRenderable* cmd : renderables)
@@ -127,14 +117,13 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     SDL_SetRenderTarget(renderer, nullptr); // restore default target
 }
 
-void GameRenderer::resize(SDL_Renderer* renderer, Game* game, int width, int height)
+bool GameRenderer::resize(SDL_Renderer* renderer,  int width, int height)
 {
-    if (width <= 0 || height <= 0) return;
-    if(width == this->m_width && height == this->m_height) return;
-
-    game->setViewport({width, height});
+    if (width <= 0 || height <= 0) return false;
+    if(width == this->m_width && height == this->m_height) return false;
 
     create_texture(renderer, width, height);
+    return true;
 }
 
 void GameRenderer::create_texture(SDL_Renderer* renderer, int width, int height)

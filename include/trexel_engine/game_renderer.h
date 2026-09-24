@@ -7,6 +7,11 @@
 // SDL Includes
 #include <SDL_render.h>
 
+struct RenderOptions
+{
+    bool showColliders = false;
+};
+
 class GameRenderer
 {
 public:
@@ -17,8 +22,10 @@ public:
     GameRenderer(const GameRenderer&) = delete;
     GameRenderer& operator=(const GameRenderer&) = delete;
 
-    void resize(SDL_Renderer* renderer, Game* game, int width, int height);
-    void render(SDL_Renderer* renderer, Game* game, const TextureManager& textures); // draws the scene into world_texture_ptr
+    void render(SDL_Renderer* renderer, Game* game, const TextureManager& textures, const RenderOptions& options); // draws the scene into world_texture_ptr
+
+    bool resize(SDL_Renderer* renderer, int width, int height);
+
     SDL_Texture* texture() const { return m_worldTexturePtr; }
 private:
     void create_texture(SDL_Renderer* renderer, int width, int height);

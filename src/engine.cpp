@@ -1,20 +1,25 @@
 #include "engine.h"
 #include "asset.h"
-#include "game_object.h"
-#include "player.h"
-#include "trexel.h"
-#include "game_actions.h"
-
-#include "imgui_impl_sdlrenderer2.h"
+#include "editor_command.h"
+#include "editor_state.h"
+#include "game.h"
+#include "input_state.h"
 #include "texture_manager.h"
 #include "ui_manager.h"
+
 #include <SDL.h>
 #include <SDL_keyboard.h>
 #include <SDL_scancode.h>
+#include <algorithm>
 #include <chrono>
-#include <ctime>
 
-static bool jumpKeyWasDown = false;
+
+namespace
+{
+    constexpr float FIXED_TIMESTEP = 1.0f / 60.0f; // game steps in 1/60s slices
+    constexpr float MAX_FRAME_TIME = 0.25f;
+}
+
 
 Engine::Engine(std::unique_ptr<Game> game)
     : m_sdlContext("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -23,6 +28,7 @@ Engine::Engine(std::unique_ptr<Game> game)
     , m_textureManager()
     , m_game(std::move(game))
 {
+    m_game->setViewport(glm::vec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT));
     m_game->init();
 
     for (const Asset& asset : m_game->getAssetManager().getAssets())
@@ -43,7 +49,7 @@ void Engine::run()
     while(running)
     {
         auto currentFrame = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> deltaTime = currentFrame - lastFrame;
+        const float frameTime = std::chrono::duration<float>(currentFrame - lastFrame).count();
         lastFrame = currentFrame;
 
         running = process_input(e);
@@ -52,7 +58,7 @@ void Engine::run()
             break;
         }
 
-        update(deltaTime.count());
+        update(frameTime);
         render();
     }
 }
@@ -68,62 +74,104 @@ bool Engine::process_input(SDL_Event &e)
     return true;
 }
 
-void Engine::update(float deltaTime)
+InputState Engine::sampleInput()
 {
-    auto commands = m_uiManager.flush_commands();
+    const Uint8* keys = SDL_GetKeyboardState(nullptr);
 
-    for (const auto& cmd : commands)
+    InputState input;
+    if (keys[SDL_SCANCODE_A]) input.move.x -= 1.0f;
+    if (keys[SDL_SCANCODE_D]) input.move.x += 1.0f;
+    if (keys[SDL_SCANCODE_W]) input.move.y -= 1.0f;
+    if (keys[SDL_SCANCODE_S]) input.move.y += 1.0f;
+
+    const bool jumpDown = keys[SDL_SCANCODE_SPACE] != 0;
+    input.jumpHeld = jumpDown;
+    input.jumpPressed = jumpDown && !m_jumpWasDown;
+    m_jumpWasDown = jumpDown;
+
+    return input;
+}
+
+void Engine::applyCommands()
+{
+    const std::vector<EditorCommand> commands = m_commands.flush();
+    for (const EditorCommand& command : commands)
     {
-        m_game->handleAction(cmd);
-    }
-
-    /*
-     * CREATE AN GAME INPUT MANAGER THAT DEALS WITH THIS
-     */
-    if (m_uiManager.getGameMode())
-    {
-        m_game->onUpdate(deltaTime);
-
-        const Uint8* keys = SDL_GetKeyboardState(nullptr);
-        glm::vec2 dir{0.0f};
-        bool jumping = false;
-
-        if (keys[SDL_SCANCODE_A]) dir.x -= 1.0f;
-        if (keys[SDL_SCANCODE_D]) dir.x += 1.0f;
-        if (keys[SDL_SCANCODE_W]) dir.y -= 1.0f;
-        if (keys[SDL_SCANCODE_S]) dir.y += 1.0f;
-
-        if (dir != glm::vec2{0.0f})
+        if (command.type == EditorCommandType::SetPlayMode)
         {
-            m_game->handleAction(GameAction{
-                .type = GameActionType::MovePlayer,
-                .direction = dir * deltaTime
-            });
+            m_editorState.playing = command.playing;
         }
-
-        bool jumpKeyIsDown = keys[SDL_SCANCODE_SPACE];
-        if (jumpKeyIsDown && !jumpKeyWasDown)
+        else
         {
-            m_game->handleAction(GameAction{.type = GameActionType::Jump});
+            m_game->applyCommand(command);
         }
     }
 }
 
-void Engine::render()
+void Engine::update(float frameTime)
 {
-    // 1. Render the game/scene first
-    ImVec2 desired = m_uiManager.viewport_size();
-    m_gameRenderer.resize(m_sdlContext.renderer(), m_game.get(), (int)desired.x, (int)desired.y);
-    m_gameRenderer.render(m_sdlContext.renderer(), m_game.get(), m_textureManager);
+    applyCommands();
 
-    // 2. Render the UI
+    // Always sample so edge detection stays correct, then throw the input
+    // away if we are not playing or the UI (e.g. a text box) wants the keys.
+    InputState input = sampleInput();
+    if (!m_editorState.playing || m_uiManager.wantsKeyboard())
+    {
+        input = InputState{};
+    }
+
+    if (!m_editorState.playing)
+    {
+        m_accumulator = 0.0f;
+        m_jumpQueued = false;
+        return;
+    }
+
+    // Fixed timestep: the game advances in equal slices no matter the frame rate.
+    m_accumulator += std::min(frameTime, MAX_FRAME_TIME);
+
+    // A key press can arrive on a frame that runs zero steps, so latch it
+    // until the next step consumes it (and make sure only one step sees it).
+    if (input.jumpPressed) m_jumpQueued = true;
+
+    while (m_accumulator >= FIXED_TIMESTEP)
+    {
+        input.jumpPressed = m_jumpQueued;
+        m_game->onUpdate(FIXED_TIMESTEP, input);
+        m_jumpQueued = false;
+        m_accumulator -= FIXED_TIMESTEP;
+    }
+}
+
+
+void Engine::render()
+
+{
+    SDL_Renderer* renderer = m_sdlContext.renderer();
+
+    // 1. Render the game/scene first
+    const ImVec2 desired = m_uiManager.viewport_size();
+    const int width = static_cast<int>(desired.x);
+    const int height = static_cast<int>(desired.y);
+    if (m_gameRenderer.resize(renderer, width, height))
+    {
+        // The renderer only reads the game, so the engine passes the new size on.
+        m_game->setViewport(glm::vec2(static_cast<float>(width), static_cast<float>(height)));
+    }
+
+    RenderOptions options;
+    options.showColliders = m_editorState.showColliders;
+    m_gameRenderer.render(renderer, m_game.get(), m_textureManager, options);
+
+    // 2. Build the UI. It gets a read-only game and the command queue.
+    EditorContext ctx{*m_game, m_commands, m_editorState};
     m_uiManager.begin_frame();
-    m_uiManager.build(m_gameRenderer.texture());
+    m_uiManager.build(ctx, m_gameRenderer.texture());
     m_uiManager.render();
 
     // 3. Render the composite frame
-    SDL_SetRenderDrawColor(m_sdlContext.renderer(), 30, 30, 30, 255);
-    SDL_RenderClear(m_sdlContext.renderer());
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), m_sdlContext.renderer());
-    SDL_RenderPresent(m_sdlContext.renderer());
+    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
+    SDL_RenderClear(renderer);
+    m_uiManager.draw(renderer);
+    SDL_RenderPresent(renderer);
 }

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "IRenderable.h"
+#include "entity.h"
 #include "game_actions.h"
 #include "game_object.h"
+#include "property.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -20,8 +22,6 @@ public:
 
     virtual void update(float dt);
 
-    virtual void handleAction(const GameAction& action) {};
-
     std::vector<const IRenderable*> getRenderables() const;
 
     template <typename T, typename... Args>
@@ -38,6 +38,15 @@ public:
     const std::string& getBackground() const { return m_background; }
 
     void setBackground(std::string textureId) { m_background = std::move(textureId); }
+
+    // Edtior: read-only queries
+    std::vector<EntityInfo> getEntities() const;
+    IInspectable* findInspectable(EntityId id) const;
+    EntityId  pick(glm::vec2 worldPos) const;
+
+    // Editor: changes
+    virtual void spawn(const std::string& prototype, glm::vec2 position) { (void)prototype; (void)position; }
+    virtual void destroy(EntityId id);
 
 protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;

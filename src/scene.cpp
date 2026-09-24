@@ -1,6 +1,8 @@
 #include "scene.h"
 #include "collision.h"
+#include "entity.h"
 #include "game_object.h"
+#include "property.h"
 #include <vector>
 
 void Scene::update(float dt)
@@ -83,4 +85,53 @@ void Scene::pruneInactive()
     m_objects.erase(
         std::remove_if(m_objects.begin(), m_objects.end(), [](const auto& o) { return !o->isActive(); }),
         m_objects.end());
+}
+
+std::vector<EntityInfo> Scene::getEntities() const
+{
+    std::vector<EntityInfo> out;
+    out.reserve(m_objects.size());
+
+    for (const auto& obj : m_objects)
+    {
+        if (!obj->isActive()) continue;
+
+        out.push_back({obj->entityId(), obj->typeName() + " #" + std::to_string(obj->entityId())});
+    }
+    return out;
+}
+
+IInspectable* Scene::findInspectable(EntityId id) const
+{
+    if (id == INVALID_ENTITY) return nullptr;
+
+    for (const auto& obj : m_objects)
+    {
+        if (obj->entityId() == id) return obj.get();
+    }
+    return nullptr;
+}
+
+EntityId Scene::pick(glm::vec2 worldPos) const
+{
+    // getRenderables() draws in list order, so the last object is on top.
+    for (auto it = m_objects.rbegin(); it != m_objects.rend(); ++it)
+    {
+        GameObject* obj = it->get();
+        if (!obj->isActive() || !obj->isVisible()) continue;
+
+        const glm::vec2 pos  = obj->getPosition();
+        const glm::vec2 size = obj->getSize();
+        if (worldPos.x >= pos.x && worldPos.x < pos.x + size.x &&
+            worldPos.y >= pos.y && worldPos.y < pos.y + size.y)
+        {
+            return obj->entityId();
+        }
+    }
+    return INVALID_ENTITY;
+}
+
+void Scene::destroy(EntityId id)
+{
+    std::erase_if(m_objects, [id](const auto& obj) { return obj->entityId() == id; });
 }

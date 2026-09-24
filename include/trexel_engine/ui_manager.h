@@ -1,10 +1,9 @@
 #pragma once
 
 #include <SDL.h>
-#include "glm/glm.hpp"
 #include "imgui.h"
 
-#include "game_actions.h"
+struct EditorContext;
 
 class UIManager
 {
@@ -19,23 +18,17 @@ public:
 
     void begin_frame();
     void render();
-    void build(SDL_Texture* world_texture);
+    void build(EditorContext& ctx, SDL_Texture* world_texture);
     void draw(SDL_Renderer* renderer);
 
     ImVec2 viewport_size() const { return m_viewportSize; }
 
-    void queueCommand(const GameAction& command);
-    std::vector<GameAction> flush_commands();
-
-    bool getGameMode() { return m_inGameMode; }
-
+    bool wantsKeyboard() const; // when UI widget should get keyboard input
 private:
-    struct {
-        std::vector<GameAction> m_pendingCommands;
-    } state;
+    void drawToolbar(EditorContext& ctx);
+    void drawHierarchy(EditorContext& ctx);
+    void drawInspector(EditorContext& ctxs);
+    void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
 
-    void setup_host_window();
-
-    ImVec2 m_viewportSize = ImVec2(800.0f, 600.0f);
-    bool m_inGameMode = false;
+    ImVec2 m_viewportSize = ImVec2(0.0f, 0.0f);
 };

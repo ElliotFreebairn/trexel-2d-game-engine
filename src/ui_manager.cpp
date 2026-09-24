@@ -1,9 +1,45 @@
 #include "ui_manager.h"
+#include "editor_command.h"
+#include "editor_state.h"
+#include "entity.h"
+#include "game.h"
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
-#include "mydefines.h"
+#include "property.h"
+
+#include <glm/glm.hpp>
 #include <stdexcept>
+
+namespace
+{
+// Draws one property. If the user edits it, emits a SetProperty command.
+// The UI never changes the object itself.
+void drawProperty(EntityId id, const Property& p, CommandQueue& commands)
+{
+    PropertyValue edited = p.value; // ImGui edits this local copy
+    bool changed = false;
+    const char* label = p.name.c_str();
+
+    ImGui::BeginDisabled(p.readOnly);
+    if (auto* b = std::get_if<bool>(&edited))
+        changed = ImGui::Checkbox(label, b);
+    else if (auto* i = std::get_if<int>(&edited))
+        changed = ImGui::DragInt(label, i);
+    else if (auto* f = std::get_if<float>(&edited))
+        changed = ImGui::DragFloat(label, f);
+    else if (auto* v = std::get_if<glm::vec2>(&edited))
+        changed = ImGui::DragFloat2(label, &v->x);
+    else if (auto* s = std::get_if<std::string>(&edited))
+        ImGui::LabelText(label, "%s", s->c_str());
+    ImGui::EndDisabled();
+
+    if (changed)
+    {
+        commands.push(EditorCommand::setProperty(id, p.name, std::move(edited)));
+    }
+}
+} // namespace
 
 UIManager::UIManager(SDL_Window* window, SDL_Renderer* renderer)
 {
@@ -43,68 +79,135 @@ void UIManager::process_event(const SDL_Event& e)
     ImGui_ImplSDL2_ProcessEvent(&e);
 }
 
+bool UIManager::wantsKeyboard() const
+{
+    return ImGui::GetIO().WantCaptureKeyboard;
+}
+
 void UIManager::begin_frame()
 {
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    setup_host_window();
+
+    ImGui::DockSpaceOverViewport();
 }
 
-void UIManager::setup_host_window()
+void UIManager::build(EditorContext& ctx, SDL_Texture* world_texture)
 {
-    constexpr ImGuiWindowFlags host_flags =
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
-        ImGuiWindowFlags_NoBackground;
-
-    ImGui::Begin("HostWindow", nullptr, host_flags);
-    ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
-    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
-    ImGui::End();
+    drawToolbar(ctx);
+    drawHierarchy(ctx);
+    drawInspector(ctx);
+    drawViewport(ctx, world_texture);
 }
 
-void UIManager::build(SDL_Texture* world_texture)
+void UIManager::drawToolbar(EditorContext &ctx)
 {
     ImGui::Begin("Toolbar");
 
-    if (ImGui::Button("Enter Game Mode"))
+    if (ImGui::CollapsingHeader("Game Options", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        m_inGameMode = !m_inGameMode;
+        // The UI only asks. The Engine owns the play mode.
+        if (ctx.state.playing)
+        {
+            if (ImGui::Button("Stop"))
+            {
+                ctx.commands.push(EditorCommand::setPlayMode(false));
+            }
+        }
+        else
+        {
+            if (ImGui::Button("Play"))
+            {
+                ctx.commands.push(EditorCommand::setPlayMode(true));
+            }
+        }
+
+        ImGui::SameLine();
+        //if (ImGui::Button("Spawn Block"))
+        //{
+        //    const glm::vec2 centre(m_viewportSize.x * 0.5f, m_viewportSize.y * 0.5f);
+        //    ctx.commands.push(EditorCommand::spawnEntity("block", centre));
+        //}
     }
 
-    if (ImGui::Button("Toggle Collision Debugging"))
+    if (ImGui::CollapsingHeader("Debugging", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        DEBUG_COLLISION = !DEBUG_COLLISION;
+        ImGui::Checkbox("Collision Boxes", &ctx.state.showColliders);
+        ImGui::Text("%.1f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
     }
 
     ImGui::End();
+}
 
+void UIManager::drawHierarchy(EditorContext &ctx)
+{
+    ImGui::Begin("Hierachy");
+
+    for (const EntityInfo& info : ctx.game.getEntities())
+    {
+        ImGui::PushID(static_cast<int>(info.id));
+        if (ImGui::Selectable(info.name.c_str(), ctx.state.selected == info.id))
+        {
+            ctx.state.selected = info.id;
+        }
+        ImGui::PopID();
+    }
+
+    if (ctx.state.selected != INVALID_ENTITY)
+    {
+        ImGui::Separator();
+        if (ImGui::Button("Delete Selected"))
+        {
+            // .. delete
+        }
+    }
+
+    ImGui::End();
+}
+
+void UIManager::drawInspector(EditorContext &ctx)
+{
+    ImGui::Begin("Inspector");
+
+    // works for any game, the UI only knows IInspectable
+    const IInspectable* object = ctx.game.findInspectable(ctx.state.selected);
+    if (!object)
+    {
+        ImGui::TextUnformatted("Nothing Selected");
+    }
+    else
+    {
+        ImGui::Text("%s (id %u)", object->typeName().c_str(), static_cast<unsigned>(object->entityId()));
+        ImGui::Separator();
+        for (const Property& p : object->properties())
+        {
+            drawProperty(ctx.state.selected, p, ctx.commands);
+
+        }
+    }
+
+    ImGui::End();
+}
+
+void UIManager::drawViewport(EditorContext &ctx, SDL_Texture *world_texture)
+{
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
     m_viewportSize = ImGui::GetContentRegionAvail();
 
     // Top-left of the image on the screen
-    ImVec2 cursor_screen_pos = ImGui::GetCursorScreenPos();
+    const ImVec2 image_pos = ImGui::GetCursorScreenPos();
     ImGui::Image((ImTextureID)(intptr_t)world_texture, m_viewportSize);
 
-    // Check interaction inside viewport
-    if (ImGui::IsItemHovered())
+    // Click to pick. The world texture is drawn 1:1, so the position inside
+    // the image is the world position. (Once you add a camera, convert here.)
+    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
     {
-        // For now calculate viewport every time mouse hovered over viewport
-        ImVec2 mouse_pos = ImGui::GetMousePos();
-        glm::vec2 local_viewport_pos =
-        {
-            mouse_pos.x - cursor_screen_pos.x,
-            mouse_pos.y - cursor_screen_pos.y
-        };
-
-        // Add function that gets loacl viewport pos
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-        {
-
-        }
+        const ImVec2 mouse = ImGui::GetMousePos();
+        const glm::vec2 world_pos(mouse.x - image_pos.x, mouse.y - image_pos.y);
+        ctx.state.selected = ctx.game.pick(world_pos);
     }
+
     ImGui::End();
 }
 
@@ -116,16 +219,4 @@ void UIManager::render()
 void UIManager::draw(SDL_Renderer* renderer)
 {
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
-}
-
-std::vector<GameAction> UIManager::flush_commands()
-{
-    std::vector<GameAction> commands = std::move(state.m_pendingCommands);
-    state.m_pendingCommands.clear();
-    return commands;
-}
-
-void UIManager::queueCommand(const GameAction& command)
-{
-    state.m_pendingCommands.push_back(command);
 }

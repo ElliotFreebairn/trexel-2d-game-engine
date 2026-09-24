@@ -9,7 +9,9 @@
 // Custom includes
 #include "common.h"
 #include "IRenderable.h"
+#include "entity.h"
 #include "game_object_def.h"
+#include "property.h"
 #include "sprite.h"
 #include "collision.h"
 
@@ -17,12 +19,17 @@
 #include <optional>
 #include <iostream>
 
-class GameObject : public IRenderable
+class GameObject : public IRenderable, public IInspectable
 {
 public:
     GameObject(glm::vec2 position, const GameObjectDef& def);
-    GameObject();
-    ~GameObject();
+    GameObject() = default;
+
+    // Each object has a unique editor id, so copying will duplicate the id
+    GameObject(const GameObject&) = delete;
+    GameObject& operator=(const GameObject&) = delete;
+
+    ~GameObject() override = default;
 
     /*
      * update will be called every frame
@@ -30,6 +37,7 @@ public:
     virtual void update(float dt) = 0;
 
     AABB getBounds() const;
+    AABB getBoundsAt(glm::vec2 position) const;
 
     // IRenderable getters
     glm::vec2 getPosition() const override { return m_position; }
@@ -52,6 +60,7 @@ public:
 
     // IRenderable setters
     void setPosition(glm::vec2 position) { m_position = position; }
+    void setSize(glm::vec2 size) { m_size = size; }
     void setAngle(double angle) { m_angle = angle; }
     void setFlip(Flip flip) { m_flip = flip; }
 
@@ -62,7 +71,12 @@ public:
     // previous positioning
     glm::vec2 getPrevPosition() const { return m_prevPosition; }
     void setPrevPosition(glm::vec2 p) { m_prevPosition = p; }
-    AABB getBoundsAt(glm::vec2 position) const;
+
+    // IInspectable
+    EntityId entityId() const override { return m_id; }
+    std::string typeName() const override { return "GameObject"; }
+    std::vector<Property> properties() const override;
+    void setProperty(std::string name, const PropertyValue& value) override;
 
 protected:
     std::optional<Sprite> m_sprite;
@@ -71,8 +85,8 @@ protected:
     bool m_isVisible = true;
     bool m_isActive = true;
 
-    glm::vec2 m_position;
-    glm::vec2 m_size;
+    glm::vec2 m_position = glm::vec2(0.0f);
+    glm::vec2 m_size = glm::vec2(0.0f);
     std::string m_textureId;
     std::optional<glm::vec3> m_colour;
     double m_angle = 0.0;
@@ -81,4 +95,7 @@ protected:
     glm::vec2 m_prevPosition;
 
     void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
+
+private:
+    const EntityId m_id = allocateEntityId();
 };

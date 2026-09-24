@@ -2,9 +2,11 @@
 #include "collision.h"
 #include "common.h"
 #include "game_object_def.h"
+#include "property.h"
 #include <optional>
 
 #include <SDL_image.h>
+#include <variant>
 
 GameObject::GameObject(glm::vec2 position, const GameObjectDef& def)
     : m_position(position), m_prevPosition(position), m_size(def.size), m_textureId(def.textureId), m_colour(def.colour)
@@ -21,17 +23,6 @@ GameObject::GameObject(glm::vec2 position, const GameObjectDef& def)
     }
 }
 
-GameObject::GameObject()
-{
-    m_position = {0.0f, 0.0f};
-    m_size = {0.0f, 0.0f};
-}
-
-GameObject::~GameObject()
-{
-
-}
-
 std::string GameObject::getTextureID() const
 {
     return m_sprite ? m_sprite->getTextureID() : m_textureId;
@@ -46,7 +37,7 @@ AABB GameObject::getBoundsAt(glm::vec2 position) const
 {
     if (!m_collider)
     {
-        return AABB{m_position, m_position + m_size};
+        return AABB{position, position + m_size};
     }
 
     const Collider& c = *m_collider;
@@ -57,7 +48,7 @@ AABB GameObject::getBoundsAt(glm::vec2 position) const
         offsetX = m_size.x - c.offset.x - c.size.x;
     }
 
-    glm::vec2 min = m_position + glm::vec2(offsetX, c.offset.y);
+    glm::vec2 min = position + glm::vec2(offsetX, c.offset.y);
     glm::vec2 max = min + c.size;
     return AABB{min, max};
 }
@@ -65,4 +56,29 @@ AABB GameObject::getBoundsAt(glm::vec2 position) const
 AABB GameObject::getBounds() const
 {
     return getBoundsAt(m_position);
+}
+
+
+// Editor
+std::vector<Property> GameObject::properties() const
+{
+    return {
+        Property("position", m_position),
+        Property("size", m_size),
+        Property("angle", static_cast<float>(m_angle)),
+        Property("visible", m_isVisible),
+        Property("active", m_isActive, /*READ ONLY */true),
+    };
+}
+
+void GameObject::setProperty(std::string name, const PropertyValue& value)
+{
+    if (name == "position")
+    {
+        m_position = std::get<glm::vec2>(value);
+        m_prevPosition = m_position;
+    }
+    else if (name == "size") m_size = std::get<glm::vec2>(value);
+    else if (name == "angle") m_angle = std::get<float>(value);
+    else if (name == "visible") m_isVisible = std::get<bool>(value);
 }
