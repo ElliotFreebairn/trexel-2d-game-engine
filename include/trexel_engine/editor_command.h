@@ -46,6 +46,15 @@ struct EditorCommand
         return command;
     }
 
+    static EditorCommand spawnEntity(std::string textureId, glm::vec2 position)
+    {
+        EditorCommand command;
+        command.type = EditorCommandType::SpawnEntity;
+        command.position = position;
+        return command;
+
+    }
+
     // Complete spawnEntity and destoryEntity
 };
 

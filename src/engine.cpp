@@ -10,16 +10,7 @@
 #include <SDL.h>
 #include <SDL_keyboard.h>
 #include <SDL_scancode.h>
-#include <algorithm>
 #include <chrono>
-
-
-namespace
-{
-    constexpr float FIXED_TIMESTEP = 1.0f / 60.0f; // game steps in 1/60s slices
-    constexpr float MAX_FRAME_TIME = 0.25f;
-}
-
 
 Engine::Engine(std::unique_ptr<Game> game)
     : m_sdlContext("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -112,8 +103,8 @@ void Engine::update(float frameTime)
 {
     applyCommands();
 
-    // Always sample so edge detection stays correct, then throw the input
-    // away if we are not playing or the UI (e.g. a text box) wants the keys.
+    // We always want to sample for edge detection
+    // If we are not playing, or the UI wants the input, wipe the input state
     InputState input = sampleInput();
     if (!m_editorState.playing || m_uiManager.wantsKeyboard())
     {
@@ -122,25 +113,15 @@ void Engine::update(float frameTime)
 
     if (!m_editorState.playing)
     {
-        m_accumulator = 0.0f;
         m_jumpQueued = false;
         return;
     }
 
-    // Fixed timestep: the game advances in equal slices no matter the frame rate.
-    m_accumulator += std::min(frameTime, MAX_FRAME_TIME);
-
-    // A key press can arrive on a frame that runs zero steps, so latch it
-    // until the next step consumes it (and make sure only one step sees it).
     if (input.jumpPressed) m_jumpQueued = true;
 
-    while (m_accumulator >= FIXED_TIMESTEP)
-    {
-        input.jumpPressed = m_jumpQueued;
-        m_game->onUpdate(FIXED_TIMESTEP, input);
-        m_jumpQueued = false;
-        m_accumulator -= FIXED_TIMESTEP;
-    }
+    input.jumpPressed = m_jumpQueued;
+    m_game->onUpdate(frameTime, input);
+    m_jumpQueued = false;
 }
 
 
@@ -150,26 +131,26 @@ void Engine::render()
     SDL_Renderer* renderer = m_sdlContext.renderer();
 
     // 1. Render the game/scene first
-    const ImVec2 desired = m_uiManager.viewport_size();
-    const int width = static_cast<int>(desired.x);
-    const int height = static_cast<int>(desired.y);
+    const ImVec2 desired_viewport = m_uiManager.viewport_size();
+    const int width = static_cast<int>(desired_viewport.x);
+    const int height = static_cast<int>(desired_viewport.y);
     if (m_gameRenderer.resize(renderer, width, height))
     {
-        // The renderer only reads the game, so the engine passes the new size on.
         m_game->setViewport(glm::vec2(static_cast<float>(width), static_cast<float>(height)));
     }
 
+    // Render options directly manipulate what/how is rendered to the game
     RenderOptions options;
     options.showColliders = m_editorState.showColliders;
     m_gameRenderer.render(renderer, m_game.get(), m_textureManager, options);
 
-    // 2. Build the UI. It gets a read-only game and the command queue.
+    // Build the UI and it get's the read-only game
+    // Changing the game via the UI requires applyCommand
     EditorContext ctx{*m_game, m_commands, m_editorState};
     m_uiManager.begin_frame();
     m_uiManager.build(ctx, m_gameRenderer.texture());
     m_uiManager.render();
 
-    // 3. Render the composite frame
     SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
     SDL_RenderClear(renderer);
     m_uiManager.draw(renderer);

@@ -15,13 +15,13 @@ namespace
 {
 // Draws one property. If the user edits it, emits a SetProperty command.
 // The UI never changes the object itself.
-void drawProperty(EntityId id, const Property& p, CommandQueue& commands)
+void drawProperty(EntityId id, const Property& property, CommandQueue& commands)
 {
-    PropertyValue edited = p.value; // ImGui edits this local copy
+    PropertyValue edited = property.value; // UI edits this local copy
     bool changed = false;
-    const char* label = p.name.c_str();
+    const char* label = property.name.c_str();
 
-    ImGui::BeginDisabled(p.readOnly);
+    ImGui::BeginDisabled(property.readOnly);
     if (auto* b = std::get_if<bool>(&edited))
         changed = ImGui::Checkbox(label, b);
     else if (auto* i = std::get_if<int>(&edited))
@@ -36,7 +36,7 @@ void drawProperty(EntityId id, const Property& p, CommandQueue& commands)
 
     if (changed)
     {
-        commands.push(EditorCommand::setProperty(id, p.name, std::move(edited)));
+        commands.push(EditorCommand::setProperty(id, property.name, std::move(edited)));
     }
 }
 } // namespace
@@ -124,17 +124,16 @@ void UIManager::drawToolbar(EditorContext &ctx)
         }
 
         ImGui::SameLine();
-        //if (ImGui::Button("Spawn Block"))
-        //{
-        //    const glm::vec2 centre(m_viewportSize.x * 0.5f, m_viewportSize.y * 0.5f);
-        //    ctx.commands.push(EditorCommand::spawnEntity("block", centre));
-        //}
+        if (ImGui::Button("Spawn Block"))
+        {
+            const glm::vec2 centre(m_viewportSize.x * 0.5f, m_viewportSize.y * 0.5f);
+            ctx.commands.push(EditorCommand::spawnEntity("block", centre));
+        }
     }
 
     if (ImGui::CollapsingHeader("Debugging", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Checkbox("Collision Boxes", &ctx.state.showColliders);
-        ImGui::Text("%.1f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
     }
 
     ImGui::End();
@@ -195,12 +194,10 @@ void UIManager::drawViewport(EditorContext &ctx, SDL_Texture *world_texture)
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
     m_viewportSize = ImGui::GetContentRegionAvail();
 
-    // Top-left of the image on the screen
+    // top-left
     const ImVec2 image_pos = ImGui::GetCursorScreenPos();
     ImGui::Image((ImTextureID)(intptr_t)world_texture, m_viewportSize);
 
-    // Click to pick. The world texture is drawn 1:1, so the position inside
-    // the image is the world position. (Once you add a camera, convert here.)
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
     {
         const ImVec2 mouse = ImGui::GetMousePos();

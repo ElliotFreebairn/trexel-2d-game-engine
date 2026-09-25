@@ -24,7 +24,6 @@ public:
     void pop();
 
     void update(float dt);
-    void handleAction(const GameAction& action);
 
     std::vector<const IRenderable*> getRenderables() const;
 
