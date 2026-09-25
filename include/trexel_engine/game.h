@@ -88,6 +88,7 @@ public:
                 m_sceneManager.current()->createObject<SceneObject>(command.position, ObjectDefs::GrassBlock());
                 break;
             case EditorCommandType::DestroyEntity:
+                m_sceneManager.current()->destroy(command.entity);
                 break;
             case EditorCommandType::SetPlayMode:
                 break; // owned by the game engine

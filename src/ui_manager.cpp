@@ -11,10 +11,7 @@
 #include <glm/glm.hpp>
 #include <stdexcept>
 
-namespace
-{
 // Draws one property. If the user edits it, emits a SetProperty command.
-// The UI never changes the object itself.
 void drawProperty(EntityId id, const Property& property, CommandQueue& commands)
 {
     PropertyValue edited = property.value; // UI edits this local copy
@@ -39,7 +36,6 @@ void drawProperty(EntityId id, const Property& property, CommandQueue& commands)
         commands.push(EditorCommand::setProperty(id, property.name, std::move(edited)));
     }
 }
-} // namespace
 
 UIManager::UIManager(SDL_Window* window, SDL_Renderer* renderer)
 {
@@ -158,7 +154,7 @@ void UIManager::drawHierarchy(EditorContext &ctx)
         ImGui::Separator();
         if (ImGui::Button("Delete Selected"))
         {
-            // .. delete
+            ctx.commands.push(EditorCommand::destroyEntity(ctx.state.selected));
         }
     }
 
@@ -182,7 +178,6 @@ void UIManager::drawInspector(EditorContext &ctx)
         for (const Property& p : object->properties())
         {
             drawProperty(ctx.state.selected, p, ctx.commands);
-
         }
     }
 

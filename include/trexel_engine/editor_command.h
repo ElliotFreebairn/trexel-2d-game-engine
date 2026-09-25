@@ -55,6 +55,14 @@ struct EditorCommand
 
     }
 
+    static EditorCommand destroyEntity(EntityId id)
+    {
+        EditorCommand command;
+        command.type = EditorCommandType::DestroyEntity;
+        command.entity = id;
+        return command;
+    }
+
     // Complete spawnEntity and destoryEntity
 };
 
