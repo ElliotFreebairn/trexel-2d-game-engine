@@ -50,6 +50,8 @@ class Engine {
         float m_accumulator = 0.0f;
         bool m_jumpWasDown = false;
         bool m_jumpQueued = false;
+        bool m_fireWasDown = false;
+        bool m_fireQueued = false;
 
         static constexpr int SCREEN_WIDTH = 1280;
         static constexpr int SCREEN_HEIGHT = 720;

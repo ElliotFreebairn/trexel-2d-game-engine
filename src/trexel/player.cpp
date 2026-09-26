@@ -1,8 +1,10 @@
 #include "player.h"
+#include "bow_item.h"
 #include "collision.h"
 #include "common.h"
 #include "game_object.h"
 #include "object_defs.h"
+#include "scene.h"
 #include "sprite.h"
 #include <SDL_render.h>
 
@@ -37,6 +39,11 @@ void Player::update(float dt)
         }
     }
 
+    if (m_fireCooldown > 0.0f)
+    {
+        m_fireCooldown -= dt;
+    }
+
     resolveSpriteState();
     updateSprite(dt);
     m_isMoving = false;
@@ -53,6 +60,10 @@ void Player::resolveSpriteState()
 
 void Player::move(glm::vec2 delta)
 {
+    if (delta.x != 0.0f)
+    {
+        m_facing = glm::vec2(delta.x < 0.0f ? -1.0f : 1.0f, 0.0f);
+    }
     setFlip(delta.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE);
     m_position += delta * 200.0f;
     m_isMoving = true;
@@ -64,6 +75,14 @@ void Player::jump()
     m_isJumping = true;
     m_velocityY = JUMP_FORCE;
     m_lastJumpPoint = m_position.y;
+}
+
+void Player::fire(Scene& scene)
+{
+    if (m_fireCooldown > 0.0f) return;
+
+    m_bow.onUse(*this, scene);
+    m_fireCooldown = BOW_COOLDOWN;
 }
 
 void Player::evCollided(CollisionAxis axis)

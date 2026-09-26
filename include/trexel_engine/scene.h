@@ -48,6 +48,8 @@ public:
     virtual void spawn(const std::string& prototype, glm::vec2 position) { (void)prototype; (void)position; }
     virtual void destroy(EntityId id);
 
+    // Does probe overlap something, doesn't actually resolve the collision
+    bool overlapsSolid(const GameObject& probe, EntityId ignore = INVALID_ENTITY) const;
 protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;
 

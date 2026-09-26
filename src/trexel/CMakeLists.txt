@@ -3,4 +3,6 @@ target_sources(trexel_exec PRIVATE
     player.cpp
     scene_object.cpp
     main_scene.cpp
+    arrow.cpp
+    bow_item.cpp
 )

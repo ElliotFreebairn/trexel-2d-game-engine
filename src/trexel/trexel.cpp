@@ -12,7 +12,6 @@
 
 Trexel::Trexel()
 {
-    onInit();
 }
 
 Trexel::~Trexel()
@@ -37,6 +36,14 @@ void Trexel::onUpdate(float deltaTime, const InputState& input)
         {
             player->jump();
         }
+        if (input.firePressed)
+        {
+            if (MainScene* scene = dynamic_cast<MainScene*>(m_sceneManager.current()))
+            {
+                std::cout << "find dynamic main\n";
+                player->fire(*scene);
+            }
+        }
     }
 
     Game::onUpdate(deltaTime, input);
@@ -55,11 +62,14 @@ void Trexel::onShutdown()
 
 void Trexel::intialiseAssets(AssetManager &assets)
 {
-    assets.addAsset("background", "assets/trexel/world/background.png", AssetType::Texture);
+    assets.addAsset("background", "assets/trexel/world/background-2.png", AssetType::Texture);
     assets.addAsset("grass_block", "assets/trexel/world/dirt_block.png", AssetType::Texture);
 
     // player
     assets.addAsset("player_idle", "assets/trexel/player/idle-sheet.png", AssetType::Texture);
     assets.addAsset("player_walking", "assets/trexel/player/walk-sheet.png", AssetType::Texture);
     assets.addAsset("player_jumping", "assets/trexel/player/jump-sheet.png", AssetType::Texture);
+
+    // bow
+    assets.addAsset("arrow", "assets/trexel/player/arrow.png", AssetType::Texture);
 }

@@ -65,6 +65,23 @@ void Scene::resolveCollisions(GameObject &mover)
     }
 }
 
+bool Scene::overlapsSolid(const GameObject &probe, EntityId ignore) const
+{
+    if (!probe.hasCollider()) return false;
+
+    const AABB probeBounds = probe.getBounds();
+    for (const auto& objPtr : m_objects)
+    {
+        const GameObject* other = objPtr.get();
+        if (other == &probe) continue;
+        if (ignore != INVALID_ENTITY && other->getEntityId() == ignore) continue;
+        if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
+
+        if (aabbOverlap(probeBounds, other->getBounds())) return true;
+    }
+    return false;
+}
+
 std::vector<const IRenderable*> Scene::getRenderables() const
 {
     std::vector<const IRenderable*> out;
@@ -120,6 +137,7 @@ EntityId Scene::pick(glm::vec2 worldPos) const
         GameObject* obj = it->get();
         if (!obj->isActive() || !obj->isVisible()) continue;
 
+        // Return the closest object to the user mouse position
         const glm::vec2 pos  = obj->getPosition();
         const glm::vec2 size = obj->getSize();
         if (worldPos.x >= pos.x && worldPos.x < pos.x + size.x &&

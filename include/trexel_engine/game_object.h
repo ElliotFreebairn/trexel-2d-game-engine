@@ -78,6 +78,9 @@ public:
     std::vector<Property> properties() const override;
     void setProperty(std::string name, const PropertyValue& value) override;
 
+    // Entity id
+    EntityId getEntityId() const { return m_id; }
+
 protected:
     std::optional<Sprite> m_sprite;
     std::optional<Collider> m_collider;

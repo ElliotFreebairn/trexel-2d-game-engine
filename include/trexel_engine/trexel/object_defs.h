@@ -2,6 +2,7 @@
 #include "../collision.h"
 #include "../game_object_def.h"
 #include "../sprite.h"
+#include "game.h"
 
 namespace ObjectDefs
 {
@@ -35,4 +36,15 @@ namespace ObjectDefs
             }
         };
     }
+
+    inline GameObjectDef Arrow()
+    {
+        // The arrow itself shoudn't block anything (only things it flies into), so solid should be false
+        return GameObjectDef
+        {
+            .size = {48.0f, 48.0f},
+            .textureId = "arrow",
+            .collider = Collider{ .isSolid = false, .size = {48.0f, 48.0f}}
+        };
+    };
 }

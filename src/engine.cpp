@@ -80,6 +80,10 @@ InputState Engine::sampleInput()
     input.jumpPressed = jumpDown && !m_jumpWasDown;
     m_jumpWasDown = jumpDown;
 
+    const bool fireDown = keys[SDL_SCANCODE_E] != 0;
+    input.firePressed = fireDown && !m_fireWasDown;
+    m_fireWasDown = fireDown;
+
     return input;
 }
 
@@ -114,14 +118,18 @@ void Engine::update(float frameTime)
     if (!m_editorState.playing)
     {
         m_jumpQueued = false;
+        m_fireQueued = false;
         return;
     }
 
     if (input.jumpPressed) m_jumpQueued = true;
+    if (input.firePressed) m_fireQueued = true;
 
     input.jumpPressed = m_jumpQueued;
+    input.firePressed = m_fireQueued;
     m_game->onUpdate(frameTime, input);
     m_jumpQueued = false;
+    m_fireQueued = false;
 }
 
 

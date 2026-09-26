@@ -12,6 +12,8 @@ public:
 
     void onEnter() override;
 
+    void spawn(const std::string& prototype, glm::vec2 position) override;
+
     // getters
     Player* getPlayer() const { return m_player; }
 private:

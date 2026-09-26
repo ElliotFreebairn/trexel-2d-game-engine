@@ -9,7 +9,6 @@
 #include "entity.h"
 #include "game_actions.h"
 #include "input_state.h"
-#include "object_defs.h"
 #include "property.h"
 #include "scene.h"
 #include "scene_manager.h"
@@ -85,7 +84,7 @@ public:
                 }
                 break;
             case EditorCommandType::SpawnEntity:
-                m_sceneManager.current()->createObject<SceneObject>(command.position, ObjectDefs::GrassBlock());
+                //m_sceneManager.current()->createObject<SceneObject>(command.position, ObjectDefs::GrassBlock());
                 break;
             case EditorCommandType::DestroyEntity:
                 m_sceneManager.current()->destroy(command.entity);
