@@ -91,30 +91,52 @@ void UIManager::begin_frame()
 
 void UIManager::build(EditorContext& ctx, SDL_Texture* world_texture)
 {
-    drawToolbar(ctx);
-    drawHierarchy(ctx);
-    drawInspector(ctx);
+    drawMainEditorWindow(ctx);
     drawViewport(ctx, world_texture);
+}
+
+
+void UIManager::drawMainEditorWindow(EditorContext &ctx)
+{
+    // Create your single clean workspace window
+    ImGui::Begin("Workspace", NULL, ImGuiWindowFlags_NoTitleBar);
+
+    if (ImGui::BeginTabBar("WorkspaceTabBar"))
+    {
+        // 1. Draw your refactored toolbar tab
+        drawToolbar(ctx);
+
+        // 2. Draw your hierarchy tab right next to it
+        if (ImGui::BeginTabItem("Files"))
+        {
+            ImGui::EndTabItem();
+        }
+
+        drawInspector(ctx);
+
+        drawHierarchy(ctx);
+
+        ImGui::EndTabBar();
+    }
+    ImGui::End();
 }
 
 void UIManager::drawToolbar(EditorContext &ctx)
 {
-    ImGui::Begin("Toolbar");
-
-    if (ImGui::CollapsingHeader("Game Options", ImGuiTreeNodeFlags_DefaultOpen))
+    // The parent window and TabBar are handled externally now
+    if (ImGui::BeginTabItem("Toolbar"))
     {
-        // The UI only asks. The Engine owns the play mode.
+        // Use standard spacing instead of bulky CollapsingHeaders for a cleaner look
+        ImGui::TextDisabled("GAME CONTROLS");
         if (ctx.state.playing)
         {
-            if (ImGui::Button("Stop"))
-            {
+            if (ImGui::Button("Stop")) {
                 ctx.commands.push(EditorCommand::setPlayMode(false));
             }
         }
         else
         {
-            if (ImGui::Button("Play"))
-            {
+            if (ImGui::Button("Play")) {
                 ctx.commands.push(EditorCommand::setPlayMode(true));
             }
         }
@@ -125,63 +147,62 @@ void UIManager::drawToolbar(EditorContext &ctx)
             const glm::vec2 centre(m_viewportSize.x * 0.5f, m_viewportSize.y * 0.5f);
             ctx.commands.push(EditorCommand::spawnEntity("block", centre));
         }
-    }
 
-    if (ImGui::CollapsingHeader("Debugging", ImGuiTreeNodeFlags_DefaultOpen))
-    {
+        ImGui::Separator();
+        ImGui::TextDisabled("VISUALS");
         ImGui::Checkbox("Collision Boxes", &ctx.state.showColliders);
-    }
 
-    ImGui::End();
+        ImGui::EndTabItem();
+    }
 }
+
 
 void UIManager::drawHierarchy(EditorContext &ctx)
 {
-    ImGui::Begin("Hierachy");
-
-    for (const EntityInfo& info : ctx.game.getEntities())
+    if (ImGui::BeginTabItem("Hiearchy"))
     {
-        ImGui::PushID(static_cast<int>(info.id));
-        if (ImGui::Selectable(info.name.c_str(), ctx.state.selected == info.id))
+        for (const EntityInfo& info : ctx.game.getEntities())
         {
-            ctx.state.selected = info.id;
+            ImGui::PushID(static_cast<int>(info.id));
+            if (ImGui::Selectable(info.name.c_str(), ctx.state.selected == info.id))
+            {
+                ctx.state.selected = info.id;
+            }
+            ImGui::PopID();
         }
-        ImGui::PopID();
-    }
 
-    if (ctx.state.selected != INVALID_ENTITY)
-    {
-        ImGui::Separator();
-        if (ImGui::Button("Delete Selected"))
+        if (ctx.state.selected != INVALID_ENTITY)
         {
-            ctx.commands.push(EditorCommand::destroyEntity(ctx.state.selected));
+            ImGui::Separator();
+            if (ImGui::Button("Delete Selected"))
+            {
+                ctx.commands.push(EditorCommand::destroyEntity(ctx.state.selected));
+            }
         }
-    }
-
-    ImGui::End();
+        ImGui::EndTabItem();}
 }
 
 void UIManager::drawInspector(EditorContext &ctx)
 {
-    ImGui::Begin("Inspector");
-
-    // works for any game, the UI only knows IInspectable
-    const IInspectable* object = ctx.game.findInspectable(ctx.state.selected);
-    if (!object)
+    if (ImGui::BeginTabItem("Inspector"))
     {
-        ImGui::TextUnformatted("Nothing Selected");
-    }
-    else
-    {
-        ImGui::Text("%s (id %u)", object->typeName().c_str(), static_cast<unsigned>(object->entityId()));
-        ImGui::Separator();
-        for (const Property& p : object->properties())
+        // works for any game, the UI only knows IInspectable
+        const IInspectable* object = ctx.game.findInspectable(ctx.state.selected);
+        if (!object)
         {
-            drawProperty(ctx.state.selected, p, ctx.commands);
+            ImGui::TextUnformatted("Nothing Selected");
         }
+        else
+        {
+            ImGui::Text("%s (id %u)", object->typeName().c_str(), static_cast<unsigned>(object->entityId()));
+            ImGui::Separator();
+            for (const Property& p : object->properties())
+            {
+                drawProperty(ctx.state.selected, p, ctx.commands);
+            }
+        }
+        ImGui::EndTabItem();
     }
-
-    ImGui::End();
 }
 
 void UIManager::drawViewport(EditorContext &ctx, SDL_Texture *world_texture)

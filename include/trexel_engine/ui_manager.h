@@ -29,6 +29,7 @@ private:
     void drawHierarchy(EditorContext& ctx);
     void drawInspector(EditorContext& ctxs);
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
+    void drawMainEditorWindow(EditorContext& ctx);
 
     ImVec2 m_viewportSize = ImVec2(0.0f, 0.0f);
 };
