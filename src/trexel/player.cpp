@@ -44,6 +44,12 @@ void Player::update(float dt)
         m_fireCooldown -= dt;
     }
 
+    // The attack animation is one-shot (SINGULAR)
+    if(m_isAttacking && m_sprite && m_sprite->isFinished())
+    {
+        m_isAttacking = false;
+    }
+
     resolveSpriteState();
     updateSprite(dt);
     m_isMoving = false;
@@ -52,6 +58,8 @@ void Player::update(float dt)
 void Player::resolveSpriteState()
 {
     if (!m_sprite) return;
+
+    if (m_isAttacking) return;
 
     if (m_isJumping) m_sprite->play(SpriteMovementState::JUMPING);
     else if (m_isMoving) m_sprite->play(SpriteMovementState::WALKING);
@@ -77,12 +85,29 @@ void Player::jump()
     m_lastJumpPoint = m_position.y;
 }
 
-void Player::fire(Scene& scene)
+void Player::fire()
 {
     if (m_fireCooldown > 0.0f) return;
 
-    m_bow.onUse(*this, scene);
+    m_isAttacking = true;
+    m_hasFiredThisAttack = false;
     m_fireCooldown = BOW_COOLDOWN;
+
+    if (m_sprite) m_sprite->play(SpriteMovementState::ATTACKING);
+}
+
+bool Player::wantsToReleaseArrow() const
+{
+    return m_isAttacking
+        &&  !m_hasFiredThisAttack
+        && m_sprite
+        && m_sprite->currentFrame() >= RELEASE_FRAME;
+}
+
+void Player::releaseArrow(Scene& scene)
+{
+    m_bow.onUse(*this, scene);
+    m_hasFiredThisAttack = true;
 }
 
 void Player::evCollided(CollisionAxis axis)

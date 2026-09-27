@@ -12,10 +12,13 @@ void Sprite::play(SpriteMovementState state)
     m_currentState = state;
     m_currentFrame = 0;
     m_elapsed = 0.0f;
+    m_finished = false; // a fresh play
 }
 
 void Sprite::update(float deltaTime)
 {
+    if (m_finished) return;
+
     auto it = m_animations.find(m_currentState);
     if (it == m_animations.end()) return;
     const SpriteAnimation& animation = it->second;
@@ -24,7 +27,23 @@ void Sprite::update(float deltaTime)
     if (m_elapsed >= animation.frameDuration)
     {
         m_elapsed -= animation.frameDuration;
-        m_currentFrame = (m_currentFrame + 1) % animation.columns;
+
+        const bool oneLastFrame = (m_currentFrame + 1 >= animation.columns);
+
+        if (oneLastFrame && animation.animationType == AnimationType::SINGULAR)
+        {
+            m_finished = true;
+        }
+        else
+        {
+            m_currentFrame = (m_currentFrame + 1) % animation.columns;
+        }
+    }
+
+    // Temp: figure out what the default is
+    if (animation.animationType == AnimationType::SINGULAR && m_currentFrame == animation.columns)
+    {
+        m_currentState = SpriteMovementState::IDLE;
     }
 }
 

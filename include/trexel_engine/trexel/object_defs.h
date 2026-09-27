@@ -33,6 +33,7 @@ namespace ObjectDefs
                 { SpriteMovementState::IDLE,    SpriteAnimation{"player_idle", 128, 128, 6, 1, 0.2f} },
                 { SpriteMovementState::WALKING, SpriteAnimation{"player_walking", 128, 128, 8, 1, 0.2f} },
                 { SpriteMovementState::JUMPING, SpriteAnimation{"player_jumping", 128, 128, 9, 1, 0.2f} },
+                { SpriteMovementState::ATTACKING, SpriteAnimation{"player_shooting", 128, 128, 14, 1, 0.1f, AnimationType::SINGULAR}}
             }
         };
     }

@@ -38,10 +38,14 @@ void Trexel::onUpdate(float deltaTime, const InputState& input)
         }
         if (input.firePressed)
         {
+           player->fire();
+        }
+
+        if (player->wantsToReleaseArrow())
+        {
             if (MainScene* scene = dynamic_cast<MainScene*>(m_sceneManager.current()))
             {
-                std::cout << "find dynamic main\n";
-                player->fire(*scene);
+                player->releaseArrow(*scene);
             }
         }
     }
@@ -69,6 +73,7 @@ void Trexel::intialiseAssets(AssetManager &assets)
     assets.addAsset("player_idle", "assets/trexel/player/idle-sheet.png", AssetType::Texture);
     assets.addAsset("player_walking", "assets/trexel/player/walk-sheet.png", AssetType::Texture);
     assets.addAsset("player_jumping", "assets/trexel/player/jump-sheet.png", AssetType::Texture);
+    assets.addAsset("player_shooting", "assets/trexel/player/shot.png", AssetType::Texture);
 
     // bow
     assets.addAsset("arrow", "assets/trexel/player/arrow.png", AssetType::Texture);

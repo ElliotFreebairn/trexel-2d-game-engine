@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <functional>
 
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -12,7 +13,14 @@ enum class SpriteMovementState
     IDLE,
     WALKING,
     RUNNING,
-    JUMPING
+    JUMPING,
+    ATTACKING
+};
+
+enum class AnimationType
+{
+    SINGULAR,
+    CONTINUOUS
 };
 
 struct SpriteAnimation
@@ -23,6 +31,7 @@ struct SpriteAnimation
     int columns;
     int rows = 1;
     float frameDuration = 0.15f;
+    AnimationType animationType = AnimationType::CONTINUOUS;
 };
 
 class Sprite
@@ -40,6 +49,8 @@ public:
 
     std::string getTextureID() const;
     Rect getSrcRect() const;
+    bool isFinished() const { return m_finished; }
+    int currentFrame() const { return m_currentFrame; }
 
 private:
     std::unordered_map<SpriteMovementState, SpriteAnimation> m_animations;
@@ -49,6 +60,7 @@ private:
 
     int m_currentFrame = 0;
     float m_elapsed = 0.0f;
+    bool m_finished = false;
 
     int currentRow(const SpriteAnimation& animation) const;
 };

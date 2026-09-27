@@ -23,7 +23,10 @@ public:
     // Custom player functions
     void move(glm::vec2 delta);
     void jump();
-    void fire(Scene& scene);
+
+    void fire();
+    bool wantsToReleaseArrow() const;
+    void releaseArrow(Scene& scene);
 
     std::string typeName() const override { return "Player"; }
     glm::vec2 getFacing() const { return m_facing; }
@@ -33,6 +36,11 @@ public:
 private:
     bool m_isMoving = false;
     bool m_isJumping = false;
+    bool m_isAttacking = false;
+
+    bool m_hasFiredThisAttack = false;
+
+    static constexpr int RELEASE_FRAME = 13;
 
     float m_velocityY = 0.0f;
     float m_lastJumpPoint = 0.0f;
