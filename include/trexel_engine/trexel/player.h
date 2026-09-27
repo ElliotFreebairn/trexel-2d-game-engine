@@ -31,6 +31,8 @@ public:
     std::string typeName() const override { return "Player"; }
     glm::vec2 getFacing() const { return m_facing; }
 
+    std::vector<Property> properties() const override;
+
     // Game object functions
     void update(float dt) override;
 private:

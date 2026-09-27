@@ -9,6 +9,7 @@
 
 #include <SDL.h>
 #include <SDL_keyboard.h>
+#include <SDL_mouse.h>
 #include <SDL_scancode.h>
 #include <chrono>
 
@@ -72,15 +73,13 @@ InputState Engine::sampleInput()
     InputState input;
     if (keys[SDL_SCANCODE_A]) input.move.x -= 1.0f;
     if (keys[SDL_SCANCODE_D]) input.move.x += 1.0f;
-    if (keys[SDL_SCANCODE_W]) input.move.y -= 1.0f;
-    if (keys[SDL_SCANCODE_S]) input.move.y += 1.0f;
 
     const bool jumpDown = keys[SDL_SCANCODE_SPACE] != 0;
     input.jumpHeld = jumpDown;
     input.jumpPressed = jumpDown && !m_jumpWasDown;
     m_jumpWasDown = jumpDown;
 
-    const bool fireDown = keys[SDL_SCANCODE_E] != 0;
+    const bool fireDown = keys[SDL_SCANCODE_F] != 0;
     input.firePressed = fireDown && !m_fireWasDown;
     m_fireWasDown = fireDown;
 

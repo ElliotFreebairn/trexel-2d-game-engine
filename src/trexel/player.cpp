@@ -4,12 +4,14 @@
 #include "common.h"
 #include "game_object.h"
 #include "object_defs.h"
+#include "property.h"
 #include "scene.h"
 #include "sprite.h"
 #include <SDL_render.h>
 
 // C++ includes
 #include <iostream>
+#include <vector>
 
 Player::Player(glm::vec2 position)
     : GameObject(position, ObjectDefs::Player())
@@ -109,4 +111,14 @@ void Player::evCollided(CollisionAxis axis)
         m_isJumping = false;
         m_velocityY = 0.0f;
     }
+}
+
+// Editor
+std::vector<Property> Player::properties() const
+{
+    std::vector<Property> properties = GameObject::properties();
+
+    properties.insert(properties.end(), {Property("jumping", m_isJumping, true), Property("grounded", m_isGrounded, true)});
+
+    return properties;
 }
