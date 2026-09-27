@@ -19,4 +19,6 @@ public:
 private:
     Player* m_player = nullptr;
     glm::vec2 m_viewportSize;
+
+    void buildEnvironment();
 };

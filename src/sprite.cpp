@@ -39,12 +39,6 @@ void Sprite::update(float deltaTime)
             m_currentFrame = (m_currentFrame + 1) % animation.columns;
         }
     }
-
-    // Temp: figure out what the default is
-    if (animation.animationType == AnimationType::SINGULAR && m_currentFrame == animation.columns)
-    {
-        m_currentState = SpriteMovementState::IDLE;
-    }
 }
 
 std::string Sprite::getTextureID() const

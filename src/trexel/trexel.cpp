@@ -26,6 +26,11 @@ Player* Trexel::getPlayer() const
 
 void Trexel::onUpdate(float deltaTime, const InputState& input)
 {
+    if (Scene* scene = m_sceneManager.current())
+    {
+        scene->snapshotPositions();
+    }
+
     if (Player* player = getPlayer())
     {
         if (input.move != glm::vec2(0.0f))
@@ -66,8 +71,9 @@ void Trexel::onShutdown()
 
 void Trexel::intialiseAssets(AssetManager &assets)
 {
-    assets.addAsset("background", "assets/trexel/world/background-2.png", AssetType::Texture);
-    assets.addAsset("grass_block", "assets/trexel/world/dirt_block.png", AssetType::Texture);
+    // Background / Environment
+    assets.addAsset("background", "assets/trexel/medieval/background/background.png", AssetType::Texture);
+    assets.addAsset("grass_block", "assets/trexel/medieval/platformer/grass_block.png", AssetType::Texture);
 
     // player
     assets.addAsset("player_idle", "assets/trexel/player/idle-sheet.png", AssetType::Texture);

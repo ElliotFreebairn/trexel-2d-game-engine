@@ -25,6 +25,12 @@ Player::Player() : GameObject()
 
 void Player::update(float dt)
 {
+
+    if (m_isGrounded && m_isJumping && m_velocityY >= 0.0f)
+    {
+        m_isJumping = false;
+    }
+
     if (m_fireCooldown > 0.0f)
     {
         m_fireCooldown -= dt;
@@ -67,6 +73,7 @@ void Player::jump()
 {
     if (m_isJumping) return;
     m_isJumping = true;
+    m_isGrounded = false;
     m_velocityY = JUMP_FORCE;
 }
 

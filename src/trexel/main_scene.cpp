@@ -9,7 +9,11 @@ void MainScene::update(float dt)
 {
     Scene::update(dt);
 
-    if (m_player) resolveCollisions(*m_player);
+    if (m_player)
+    {
+        resolveCollisions(*m_player);
+        m_player->setGrounded(isGroundedOn(*m_player));
+    }
 
     // Arrows react to a hit (stop/despawn) rather than resolve collsions, so don't use resolveCollisions
     for (auto& objPtr : m_objects)
@@ -23,10 +27,23 @@ void MainScene::update(float dt)
     }
 }
 
+void MainScene::buildEnvironment()
+{
+    createObject<SceneObject>(glm::vec2(500.0f, 600.0f), ObjectDefs::GrassBlock());
+    createObject<SceneObject>(glm::vec2(550.0f, 600.0f), ObjectDefs::GrassBlock());
+    createObject<SceneObject>(glm::vec2(600.0f, 600.0f), ObjectDefs::GrassBlock());
+    createObject<SceneObject>(glm::vec2(650.0f, 600.0f), ObjectDefs::GrassBlock());
+    createObject<SceneObject>(glm::vec2(700.0f, 600.0f), ObjectDefs::GrassBlock());
+    createObject<SceneObject>(glm::vec2(750.0f, 600.0f), ObjectDefs::GrassBlock());
+}
+
 void MainScene::onEnter()
 {
     setBackground("background");
-    createObject<SceneObject>(glm::vec2(500.0f, 500.0f), ObjectDefs::GrassBlock());
+
+    // temp helper function to build map
+    buildEnvironment();
+
     m_player = &createObject<Player>(glm::vec2(450.0f, 400.0f));
 }
 

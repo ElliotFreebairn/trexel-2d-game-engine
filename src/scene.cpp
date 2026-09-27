@@ -11,13 +11,20 @@ void Scene::update(float dt)
     {
         if (obj->isActive())
         {
-            obj->setPrevPosition(obj->getPosition());
             obj->update(dt);
             obj->applyGravity(dt);
         }
     }
 
     pruneInactive();
+}
+
+void Scene::snapshotPositions()
+{
+    for (auto& objPtr : m_objects)
+    {
+        objPtr->setPrevPosition(objPtr->getPosition());
+    }
 }
 
 void Scene::resolveCollisions(GameObject &mover)
@@ -79,6 +86,30 @@ bool Scene::overlapsSolid(const GameObject &probe, EntityId ignore) const
         if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
 
         if (aabbOverlap(probeBounds, other->getBounds())) return true;
+    }
+    return false;
+}
+
+bool Scene::isGroundedOn(const GameObject &probe, float skinWidth, EntityId ignore)
+{
+    if (!probe.hasCollider()) return false;
+
+    AABB bounds = probe.getBounds();
+
+    bounds.min.x += 2.0f;
+    bounds.max.x -= 2.0f;
+
+    bounds.min.y += skinWidth;
+    bounds.max.y += skinWidth;
+
+    for (const auto& objPtr : m_objects)
+    {
+        const GameObject* other = objPtr.get();
+        if (other == &probe) continue;
+        if (ignore != INVALID_ENTITY && other->entityId() == ignore) continue;
+        if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
+
+        if (aabbOverlap(bounds, other->getBounds())) return true;
     }
     return false;
 }

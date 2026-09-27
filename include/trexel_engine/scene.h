@@ -22,6 +22,8 @@ public:
 
     virtual void update(float dt);
 
+    void snapshotPositions();
+
     std::vector<const IRenderable*> getRenderables() const;
 
     template <typename T, typename... Args>
@@ -54,6 +56,8 @@ protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;
 
     void resolveCollisions(GameObject& mover);
+
+    bool isGroundedOn(const GameObject& probe, float skinWidth = 1.0f, EntityId ignore = INVALID_ENTITY);
 
 private:
     std::string m_name;

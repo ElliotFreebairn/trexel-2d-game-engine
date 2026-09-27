@@ -9,6 +9,7 @@
 #include "entity.h"
 #include "game_actions.h"
 #include "input_state.h"
+#include "main_scene.h"
 #include "property.h"
 #include "scene.h"
 #include "scene_manager.h"
@@ -24,6 +25,8 @@
 class Game
 {
 public:
+    friend class Scene;
+
     virtual ~Game() = default;
 
     void init()
@@ -109,6 +112,5 @@ protected:
     AssetManager m_assetManager;
     bool m_isRunning = true;
 
-private:
     glm::vec2 viewport = glm::vec2(0.0f);
 };

@@ -86,9 +86,20 @@ public:
     void applyGravity(float dt)
     {
         if (!m_applyGravity) return;
+
+        if (m_isGrounded && m_velocityY >= 0.0f)
+        {
+            m_velocityY = 0.0f;
+            return;
+        }
+
         m_velocityY += GRAVITY * dt;
+        if (m_velocityY > MAX_FALL_SPEED) m_velocityY = MAX_FALL_SPEED;
         m_position.y += m_velocityY * dt;
     }
+
+    bool isGrounded() const { return m_isGrounded; }
+    void setGrounded(bool grounded) { m_isGrounded = grounded; }
 
 protected:
     std::optional<Sprite> m_sprite;
@@ -97,6 +108,7 @@ protected:
     bool m_isVisible = true;
     bool m_isActive = true;
     bool m_applyGravity = false;
+    bool m_isGrounded = false;
 
     glm::vec2 m_position = glm::vec2(0.0f);
     glm::vec2 m_size = glm::vec2(0.0f);
@@ -109,6 +121,7 @@ protected:
 
     float m_velocityY = 0.0f;
     static constexpr float GRAVITY = 1500.0f;
+    static constexpr float MAX_FALL_SPEED = 1000.0f;
 
     void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
 
