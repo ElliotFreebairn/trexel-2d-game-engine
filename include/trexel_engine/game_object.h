@@ -51,6 +51,7 @@ public:
     // GameObject getters
     bool isVisible() const { return m_isVisible; }
     bool isActive() const { return m_isActive; }
+    bool isGravity() const { return m_applyGravity; }
 
     // Collision
     bool hasCollider() const { return m_collider.has_value(); }
@@ -81,12 +82,21 @@ public:
     // Entity id
     EntityId getEntityId() const { return m_id; }
 
+    // Gravity
+    void applyGravity(float dt)
+    {
+        if (!m_applyGravity) return;
+        m_velocityY += GRAVITY * dt;
+        m_position.y += m_velocityY * dt;
+    }
+
 protected:
     std::optional<Sprite> m_sprite;
     std::optional<Collider> m_collider;
 
     bool m_isVisible = true;
     bool m_isActive = true;
+    bool m_applyGravity = false;
 
     glm::vec2 m_position = glm::vec2(0.0f);
     glm::vec2 m_size = glm::vec2(0.0f);
@@ -96,6 +106,9 @@ protected:
     Flip m_flip = Flip::NONE;
 
     glm::vec2 m_prevPosition;
+
+    float m_velocityY = 0.0f;
+    static constexpr float GRAVITY = 1500.0f;
 
     void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
 

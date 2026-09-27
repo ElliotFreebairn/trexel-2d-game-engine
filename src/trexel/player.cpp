@@ -15,7 +15,7 @@ Player::Player(glm::vec2 position)
     : GameObject(position, ObjectDefs::Player())
 
 {
-
+    m_applyGravity = true;
 }
 
 Player::Player() : GameObject()
@@ -25,20 +25,6 @@ Player::Player() : GameObject()
 
 void Player::update(float dt)
 {
-    if (m_isJumping)
-    {
-        m_position.y += m_velocityY * dt;
-
-        m_velocityY += GRAVITY * dt;
-
-        if (m_position.y >= m_lastJumpPoint)
-        {
-            m_position.y = m_lastJumpPoint;
-            m_isJumping = false;
-            m_velocityY = 0.0f;
-        }
-    }
-
     if (m_fireCooldown > 0.0f)
     {
         m_fireCooldown -= dt;
@@ -82,7 +68,6 @@ void Player::jump()
     if (m_isJumping) return;
     m_isJumping = true;
     m_velocityY = JUMP_FORCE;
-    m_lastJumpPoint = m_position.y;
 }
 
 void Player::fire()

@@ -42,10 +42,7 @@ private:
 
     static constexpr int RELEASE_FRAME = 13;
 
-    float m_velocityY = 0.0f;
-    float m_lastJumpPoint = 0.0f;
-    const float GRAVITY = 1500.0f;
-    const float JUMP_FORCE = -600.0f;
+    const float JUMP_FORCE = -500.0f;
 
     // bow
     glm::vec2 m_facing = glm::vec2(1.0f, 0.0f);

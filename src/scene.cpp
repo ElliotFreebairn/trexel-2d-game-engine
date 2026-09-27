@@ -13,6 +13,7 @@ void Scene::update(float dt)
         {
             obj->setPrevPosition(obj->getPosition());
             obj->update(dt);
+            obj->applyGravity(dt);
         }
     }
 

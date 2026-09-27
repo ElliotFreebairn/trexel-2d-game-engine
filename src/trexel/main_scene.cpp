@@ -8,6 +8,7 @@
 void MainScene::update(float dt)
 {
     Scene::update(dt);
+
     if (m_player) resolveCollisions(*m_player);
 
     // Arrows react to a hit (stop/despawn) rather than resolve collsions, so don't use resolveCollisions
