@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <stdexcept>
 #include <filesystem>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -205,9 +206,31 @@ void UIManager::drawInspector(EditorContext &ctx)
     }
 }
 
+/*
+ * Very dumb but simple directory sorter
+ */
+std::vector<std::filesystem::directory_entry> sortByDirectoryType(std::string path)
+{
+    std::vector<fs::directory_entry> directories;
+    std::vector<fs::directory_entry> files;
+
+    for (const auto& entry : fs::directory_iterator(path))
+    {
+        if (entry.is_directory()) directories.push_back(entry);
+        else files.push_back(entry);
+    }
+
+    directories.insert_range(directories.end(), files);
+    return directories;
+}
+
 void drawFileTreeFromPath(std::string path)
 {
-    for (const auto& entry : fs::directory_iterator(path))
+    /*
+     * We want to order the entries drawn top to bottom via directory to file and then via the alphabet
+     */
+    std::vector<std::filesystem::directory_entry> directories = sortByDirectoryType(path);
+    for (const auto& entry : directories)
     {
         std::string filename = entry.path().filename().string();
 
