@@ -27,7 +27,8 @@ public:
 private:
     void drawToolbar(EditorContext& ctx);
     void drawHierarchy(EditorContext& ctx);
-    void drawInspector(EditorContext& ctxs);
+    void drawInspector(EditorContext& ctx);
+    void drawFileTree(EditorContext& ctx);
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
     void drawMainEditorWindow(EditorContext& ctx);
 

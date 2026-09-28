@@ -10,6 +10,9 @@
 
 #include <glm/glm.hpp>
 #include <stdexcept>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 // Draws one property. If the user edits it, emits a SetProperty command.
 void drawProperty(EntityId id, const Property& property, CommandQueue& commands)
@@ -107,10 +110,7 @@ void UIManager::drawMainEditorWindow(EditorContext &ctx)
         drawToolbar(ctx);
 
         // 2. Draw your hierarchy tab right next to it
-        if (ImGui::BeginTabItem("Files"))
-        {
-            ImGui::EndTabItem();
-        }
+        drawFileTree(ctx);
 
         drawInspector(ctx);
 
@@ -205,9 +205,48 @@ void UIManager::drawInspector(EditorContext &ctx)
     }
 }
 
+void drawFileTreeFromPath(std::string path)
+{
+    for (const auto& entry : fs::directory_iterator(path))
+    {
+        std::string filename = entry.path().filename().string();
+
+        if (entry.is_directory())
+        {
+            if (ImGui::TreeNode(filename.c_str()))
+            {
+                drawFileTreeFromPath(entry.path());
+
+                ImGui::TreePop();
+            }
+        }
+        else
+        {
+            ImGui::Text("%s", filename.c_str());
+        }
+    }
+}
+
+/*
+ * TEMP! Need to create a proper file structure class and behaviour
+ */
+void UIManager::drawFileTree(EditorContext &ctx)
+{
+    if (ImGui::BeginTabItem("File Tree"))
+    {
+        // TEMP - Start at the project root directy (Decide what should this default to)
+        std::string path = fs::current_path();
+
+        drawFileTreeFromPath(path);
+
+        ImGui::EndTabItem();
+    }
+}
+
+
 void UIManager::drawViewport(EditorContext &ctx, SDL_Texture *world_texture)
 {
-    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize);
+    ImGui::Begin("Game", nullptr, ImGuiWindowFlags_NoResize);
     m_viewportSize = ImGui::GetContentRegionAvail();
 
     // top-left
