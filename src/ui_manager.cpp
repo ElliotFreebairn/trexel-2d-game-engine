@@ -7,11 +7,13 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
 #include "property.h"
+#include "file_tree_widget.h"
 
 #include <glm/glm.hpp>
 #include <stdexcept>
 #include <filesystem>
 #include <vector>
+
 
 namespace fs = std::filesystem;
 
@@ -207,61 +209,14 @@ void UIManager::drawInspector(EditorContext &ctx)
 }
 
 /*
- * Very dumb but simple directory sorter
- */
-std::vector<std::filesystem::directory_entry> sortByDirectoryType(std::string path)
-{
-    std::vector<fs::directory_entry> directories;
-    std::vector<fs::directory_entry> files;
-
-    for (const auto& entry : fs::directory_iterator(path))
-    {
-        if (entry.is_directory()) directories.push_back(entry);
-        else files.push_back(entry);
-    }
-
-    directories.insert_range(directories.end(), files);
-    return directories;
-}
-
-void drawFileTreeFromPath(std::string path)
-{
-    /*
-     * We want to order the entries drawn top to bottom via directory to file and then via the alphabet
-     */
-    std::vector<std::filesystem::directory_entry> directories = sortByDirectoryType(path);
-    for (const auto& entry : directories)
-    {
-        std::string filename = entry.path().filename().string();
-
-        if (entry.is_directory())
-        {
-            if (ImGui::TreeNode(filename.c_str()))
-            {
-                drawFileTreeFromPath(entry.path());
-
-                ImGui::TreePop();
-            }
-        }
-        else
-        {
-            ImGui::Text("%s", filename.c_str());
-        }
-    }
-}
-
-/*
  * TEMP! Need to create a proper file structure class and behaviour
  */
 void UIManager::drawFileTree(EditorContext &ctx)
 {
+    static FileTreeWidget treeWidget;
     if (ImGui::BeginTabItem("File Tree"))
     {
-        // TEMP - Start at the project root directy (Decide what should this default to)
-        std::string path = fs::current_path();
-
-        drawFileTreeFromPath(path);
-
+        treeWidget.draw();
         ImGui::EndTabItem();
     }
 }
