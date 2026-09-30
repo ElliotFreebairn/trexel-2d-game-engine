@@ -5,6 +5,9 @@
 #include "property.h"
 #include <vector>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 void Scene::update(float dt)
 {
     for (auto& obj : m_objects)
@@ -18,6 +21,17 @@ void Scene::update(float dt)
 
     pruneInactive();
 }
+
+void Scene::saveScene(std::string mapPath)
+{
+
+}
+
+void Scene::loadScene(std::string mapPath)
+{
+
+}
+
 
 void Scene::snapshotPositions()
 {

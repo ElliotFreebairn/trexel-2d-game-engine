@@ -144,16 +144,19 @@ void UIManager::drawToolbar(EditorContext &ctx)
             }
         }
 
-        ImGui::SameLine();
-        if (ImGui::Button("Spawn Block"))
-        {
-            const glm::vec2 centre(m_viewportSize.x * 0.5f, m_viewportSize.y * 0.5f);
-            ctx.commands.push(EditorCommand::spawnEntity("block", centre));
-        }
+        //ImGui::SameLine();
+        //if (ImGui::Button("Spawn Block"))
+        //{
+        //    const glm::vec2 centre(m_viewportSize.x * 0.5f, m_viewportSize.y * 0.5f);
+        //    ctx.commands.push(EditorCommand::spawnEntity("block", centre));
+        //}
 
         ImGui::Separator();
         ImGui::TextDisabled("VISUALS");
         ImGui::Checkbox("Collision Boxes", &ctx.state.showColliders);
+
+        ImGui::Separator();
+        ImGui::TextDisabled("WORLD BUILDING");
 
         ImGui::EndTabItem();
     }

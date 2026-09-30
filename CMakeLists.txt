@@ -34,6 +34,10 @@ target_include_directories(imgui PUBLIC
     ${SDL2_INCLUDE_DIRS}
 )
 
+add_library(nlohmann_json INTERFACE)
+add_library(nlohmann_json::nlohmann_json ALIAS nlohmann_json)
+target_include_directories(nlohmann_json INTERFACE ${CMAKE_SOURCE_DIR}/include)
+
 target_link_libraries(imgui PUBLIC ${SDL2_LIBRARIES})
 
 find_package(glm CONFIG REQUIRED)

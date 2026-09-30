@@ -22,6 +22,7 @@ target_link_libraries(trexel_exec PRIVATE SDL2::SDL2)
 target_link_libraries(trexel_exec PRIVATE SDL2_image::SDL2_image)
 target_link_libraries(trexel_exec PRIVATE imgui)
 target_link_libraries(trexel_exec PRIVATE glm::glm)
+target_link_libraries(trexel_exec PRIVATE nlohmann_json::nlohmann_json)
 
 # Include header files
 target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel_engine)

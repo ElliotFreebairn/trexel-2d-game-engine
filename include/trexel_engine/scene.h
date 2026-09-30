@@ -52,6 +52,11 @@ public:
 
     // Does probe overlap something, doesn't actually resolve the collision
     bool overlapsSolid(const GameObject& probe, EntityId ignore = INVALID_ENTITY) const;
+
+    // SCENE LOADING AND PARSING -- TEMP
+    void loadScene(std::string mapPath);
+    void saveScene(std::string mapPath);
+
 protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;
 
