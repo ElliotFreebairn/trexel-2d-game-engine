@@ -2,7 +2,11 @@
 #include "collision.h"
 #include "entity.h"
 #include "game_object.h"
+#include "game_object_def.h"
+#include "object_defs.h"
 #include "property.h"
+#include "scene_object.h"
+#include <fstream>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -22,15 +26,89 @@ void Scene::update(float dt)
     pruneInactive();
 }
 
+
+/*
+ * TEMP
+ */
 void Scene::saveScene(std::string mapPath)
 {
+    /*
+     * JSON Format
+     * {
+     *    "objects": [
+     *      {
+     *          objectDef : "GrassBlock",
+     *          colour : {
+     *              ...
+     *          },
+     *          position : {
+     *              ...
+     *          },
+     *          size : {
+     *              ...
+     *          }
+     *      },
+     *      {
+     *          ...
+     *      }
+     *
+     * }
+     */
 
+    json savedMap;
+    for (const auto& objPtr : m_objects)
+    {
+
+        /*
+         * create helper method glm::vecx to jsonobj, template that
+         * also create a a struct that defines how store a json, making it easy to save and easier to read back
+         */
+        json objectDef = {"objectDef", objPtr->getObjectDefName()};
+        json position = json::object({{"x", objPtr->getPosition().x}, {"y", objPtr->getPosition().y}});
+        json size = json::object({{"width", objPtr->getSize().x}, {"height", objPtr->getSize().y}});
+        json colour;
+        // fix this
+        if (objPtr->getColour().has_value())
+        {
+            colour = json::object({{{"r", objPtr->getColour().value().x}, {"g", objPtr->getColour().value().y}, {"b", objPtr->getColour().value().z}}});
+        }
+
+        json obj = json::object({objectDef, {"position", position}, {"size", size}, {"colour", colour}});
+        savedMap["objects"] += obj;
+    }
+
+    // write to file
+    std::fstream file;
+    file.open(mapPath, std::ios::out);
+
+    file << savedMap;
 }
 
 void Scene::loadScene(std::string mapPath)
 {
+    // load json from disk to json object
+    std::fstream savedMapFile;
+    savedMapFile.open(mapPath, std::ios::in);
+    json savedMap(json::parse(savedMapFile));
 
+    // create the objects based of the json object
+    for (const auto& object : savedMap["objects"])
+    {
+        // we need to have a value of the type of game object, then potentially the game object def
+        // redo how object def is stored in json, shoudn't be double idenetation
+        std::string objectDefName = object["objectDef"];
+        GameObjectDef objectDef = ObjectDefs::getGameObjectDef(objectDefName);
+        glm::vec2 pos = {object["position"]["x"], object["position"]["y"]};
+        glm::vec2 size = {object["size"]["width"], object["size"]["height"]};
+        // parse colour
+
+        createObject<SceneObject>(pos, objectDef);
+        std::cout << object["position"] << "\n";
+    }
 }
+/*
+ * TEMP
+ */
 
 
 void Scene::snapshotPositions()

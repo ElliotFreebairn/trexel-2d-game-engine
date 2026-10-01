@@ -21,6 +21,8 @@ GameObject::GameObject(glm::vec2 position, const GameObjectDef& def)
             m_sprite->addAnimation(state, animation);
         }
     }
+
+    m_objectDefName = def.objectDefName;
 }
 
 std::string GameObject::getTextureID() const

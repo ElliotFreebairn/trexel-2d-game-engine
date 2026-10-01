@@ -3,6 +3,7 @@
 #include "../game_object_def.h"
 #include "../sprite.h"
 #include "game.h"
+#include "game_object.h"
 
 namespace ObjectDefs
 {
@@ -11,7 +12,8 @@ namespace ObjectDefs
         return GameObjectDef{
             .size = {50.0f, 50.0f},
             .textureId = "grass_block",
-            .collider = Collider{ .isSolid = true, .size = {50.0f, 50.0f}}
+            .collider = Collider{ .isSolid = true, .size = {50.0f, 50.0f}},
+            .objectDefName = "GrassBlock"
         };
     }
 
@@ -34,7 +36,8 @@ namespace ObjectDefs
                 { SpriteMovementState::WALKING, SpriteAnimation{"player_walking", 128, 128, 8, 1, 0.2f} },
                 { SpriteMovementState::JUMPING, SpriteAnimation{"player_jumping", 128, 128, 9, 1, 0.2f} },
                 { SpriteMovementState::ATTACKING, SpriteAnimation{"player_shooting", 128, 128, 14, 1, 0.05f, AnimationType::SINGULAR}}
-            }
+            },
+            .objectDefName = "Player"
         };
     }
 
@@ -45,7 +48,18 @@ namespace ObjectDefs
         {
             .size = {48.0f, 48.0f},
             .textureId = "arrow",
-            .collider = Collider{ .isSolid = false, .size = {48.0f, 48.0f}}
+            .collider = Collider{ .isSolid = false, .size = {48.0f, 48.0f}},
+            .objectDefName = "Arrow"
+
         };
     };
+
+    static GameObjectDef getGameObjectDef(std::string name)
+    {
+        if (name == "GrassBlock") return GrassBlock();
+        if (name == "Player") return Player();
+        if (name == "Arrow") return Arrow();
+
+        return {};
+    }
 }

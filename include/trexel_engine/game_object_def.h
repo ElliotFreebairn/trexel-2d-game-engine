@@ -13,4 +13,5 @@ struct GameObjectDef
     std::optional<glm::vec3> colour;
     std::optional<Collider> collider;
     std::unordered_map<SpriteMovementState, SpriteAnimation> animations;
+    std::string objectDefName;
 };

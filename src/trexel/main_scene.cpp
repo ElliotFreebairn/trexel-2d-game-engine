@@ -4,6 +4,7 @@
 #include "object_defs.h"
 #include "scene.h"
 #include "scene_object.h"
+#include <cmath>
 
 void MainScene::update(float dt)
 {
@@ -42,9 +43,11 @@ void MainScene::onEnter()
     setBackground("background");
 
     // temp helper function to build map
-    buildEnvironment();
+    //buildEnvironment();
+    //m_player = &createObject<Player>(glm::vec2(450.0f, 400.0f));
 
-    m_player = &createObject<Player>(glm::vec2(450.0f, 400.0f));
+    loadScene("/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json");
+    saveScene("/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json");
 }
 
 // Whaat can i spawn?

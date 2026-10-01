@@ -101,6 +101,9 @@ public:
     bool isGrounded() const { return m_isGrounded; }
     void setGrounded(bool grounded) { m_isGrounded = grounded; }
 
+    // object def
+    std::string getObjectDefName() const { return m_objectDefName; }
+
 protected:
     std::optional<Sprite> m_sprite;
     std::optional<Collider> m_collider;
@@ -122,6 +125,9 @@ protected:
     float m_velocityY = 0.0f;
     static constexpr float GRAVITY = 1500.0f;
     static constexpr float MAX_FALL_SPEED = 1000.0f;
+
+    // object def
+    std::string m_objectDefName;
 
     void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
 
