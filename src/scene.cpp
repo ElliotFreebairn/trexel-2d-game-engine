@@ -4,6 +4,7 @@
 #include "game_object.h"
 #include "game_object_def.h"
 #include "object_defs.h"
+#include "player.h"
 #include "property.h"
 #include "scene_object.h"
 #include <fstream>
@@ -63,17 +64,19 @@ void Scene::saveScene(std::string mapPath)
          * create helper method glm::vecx to jsonobj, template that
          * also create a a struct that defines how store a json, making it easy to save and easier to read back
          */
+        json className = {"class", objPtr->getClassName()};
         json objectDef = {"objectDef", objPtr->getObjectDefName()};
         json position = json::object({{"x", objPtr->getPosition().x}, {"y", objPtr->getPosition().y}});
         json size = json::object({{"width", objPtr->getSize().x}, {"height", objPtr->getSize().y}});
         json colour;
+
         // fix this
         if (objPtr->getColour().has_value())
         {
             colour = json::object({{{"r", objPtr->getColour().value().x}, {"g", objPtr->getColour().value().y}, {"b", objPtr->getColour().value().z}}});
         }
 
-        json obj = json::object({objectDef, {"position", position}, {"size", size}, {"colour", colour}});
+        json obj = json::object({className, objectDef, {"position", position}, {"size", size}, {"colour", colour}});
         savedMap["objects"] += obj;
     }
 
@@ -89,20 +92,34 @@ void Scene::loadScene(std::string mapPath)
     // load json from disk to json object
     std::fstream savedMapFile;
     savedMapFile.open(mapPath, std::ios::in);
-    json savedMap(json::parse(savedMapFile));
+    if (savedMapFile.fail()) return;
 
-    // create the objects based of the json object
+    json savedMap(json::parse(savedMapFile));
+    if (savedMap["objects"].size() == 0) return;
+
     for (const auto& object : savedMap["objects"])
     {
         // we need to have a value of the type of game object, then potentially the game object def
         // redo how object def is stored in json, shoudn't be double idenetation
+        std::string className = object["class"];
         std::string objectDefName = object["objectDef"];
         GameObjectDef objectDef = ObjectDefs::getGameObjectDef(objectDefName);
         glm::vec2 pos = {object["position"]["x"], object["position"]["y"]};
         glm::vec2 size = {object["size"]["width"], object["size"]["height"]};
         // parse colour
 
-        createObject<SceneObject>(pos, objectDef);
+        // temp make templateable
+        if (className == "Player")
+        {
+            // how do we attach the player
+            // architectually this has to change?
+            createObject<Player>(pos);
+        }
+        else if (className == "SceneObject")
+        {
+            createObject<SceneObject>(pos, objectDef);
+        }
+
         std::cout << object["position"] << "\n";
     }
 }

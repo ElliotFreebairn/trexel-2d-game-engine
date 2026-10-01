@@ -3,6 +3,7 @@
 // Custom includes
 #include "game_object.h"
 #include "behaviour.h"
+#include "game_object_def.h"
 
 // C++ includes
 #include <memory>
@@ -11,8 +12,7 @@
 class SceneObject : public GameObject
 {
 public:
-    using GameObject::GameObject;
-
+    SceneObject(glm::vec2 position, GameObjectDef objectDef);
     ~SceneObject() = default;
 
     void update(float dt) override;

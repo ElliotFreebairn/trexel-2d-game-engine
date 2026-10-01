@@ -7,10 +7,12 @@ class MainScene : public Scene
 {
 public:
     MainScene(glm::vec2 viewportSize) : Scene("main") { m_viewportSize = viewportSize; }
+    ~MainScene();
 
     void update(float dt) override;
 
     void onEnter() override;
+    void onExit() override;
 
     void spawn(const std::string& prototype, glm::vec2 position) override;
 

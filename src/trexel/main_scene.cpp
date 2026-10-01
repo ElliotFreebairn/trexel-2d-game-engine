@@ -6,6 +6,11 @@
 #include "scene_object.h"
 #include <cmath>
 
+MainScene::~MainScene()
+{
+    onExit();
+}
+
 void MainScene::update(float dt)
 {
     Scene::update(dt);
@@ -47,6 +52,10 @@ void MainScene::onEnter()
     //m_player = &createObject<Player>(glm::vec2(450.0f, 400.0f));
 
     loadScene("/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json");
+}
+
+void MainScene::onExit()
+{
     saveScene("/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json");
 }
 
