@@ -21,6 +21,7 @@ public:
     virtual void onResume() {};
 
     virtual void update(float dt);
+    virtual void onViewportResized(glm::vec2 newSize) { (void)newSize; }
 
     void snapshotPositions();
 
@@ -35,6 +36,9 @@ public:
         m_objects.push_back(std::move(obj));
         return ref;
     }
+
+    GameObject& addObject(std::unique_ptr<GameObject> obj);
+    const std::vector<std::unique_ptr<GameObject>>& getObjects() const { return m_objects; }
 
     const std::string& getName() const { return m_name; }
     const std::string& getBackground() const { return m_background; }
@@ -56,6 +60,7 @@ public:
     // SCENE LOADING AND PARSING -- TEMP
     void loadScene(std::string mapPath);
     void saveScene(std::string mapPath);
+
 
 protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;

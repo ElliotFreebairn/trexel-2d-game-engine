@@ -102,8 +102,8 @@ public:
     void setGrounded(bool grounded) { m_isGrounded = grounded; }
 
     // object def
-    std::string getObjectDefName() const { return m_objectDefName; }
-    std::string getClassName() const { return m_className; }
+    const std::string& defName() const { return m_defName; }
+    void setDefName(std::string name) { m_defName = std::move(name); }
 
 protected:
     std::optional<Sprite> m_sprite;
@@ -128,8 +128,7 @@ protected:
     static constexpr float MAX_FALL_SPEED = 1000.0f;
 
     // object def
-    std::string m_objectDefName;
-    std::string m_className;
+    std::string m_defName;
 
     void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
 

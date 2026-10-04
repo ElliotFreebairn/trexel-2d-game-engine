@@ -4,24 +4,42 @@
 #include "object_defs.h"
 #include "scene.h"
 #include "scene_object.h"
-#include <cmath>
+#include "scene_serializer.h"
 
-MainScene::~MainScene()
+namespace
 {
-    onExit();
+constexpr const char* WORLD_SAVE_PATH = "/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json";
+}
+
+MainScene::MainScene(glm::vec2 viewportSize, const GameObjectRegistry& registry)
+    : Scene("main")
+    , m_registry(registry)      // <- initializer list
+{
+}
+
+Player* MainScene::getPlayer() const
+{
+    for (const auto& obj : m_objects)
+    {
+        if (Player* player = dynamic_cast<Player*>(obj.get()))
+        {
+            return player;
+        }
+    }
+    return nullptr;
 }
 
 void MainScene::update(float dt)
 {
     Scene::update(dt);
 
-    if (m_player)
+    if (Player* player = getPlayer())
     {
-        resolveCollisions(*m_player);
-        m_player->setGrounded(isGroundedOn(*m_player));
+        resolveCollisions(*player);
+        player->setGrounded(isGroundedOn(*player));
     }
 
-    // Arrows react to a hit (stop/despawn) rather than resolve collsions, so don't use resolveCollisions
+    // Arrows react to a hit (stop/despawn) rather than resolve collisions, so don't use resolveCollisions
     for (auto& objPtr : m_objects)
     {
         Arrow* arrow = dynamic_cast<Arrow*>(objPtr.get());
@@ -29,7 +47,6 @@ void MainScene::update(float dt)
         {
             arrow->evCollided(CollisionAxis::X);
         }
-
     }
 }
 
@@ -47,16 +64,16 @@ void MainScene::onEnter()
 {
     setBackground("background");
 
-    // temp helper function to build map
-    //buildEnvironment();
-    //m_player = &createObject<Player>(glm::vec2(450.0f, 400.0f));
-
-    loadScene("/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json");
+    if (!SceneSerializer::load(*this, WORLD_SAVE_PATH, m_registry))
+    {
+        buildEnvironment();
+        createObject<Player>(glm::vec2(450.0f, 400.0f));
+    }
 }
 
 void MainScene::onExit()
 {
-    saveScene("/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json");
+    SceneSerializer::save(*this, WORLD_SAVE_PATH);
 }
 
 // Whaat can i spawn?

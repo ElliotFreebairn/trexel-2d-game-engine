@@ -18,7 +18,6 @@ Player::Player(glm::vec2 position)
 
 {
     m_applyGravity = true;
-    m_className = __func__;
 }
 
 Player::Player() : GameObject()

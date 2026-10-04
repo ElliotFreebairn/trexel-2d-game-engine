@@ -18,6 +18,8 @@ public:
     void update(float dt) override;
 
     void addBehaviour(std::unique_ptr<IBehaviour> b) { m_behaviours.push_back(std::move(b)); }
+
+    std::string typeName() const override { return "SceneObject"; }
 private:
     std::vector<std::unique_ptr<IBehaviour>> m_behaviours;
 };

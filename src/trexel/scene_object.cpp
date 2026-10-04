@@ -4,7 +4,6 @@
 
 SceneObject::SceneObject(glm::vec2 position, GameObjectDef objectDef) : GameObject(position, objectDef)
 {
-    m_className = __func__;
 }
 
 void SceneObject::update(float dt)

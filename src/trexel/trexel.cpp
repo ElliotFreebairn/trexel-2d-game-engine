@@ -4,6 +4,7 @@
 #include "asset_manager.h"
 #include "game_actions.h"
 #include "game_object.h"
+#include "game_object_def.h"
 #include "main_scene.h"
 #include "player.h"
 #include "scene_object.h"
@@ -12,10 +13,24 @@
 
 Trexel::Trexel()
 {
+
 }
 
 Trexel::~Trexel()
 {
+    onShutdown();
+}
+
+
+void Trexel::registerObjectTypes(GameObjectRegistry &registry)
+{
+    registry.registerType("Player", [](glm::vec2 position, const GameObjectDef&) {
+        return std::make_unique<Player>(position);
+    });
+
+    registry.registerType("SceneObject", [](glm::vec2 position, const GameObjectDef& def) {
+        return std::make_unique<SceneObject>(position, def);
+    });
 }
 
 Player* Trexel::getPlayer() const
@@ -60,13 +75,13 @@ void Trexel::onUpdate(float deltaTime, const InputState& input)
 
 void Trexel::onInit()
 {
-    m_sceneManager.registerScene("main", [this] { return std::make_unique<MainScene>(this->getViewport());});
+    m_sceneManager.registerScene("main", [this] { return std::make_unique<MainScene>(this->getViewport(), this->getObjectRegistry()); });
     m_sceneManager.switchTo("main");
 }
 
 void Trexel::onShutdown()
 {
-
+    m_sceneManager.current()->onExit();
 }
 
 void Trexel::intialiseAssets(AssetManager &assets)

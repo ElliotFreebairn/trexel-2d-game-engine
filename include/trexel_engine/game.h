@@ -8,6 +8,7 @@
 #include "editor_command.h"
 #include "entity.h"
 #include "game_actions.h"
+#include "game_object_registry.h"
 #include "input_state.h"
 #include "main_scene.h"
 #include "property.h"
@@ -99,18 +100,31 @@ public:
 
     // misc
     const AssetManager& getAssetManager() const { return m_assetManager; }
+    const GameObjectRegistry& getObjectRegistry() const { return m_objectRegistry; }
     bool isRunning() const { return m_isRunning; }
 
-    glm::vec2 getViewport() { return viewport; }
-    void setViewport(glm::vec2 viewport) { this->viewport = viewport; }
+
+    glm::vec2 getViewport() const { return m_viewport; }
+    void setViewport(glm::vec2 viewport)
+    {
+        m_viewport = viewport;
+        if (Scene* scene = m_sceneManager.current())
+        {
+            scene->onViewportResized(viewport);
+        }
+    }
+
 
 protected:
     virtual void intialiseAssets(AssetManager& assets) = 0;
+
+    virtual void registerObjectTypes(GameObjectRegistry& registry) { (void)registry; }
     virtual void onInit() = 0;
 
     SceneManager m_sceneManager;
     AssetManager m_assetManager;
+    GameObjectRegistry m_objectRegistry;
     bool m_isRunning = true;
 
-    glm::vec2 viewport = glm::vec2(0.0f);
+    glm::vec2 m_viewport = glm::vec2(0.0f);
 };

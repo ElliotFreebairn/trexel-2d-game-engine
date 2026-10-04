@@ -54,12 +54,20 @@ namespace ObjectDefs
         };
     };
 
-    static GameObjectDef getGameObjectDef(std::string name)
-    {
-        if (name == "GrassBlock") return GrassBlock();
-        if (name == "Player") return Player();
-        if (name == "Arrow") return Arrow();
 
-        return {};
+    inline GameObjectDef getGameObjectDef(const std::string& name)
+    {
+        static const std::unordered_map<std::string, GameObjectDef(*)()> defs = {
+            {"GrassBlock", &GrassBlock},
+            {"Player", &Player},
+            {"Arrow", &Arrow},
+        };
+
+        auto it = defs.find(name);
+        if (it == defs.end())
+        {
+            throw std::runtime_error("Unknown object def: " + name);
+        }
+        return it->second();
     }
 }

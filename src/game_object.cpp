@@ -21,10 +21,6 @@ GameObject::GameObject(glm::vec2 position, const GameObjectDef& def)
             m_sprite->addAnimation(state, animation);
         }
     }
-
-    m_objectDefName = def.objectDefName;
-    // there has to a better way than doing this for every subclass of game object
-    m_className = __func__;
 }
 
 std::string GameObject::getTextureID() const
