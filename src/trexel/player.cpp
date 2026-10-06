@@ -17,6 +17,7 @@ Player::Player(glm::vec2 position)
     : GameObject(position, ObjectDefs::Player())
 
 {
+    m_defName = "Player";
     m_applyGravity = true;
 }
 

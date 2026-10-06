@@ -75,6 +75,9 @@ void Trexel::onUpdate(float deltaTime, const InputState& input)
 
 void Trexel::onInit()
 {
+    // initialise objects allowed in the game
+    registerObjectTypes(m_objectRegistry);
+
     m_sceneManager.registerScene("main", [this] { return std::make_unique<MainScene>(this->getViewport(), this->getObjectRegistry()); });
     m_sceneManager.switchTo("main");
 }

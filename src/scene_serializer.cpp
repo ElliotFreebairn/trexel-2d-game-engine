@@ -95,6 +95,7 @@ bool SceneSerializer::load(Scene& scene, const std::string& path, const GameObje
             catch (const std::exception& e)
             {
                 std::cerr << "SceneSerializer::load: " << e.what() << ", skipping one object\n";
+                std::cerr << "JSON PayLoad: \n" << saved;
                 continue;
             }
         }
@@ -103,6 +104,7 @@ bool SceneSerializer::load(Scene& scene, const std::string& path, const GameObje
         if (!obj)
         {
             std::cerr << "SceneSerializer::load: unknown class \"" << className << "\", skipping one object\n";
+            std::cerr << "JSON PayLoad: \n" << saved;
             continue;
         }
 

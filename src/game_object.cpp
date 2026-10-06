@@ -11,6 +11,8 @@
 GameObject::GameObject(glm::vec2 position, const GameObjectDef& def)
     : m_position(position), m_prevPosition(position), m_size(def.size), m_textureId(def.textureId), m_colour(def.colour)
 {
+    m_defName = def.objectDefName;
+
     if (def.collider) addCollider(*def.collider);
 
     if (!def.animations.empty())
