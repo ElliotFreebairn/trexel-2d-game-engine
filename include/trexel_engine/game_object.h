@@ -7,6 +7,7 @@
 #include <SDL.h>
 
 // Custom includes
+#include "ISerializer.h"
 #include "common.h"
 #include "IRenderable.h"
 #include "entity.h"
@@ -19,7 +20,7 @@
 #include <optional>
 #include <iostream>
 
-class GameObject : public IRenderable, public IInspectable
+class GameObject : public IRenderable, public IInspectable, public ISerializer
 {
 public:
     GameObject(glm::vec2 position, const GameObjectDef& def);
@@ -104,6 +105,10 @@ public:
     // object def
     const std::string& defName() const { return m_defName; }
     void setDefName(std::string name) { m_defName = std::move(name); }
+
+    // SERIALIZATION
+    // implemenations of this base class need to implement that for themselves
+    // maybe game object should have its default serialization state or that's handled by object definitions?
 
 protected:
     std::optional<Sprite> m_sprite;
