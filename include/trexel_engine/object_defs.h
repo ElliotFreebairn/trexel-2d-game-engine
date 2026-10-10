@@ -1,7 +1,7 @@
 #pragma once
-#include "../collision.h"
-#include "../game_object_def.h"
-#include "../sprite.h"
+#include "collision.h"
+#include "game_object_def.h"
+#include "sprite.h"
 #include "game.h"
 #include "game_object.h"
 #include "nlohmann/json.hpp"
@@ -9,18 +9,47 @@
 
 namespace ObjectDefs
 {
-    void loadObjectDefinitions(const std::string& path);
+    bool loadObjectDefinitions(const std::string& path);
     GameObjectDef& getObjectDefinition(const std::string& objectDef);
 }
 
 /*
  * Object Definition JSON Example
  *
+ * This is specific to how a game object looks, not its properties, that's why it is generic to the game object
+ *
  * {
  *  "object_definitions":
  *      [
  *          {
- *              "definition_name" : "Player"
+ *              "def" : string, (example "ARCHER")
+ *              "texture" : string, (example "archer_idle", if the animations are defined the texture is unused)
+ *              "size": glm::vec2, (the size of the image, if the collider is not defined, the collider will span the entire image)
+ *              "collider" :
+ *                  {
+ *                      "size" : glm::vec2,  (default size will be the player size)
+ *                      "offset": glm::vec2, (default {0, 0}),
+ *                      "solid": bool (default true)
+ *                  },
+ *               "animations": (states must match the SpriteMovementState enum), (Animation size = size)
+ *                {
+ *                  "frameSpeed" : float, (default 0.2f)
+ *                  [
+ *                      {
+ *                          "state" : "IDLE",
+ *                          "textureId", std::string
+ *                          "frames:" x,
+ *                          "rows" : x, (default to 1),
+ *                      }
+ *                  ]
+ *                },
+ *                // do we need this?
+ *                "custom":
+ *                 {
+ *                      // the above, is the basic information needed to create a game object
+ *                      // to save/load specific state to a custom game object, such as Player, the player will serialize/deserialize
+ *                      // from the custom section
+ *                 }
  *          }
  *      ]
  * }

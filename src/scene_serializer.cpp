@@ -3,42 +3,13 @@
 #include "game_object_registry.h"
 #include "object_defs.h"
 #include "scene.h"
+#include "json_utility.h"
 
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-
-namespace
-{
-json vec2ToJson(glm::vec2 v)
-{
-    json j = json::object();
-    j["x"] = v.x;
-    j["y"] = v.y;
-    return j;
-}
-
-glm::vec2 vec2FromJson(const json& j)
-{
-    return glm::vec2(j.at("x").get<float>(), j.at("y").get<float>());
-}
-
-json vec3ToJson(glm::vec3 v)
-{
-    json j = json::object();
-    j["r"] = v.x;
-    j["g"] = v.y;
-    j["b"] = v.z;
-    return j;
-}
-
-glm::vec3 vec3FromJson(const json& j)
-{
-    return glm::vec3(j.at("r").get<float>(), j.at("g").get<float>(), j.at("b").get<float>());
-}
-}
 
 void SceneSerializer::save(const Scene& scene, const std::string& path)
 {

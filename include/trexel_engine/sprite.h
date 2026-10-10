@@ -2,9 +2,13 @@
 
 #include "common.h"
 
+#include <algorithm>
+#include <cctype>
+#include <map>
 #include <unordered_map>
 #include <string>
 #include <functional>
+#include <bits/stdc++.h>
 
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -16,12 +20,33 @@ enum class SpriteMovementState
     JUMPING,
     ATTACKING
 };
+// implement a generic method for this, get rid of this later!
+SpriteMovementState toSpriteMovementState(std::string input)
+{
+    std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+    if (input == "IDLE") return SpriteMovementState::IDLE;
+    if (input == "WALKING") return SpriteMovementState::WALKING;
+    if (input == "RUNNING") return SpriteMovementState::RUNNING;
+    if (input == "JUMPING") return SpriteMovementState::JUMPING;
+    if (input == "ATTACKING") return  SpriteMovementState::ATTACKING;
+
+    // by default
+    return SpriteMovementState::IDLE;
+}
 
 enum class AnimationType
 {
     SINGULAR,
     CONTINUOUS
 };
+AnimationType toAnimationType(std::string input)
+{
+   std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+   if (input == "SINGULAR") return AnimationType::SINGULAR;
+   if (input == "CONTINOUS") return AnimationType::CONTINUOUS;
+
+   return AnimationType::CONTINUOUS;
+}
 
 struct SpriteAnimation
 {
