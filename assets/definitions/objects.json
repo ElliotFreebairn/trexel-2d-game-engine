@@ -1,0 +1,79 @@
+{
+  "definitions":
+  [
+
+    {
+      "name": "archer",
+      "textureId": "",
+      "size": {
+        "x" : 128.0,
+        "y":  128.0
+      },
+      "collider": {
+        "size": {
+          "x": 128.0,
+          "y": 128.0
+        },
+        "offset": {
+          "x": 50.0,
+          "y": 55.0
+        },
+        "solid": true
+      },
+      "animations": {
+        "frameSpeed": 0.2,
+        "states": [
+          {
+            "state": "IDLE",
+            "textureId": "player_idle",
+            "frames": 6,
+            "rows": 1,
+            "type": "CONTINOUS"
+          },
+          {
+            "state": "WALKING",
+            "textureId": "player_walking",
+            "frames": 8,
+            "rows": 1,
+            "type": "CONTINOUS"
+          },
+          {
+            "state": "JUMPING",
+            "textureId": "player_jumping",
+            "frames": 9,
+            "rows": 1,
+            "type": "CONTINOUS"
+          },
+          {
+            "state": "ATTACKING",
+            "textureId": "player_attacking",
+            "frames": 14,
+            "rows": 1,
+            "type": "SINGULAR"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "grass_block",
+      "textureId": "grass_block",
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      },
+      "collider": {
+        "size": {
+          "x": 50.0,
+          "y": 50.0
+        },
+        "offset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "solid": true
+      }
+    }
+
+  ]
+}

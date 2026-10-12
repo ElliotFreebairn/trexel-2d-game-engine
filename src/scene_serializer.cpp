@@ -61,12 +61,12 @@ bool SceneSerializer::load(Scene& scene, const std::string& path, const GameObje
         {
             try
             {
-                def = ObjectDefs::getGameObjectDef(defName);
+                def = ObjectDefs::getObjectDefinition(defName);
             }
             catch (const std::exception& e)
             {
                 std::cerr << "SceneSerializer::load: " << e.what() << ", skipping one object\n";
-                std::cerr << "JSON PayLoad: \n" << saved;
+                std::cerr << "JSON PayLoad: \n" << objJson;
                 continue;
             }
         }

@@ -94,6 +94,7 @@ namespace ObjectDefs
             def.size = size;
 
             // LOADING COLLIDER
+            // ensure we check nested sizes/offset is contained
             if (defJson.contains("collider"))
             {
                 json cJson = defJson["collider"];
@@ -118,7 +119,7 @@ namespace ObjectDefs
                 std::unordered_map<SpriteMovementState, SpriteAnimation> animations;
 
                 // LOADING THE FRAME SPEED FOR ALL ANIMATIONS
-                float frameSpeed = defJson["frameSpeed"];
+                float frameSpeed = aJson["frameSpeed"];
 
                 for (const auto& animation : aJson["states"])
                 {
@@ -126,7 +127,7 @@ namespace ObjectDefs
 
                     // LOADING ANIMATION STATE
                     std::string state = animation["state"];
-                    SpriteMovementState movoementState = toSpriteMovementState(state);
+                    SpriteMovementState movoementState = Sprite::toSpriteMovementState(state);
 
                     // LOADING ANIMATION TEXTURE ID
                     std::string textureId = animation["textureId"];
@@ -144,7 +145,7 @@ namespace ObjectDefs
                     if (animation.contains("type"))
                     {
                         std::string type = animation["type"];
-                        AnimationType animType = toAnimationType(type);
+                        AnimationType animType = Sprite::toAnimationType(type);
 
                         spriteAnimation.animationType = animType;
                     }

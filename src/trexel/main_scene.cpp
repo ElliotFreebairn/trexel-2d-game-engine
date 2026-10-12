@@ -1,6 +1,7 @@
 #include "main_scene.h"
 #include "arrow.h"
 #include "collision.h"
+#include "game_object.h"
 #include "object_defs.h"
 #include "scene.h"
 #include "scene_object.h"
@@ -9,12 +10,14 @@
 namespace
 {
 constexpr const char* WORLD_SAVE_PATH = "/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json";
+constexpr const char* WORLD_OBJECT_DEFS = "/home/elliotf/Develop/Personal/trexel/assets/definitions/objects.json";
 }
 
 MainScene::MainScene(glm::vec2 viewportSize, const GameObjectRegistry& registry)
     : Scene("main")
     , m_registry(registry)      // <- initializer list
 {
+    ObjectDefs::loadObjectDefinitions(WORLD_OBJECT_DEFS);
 }
 
 Player* MainScene::getPlayer() const
@@ -52,12 +55,13 @@ void MainScene::update(float dt)
 
 void MainScene::buildEnvironment()
 {
-    createObject<SceneObject>(glm::vec2(500.0f, 600.0f), ObjectDefs::GrassBlock());
-    createObject<SceneObject>(glm::vec2(550.0f, 600.0f), ObjectDefs::GrassBlock());
-    createObject<SceneObject>(glm::vec2(600.0f, 600.0f), ObjectDefs::GrassBlock());
-    createObject<SceneObject>(glm::vec2(650.0f, 600.0f), ObjectDefs::GrassBlock());
-    createObject<SceneObject>(glm::vec2(700.0f, 600.0f), ObjectDefs::GrassBlock());
-    createObject<SceneObject>(glm::vec2(750.0f, 600.0f), ObjectDefs::GrassBlock());
+    GameObjectDef objectDef = ObjectDefs::getObjectDefinition("grass_block");
+    createObject<SceneObject>(glm::vec2(500.0f, 600.0f), objectDef);
+    createObject<SceneObject>(glm::vec2(550.0f, 600.0f), objectDef);
+    createObject<SceneObject>(glm::vec2(600.0f, 600.0f), objectDef);
+    createObject<SceneObject>(glm::vec2(650.0f, 600.0f), objectDef);
+    createObject<SceneObject>(glm::vec2(700.0f, 600.0f), objectDef);
+    createObject<SceneObject>(glm::vec2(750.0f, 600.0f), objectDef);
 }
 
 void MainScene::onEnter()
@@ -81,6 +85,6 @@ void MainScene::spawn(const std::string &prototype, glm::vec2 position)
 {
     if (prototype == "block")
     {
-        createObject<SceneObject>(position, ObjectDefs::GrassBlock());
+        createObject<SceneObject>(position, ObjectDefs::getObjectDefinition("grass_block"));
     }
 }

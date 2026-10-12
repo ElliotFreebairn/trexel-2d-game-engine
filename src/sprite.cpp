@@ -66,3 +66,27 @@ Rect Sprite::getSrcRect() const
         animation.frameHeight
     };
 }
+
+// TEMP
+AnimationType Sprite::toAnimationType(std::string input)
+{
+   std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+   if (input == "SINGULAR") return AnimationType::SINGULAR;
+   if (input == "CONTINOUS") return AnimationType::CONTINUOUS;
+
+   return AnimationType::CONTINUOUS;
+};
+
+// implement a generic method for this, get rid of this later!
+SpriteMovementState Sprite::toSpriteMovementState(std::string input)
+{
+    std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+    if (input == "IDLE") return SpriteMovementState::IDLE;
+    if (input == "WALKING") return SpriteMovementState::WALKING;
+    if (input == "RUNNING") return SpriteMovementState::RUNNING;
+    if (input == "JUMPING") return SpriteMovementState::JUMPING;
+    if (input == "ATTACKING") return  SpriteMovementState::ATTACKING;
+
+    // by default
+    return SpriteMovementState::IDLE;
+}

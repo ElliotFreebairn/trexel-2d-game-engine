@@ -3,7 +3,7 @@
 #include "object_defs.h"
 
 Arrow::Arrow(glm::vec2 position, glm::vec2 velocity, EntityId onwerId)
-    : GameObject(position, ObjectDefs::Arrow())
+    : GameObject(position, ObjectDefs::getObjectDefinition("Arrow"))
     , m_velocity(velocity), m_ownerId(onwerId)
 {
 }

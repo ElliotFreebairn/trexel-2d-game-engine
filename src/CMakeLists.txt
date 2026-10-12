@@ -17,6 +17,7 @@ add_executable(trexel_exec
     mydefines.cpp
     game_object_registry.cpp
     scene_serializer.cpp
+    object_defs.cpp
 )
 
 # Link to actual SDL2 library

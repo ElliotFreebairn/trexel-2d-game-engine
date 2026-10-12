@@ -14,10 +14,9 @@
 #include <vector>
 
 Player::Player(glm::vec2 position)
-    : GameObject(position, ObjectDefs::Player())
+    : GameObject(position, ObjectDefs::getObjectDefinition("archer"))
 
 {
-    m_defName = "Player";
     m_applyGravity = true;
 }
 

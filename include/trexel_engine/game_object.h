@@ -109,6 +109,8 @@ public:
     // SERIALIZATION
     // implemenations of this base class need to implement that for themselves
     // maybe game object should have its default serialization state or that's handled by object definitions?
+    nlohmann::json serialize() override { return nullptr; }
+    void deSerialize(const nlohmann::json& j) override { }
 
 protected:
     std::optional<Sprite> m_sprite;
