@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../IUsable.h"
-#include "../item.h"
+#include "IUsable.h"
+#include "item.h"
 
 constexpr float BOW_COOLDOWN = 0.4f;
 constexpr float ARROW_SPEED = 900.0f; // pixels per second

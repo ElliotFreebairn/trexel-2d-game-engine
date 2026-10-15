@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../game_object.h"
+#include "game_object.h"
 #include "entity.h"
 
 class Arrow : public GameObject

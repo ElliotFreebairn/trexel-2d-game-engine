@@ -8,8 +8,10 @@
 #include <string>
 #include <optional>
 
-#include "collision.h"
-
+#define DEBUG
+#ifdef DEBUG
+#include "../collision.h"
+#endif
 
 class IRenderable
 {
