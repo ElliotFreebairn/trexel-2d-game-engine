@@ -3,7 +3,7 @@
 
 enum class AssetType
 {
-    Texture,
+    Texture
 };
 
 struct Asset

@@ -14,7 +14,7 @@
 
 namespace
 {
-constexpr const char* OBJECT_DEFINITIONS_PATH = "/home/elliotf/Develop/Personal/trexel/assets/definitions/objects.json";
+constexpr const char* OBJECT_DEFINITIONS_PATH = "/home/elliotf/Develop/Personal/trexel/data/definitions/objects.json";
 }
 
 Trexel::Trexel()
@@ -90,18 +90,19 @@ void Trexel::onShutdown()
     m_sceneManager.current()->onExit();
 }
 
-void Trexel::intialiseAssets(AssetManager &assets)
+void Trexel::intialiseAssets(AssetManager& assetManager)
 {
-    // Background / Environment
-    assets.addAsset("background", "assets/trexel/medieval/background/background.png", AssetType::Texture);
-    assets.addAsset("grass_block", "assets/trexel/medieval/platformer/grass_block.png", AssetType::Texture);
+    assetManager.loadManifest(MANIFEST_PATH);
+   // Background / Environment
+   // assets.addAsset("background", "assets/trexel/medieval/background/background.png", AssetType::Texture);
+   // assets.addAsset("grass_block", "assets/trexel/medieval/platformer/grass_block.png", AssetType::Texture);
 
-    // player
-    assets.addAsset("player_idle", "assets/trexel/player/idle-sheet.png", AssetType::Texture);
-    assets.addAsset("player_walking", "assets/trexel/player/walk-sheet.png", AssetType::Texture);
-    assets.addAsset("player_jumping", "assets/trexel/player/jump-sheet.png", AssetType::Texture);
-    assets.addAsset("player_shooting", "assets/trexel/player/shot.png", AssetType::Texture);
+   // // player
+   // assets.addAsset("player_idle", "assets/trexel/player/idle-sheet.png", AssetType::Texture);
+   // assets.addAsset("player_walking", "assets/trexel/player/walk-sheet.png", AssetType::Texture);
+   // assets.addAsset("player_jumping", "assets/trexel/player/jump-sheet.png", AssetType::Texture);
+   // assets.addAsset("player_shooting", "assets/trexel/player/shot.png", AssetType::Texture);
 
-    // bow
-    assets.addAsset("arrow", "assets/trexel/player/arrow.png", AssetType::Texture);
+   // // bow
+   // assets.addAsset("arrow", "assets/trexel/player/arrow.png", AssetType::Texture);
 }

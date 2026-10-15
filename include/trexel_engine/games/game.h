@@ -18,7 +18,9 @@
 
 // C++ includes
 #include <cerrno>
+#include <filesystem>
 #include <vector>
+
 
 /*
  * A game knows nothing about the renderer
@@ -116,7 +118,7 @@ public:
 
 
 protected:
-    virtual void intialiseAssets(AssetManager& assets) = 0;
+    virtual void intialiseAssets(AssetManager& manager) = 0;
 
     virtual void registerObjectTypes(ObjectFactory& factory) { (void)factory; }
     virtual void onInit() = 0;

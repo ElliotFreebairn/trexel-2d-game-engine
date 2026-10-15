@@ -1,0 +1,40 @@
+{
+  "assets":
+  [
+    {
+      "id": "archer_idle",
+      "type": "texture",
+      "path": "trexel/player/idle-sheet.png"
+    },
+    {
+      "id": "archer_walking",
+      "type": "texture",
+      "path": "trexel/player/walk-sheet.png"
+    },
+    {
+      "id": "archer_jumping",
+      "type": "texture",
+      "path": "trexel/player/jump-sheet.png"
+    },
+    {
+      "id": "archer_shooting",
+      "type": "texture",
+      "path": "trexel/player/shot.png"
+    },
+    {
+      "id": "archer_arrow",
+      "type": "texture",
+      "path": "trexel/player/arrow.png"
+    },
+    {
+      "id": "background",
+      "type": "texture",
+      "path": "trexel/medieval/background/background.png"
+    },
+    {
+      "id": "grass_block",
+      "type": "texture",
+      "path": "trexel/medieval/platformer/grass_block.png"
+    }
+  ]
+}

@@ -7,6 +7,8 @@
 #include "object_factory.h"
 #include "input_state.h"
 #include "player.h"
+#include <filesystem>
+
 
 class Trexel : public Game
 {
@@ -17,11 +19,15 @@ public:
     void onUpdate(float detlaTime, const InputState& state) override;
     void onShutdown() override;
 
+public:
+    static inline constexpr const char* MANIFEST_PATH = "/home/elliotf/Develop/Personal/trexel/data/asset_manifest.json";
+
 protected:
     void onInit() override;
-    void intialiseAssets(AssetManager& assets) override;
+    void intialiseAssets(AssetManager& manager) override;
     void registerObjectTypes(ObjectFactory& factory) override;
 
 private:
     Player* getPlayer() const;
+
 };

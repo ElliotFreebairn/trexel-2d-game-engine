@@ -8,7 +8,7 @@
 
 namespace
 {
-constexpr const char* WORLD_SAVE_PATH = "/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json";
+constexpr const char* WORLD_SAVE_PATH = "/home/elliotf/Develop/Personal/trexel/data/saved_worlds/world.json";
 }
 
 MainScene::MainScene(glm::vec2 viewportSize, const ObjectFactory& factory)
