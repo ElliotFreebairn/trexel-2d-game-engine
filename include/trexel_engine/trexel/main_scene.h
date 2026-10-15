@@ -1,18 +1,17 @@
 // main_scene.h — changes needed
 #pragma once
-#include "game_object_registry.h"
+#include "object_factory.h"
 #include "scene.h"
 #include "player.h"
 
 class MainScene : public Scene
 {
 public:
-    MainScene(glm::vec2 viewport, const GameObjectRegistry& registry);
+    MainScene(glm::vec2 viewport, const ObjectFactory& factory);
 
     void update(float dt) override;
     void onEnter() override;
     void onExit() override;
-    void spawn(const std::string& prototype, glm::vec2 position) override;
 
     // No longer a stored field - see getPlayer() in main_scene.cpp.
     Player* getPlayer() const;
@@ -22,5 +21,4 @@ private:
     void buildEnvironment();
 
     glm::vec2 m_viewport;
-    const GameObjectRegistry& m_registry;
 };

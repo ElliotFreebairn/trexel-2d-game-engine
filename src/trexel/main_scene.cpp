@@ -2,7 +2,6 @@
 #include "arrow.h"
 #include "collision.h"
 #include "game_object.h"
-#include "object_defs.h"
 #include "scene.h"
 #include "scene_object.h"
 #include "scene_serializer.h"
@@ -10,14 +9,12 @@
 namespace
 {
 constexpr const char* WORLD_SAVE_PATH = "/home/elliotf/Develop/Personal/trexel/assets/saved_worlds/world.json";
-constexpr const char* WORLD_OBJECT_DEFS = "/home/elliotf/Develop/Personal/trexel/assets/definitions/objects.json";
 }
 
-MainScene::MainScene(glm::vec2 viewportSize, const GameObjectRegistry& registry)
-    : Scene("main")
-    , m_registry(registry)      // <- initializer list
+MainScene::MainScene(glm::vec2 viewportSize, const ObjectFactory& factory)
+    : Scene("main", factory)
+    , m_viewport(viewportSize)
 {
-    ObjectDefs::loadObjectDefinitions(WORLD_OBJECT_DEFS);
 }
 
 Player* MainScene::getPlayer() const
@@ -39,7 +36,7 @@ void MainScene::update(float dt)
     if (Player* player = getPlayer())
     {
         resolveCollisions(*player);
-        player->setGrounded(isGroundedOn(*player));
+        player->body.grounded = isGroundedOn(*player);
     }
 
     // Arrows react to a hit (stop/despawn) rather than resolve collisions, so don't use resolveCollisions
@@ -55,36 +52,26 @@ void MainScene::update(float dt)
 
 void MainScene::buildEnvironment()
 {
-    GameObjectDef objectDef = ObjectDefs::getObjectDefinition("grass_block");
-    createObject<SceneObject>(glm::vec2(500.0f, 600.0f), objectDef);
-    createObject<SceneObject>(glm::vec2(550.0f, 600.0f), objectDef);
-    createObject<SceneObject>(glm::vec2(600.0f, 600.0f), objectDef);
-    createObject<SceneObject>(glm::vec2(650.0f, 600.0f), objectDef);
-    createObject<SceneObject>(glm::vec2(700.0f, 600.0f), objectDef);
-    createObject<SceneObject>(glm::vec2(750.0f, 600.0f), objectDef);
+    spawn("grass_block", glm::vec2(500.0f, 600.0f));
+    spawn("grass_block", glm::vec2(550.0f, 600.0f));
+    spawn("grass_block", glm::vec2(600.0f, 600.0f));
+    spawn("grass_block", glm::vec2(650.0f, 600.0f));
+    spawn("grass_block", glm::vec2(700.0f, 600.0f));
+    spawn("grass_block", glm::vec2(750.0f, 600.0f));
 }
 
 void MainScene::onEnter()
 {
     setBackground("background");
 
-    if (!SceneSerializer::load(*this, WORLD_SAVE_PATH, m_registry))
+    if (!SceneSerializer::load(*this, WORLD_SAVE_PATH))
     {
         buildEnvironment();
-        createObject<Player>(glm::vec2(450.0f, 400.0f));
+        spawn("archer", glm::vec2(450.0f, 400.0f));
     }
 }
 
 void MainScene::onExit()
 {
     SceneSerializer::save(*this, WORLD_SAVE_PATH);
-}
-
-// Whaat can i spawn?
-void MainScene::spawn(const std::string &prototype, glm::vec2 position)
-{
-    if (prototype == "block")
-    {
-        createObject<SceneObject>(position, ObjectDefs::getObjectDefinition("grass_block"));
-    }
 }

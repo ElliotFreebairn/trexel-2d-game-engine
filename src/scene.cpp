@@ -3,7 +3,6 @@
 #include "entity.h"
 #include "game_object.h"
 #include "game_object_def.h"
-#include "object_defs.h"
 #include "player.h"
 #include "property.h"
 #include "scene_object.h"
@@ -34,11 +33,18 @@ GameObject& Scene::addObject(std::unique_ptr<GameObject> obj)
     return ref;
 }
 
+GameObject* Scene::spawn(const std::string& defName, glm::vec2 position)
+{
+    std::unique_ptr<GameObject> obj = m_factory.create(defName, position);
+    if (!obj) return nullptr;
+    return &addObject(std::move(obj));
+}
+
 void Scene::snapshotPositions()
 {
     for (auto& objPtr : m_objects)
     {
-        objPtr->setPrevPosition(objPtr->getPosition());
+        objPtr->transform.prevPosition = objPtr->transform.position;
     }
 }
 
@@ -50,15 +56,15 @@ void Scene::resolveCollisions(GameObject &mover)
     {
         GameObject* other = objPtr.get();
         if (other == &mover) continue;
-        if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
+        if (!other->hasCollider() || !other->collider->isSolid) continue;
 
         AABB moverBounds = mover.getBounds();
         AABB otherBounds = other->getBounds();
 
         if (!aabbOverlap(moverBounds, otherBounds)) continue;
 
-        glm::vec2 prevPos = mover.getPrevPosition();
-        glm::vec2 currPos = mover.getPosition();
+        glm::vec2 prevPos = mover.transform.prevPosition;
+        glm::vec2 currPos = mover.transform.position;
 
         // Isolate each axis: does moving *only* on that axis explain the overlap?
         bool xAlone = aabbOverlap(mover.getBoundsAt({currPos.x, prevPos.y}), otherBounds);
@@ -83,7 +89,7 @@ void Scene::resolveCollisions(GameObject &mover)
         {
             pos.y += (moverBounds.min.y < otherBounds.min.y) ? -overlapY : overlapY;
         }
-        mover.setPosition(pos);
+        mover.transform.position = pos;
         mover.evCollided(resolveX ? CollisionAxis::X : CollisionAxis::Y);
     }
 }
@@ -97,8 +103,8 @@ bool Scene::overlapsSolid(const GameObject &probe, EntityId ignore) const
     {
         const GameObject* other = objPtr.get();
         if (other == &probe) continue;
-        if (ignore != INVALID_ENTITY && other->getEntityId() == ignore) continue;
-        if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
+        if (ignore != INVALID_ENTITY && other->entityId() == ignore) continue;
+        if (!other->hasCollider() || !other->collider->isSolid) continue;
 
         if (aabbOverlap(probeBounds, other->getBounds())) return true;
     }
@@ -122,7 +128,7 @@ bool Scene::isGroundedOn(const GameObject &probe, float skinWidth, EntityId igno
         const GameObject* other = objPtr.get();
         if (other == &probe) continue;
         if (ignore != INVALID_ENTITY && other->entityId() == ignore) continue;
-        if (!other->hasCollider() || !other->getCollider()->isSolid) continue;
+        if (!other->hasCollider() || !other->collider->isSolid) continue;
 
         if (aabbOverlap(bounds, other->getBounds())) return true;
     }
@@ -136,7 +142,7 @@ std::vector<const IRenderable*> Scene::getRenderables() const
 
     for (auto& obj : m_objects)
     {
-        if (obj->isVisible())
+        if (obj->visual.visible)
         {
             out.push_back(obj.get());
         }
@@ -182,7 +188,7 @@ EntityId Scene::pick(glm::vec2 worldPos) const
     for (auto it = m_objects.rbegin(); it != m_objects.rend(); ++it)
     {
         GameObject* obj = it->get();
-        if (!obj->isActive() || !obj->isVisible()) continue;
+        if (!obj->isActive() || !obj->visual.visible) continue;
 
         // Return the closest object to the user mouse position
         const glm::vec2 pos  = obj->getPosition();

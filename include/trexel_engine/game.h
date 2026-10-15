@@ -8,7 +8,7 @@
 #include "editor_command.h"
 #include "entity.h"
 #include "game_actions.h"
-#include "game_object_registry.h"
+#include "object_factory.h"
 #include "input_state.h"
 #include "main_scene.h"
 #include "property.h"
@@ -88,7 +88,7 @@ public:
                 }
                 break;
             case EditorCommandType::SpawnEntity:
-                //m_sceneManager.current()->createObject<SceneObject>(command.position, ObjectDefs::GrassBlock());
+                //scene->spawn(command.prototype, command.position);
                 break;
             case EditorCommandType::DestroyEntity:
                 m_sceneManager.current()->destroy(command.entity);
@@ -100,7 +100,7 @@ public:
 
     // misc
     const AssetManager& getAssetManager() const { return m_assetManager; }
-    const GameObjectRegistry& getObjectRegistry() const { return m_objectRegistry; }
+    const ObjectFactory& getObjectFactory() const { return m_objectFactory; }
     bool isRunning() const { return m_isRunning; }
 
 
@@ -118,12 +118,12 @@ public:
 protected:
     virtual void intialiseAssets(AssetManager& assets) = 0;
 
-    virtual void registerObjectTypes(GameObjectRegistry& registry) { (void)registry; }
+    virtual void registerObjectTypes(ObjectFactory& factory) { (void)factory; }
     virtual void onInit() = 0;
 
     SceneManager m_sceneManager;
     AssetManager m_assetManager;
-    GameObjectRegistry m_objectRegistry;
+    ObjectFactory m_objectFactory;
     bool m_isRunning = true;
 
     glm::vec2 m_viewport = glm::vec2(0.0f);

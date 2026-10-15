@@ -12,7 +12,7 @@
 class SceneObject : public GameObject
 {
 public:
-    SceneObject(glm::vec2 position, GameObjectDef objectDef);
+    SceneObject(const GameObjectDef& def, glm::vec2 position);
     ~SceneObject() = default;
 
     void update(float dt) override;

@@ -2,7 +2,7 @@
 #include "game_object.h"
 #include "game_object_def.h"
 
-SceneObject::SceneObject(glm::vec2 position, GameObjectDef objectDef) : GameObject(position, objectDef)
+SceneObject::SceneObject(const GameObjectDef& def, glm::vec2 position) : GameObject(def, position)
 {
 }
 

@@ -1,7 +1,5 @@
 #include "scene_serializer.h"
 #include "game_object.h"
-#include "game_object_registry.h"
-#include "object_defs.h"
 #include "scene.h"
 #include "json_utility.h"
 
@@ -16,29 +14,16 @@ void SceneSerializer::save(const Scene& scene, const std::string& path)
     json out = json::object();
     out["objects"] = json::array();
 
-    for (const auto& objPtr : scene.getObjects())
+    for (const auto& obj : scene.getObjects())
     {
-        const GameObject& obj = *objPtr;
-
-        json objJson = json::object();
-        objJson["class"] = obj.typeName();
-        objJson["objectDef"] = obj.defName();
-        objJson["position"] = vec2ToJson(obj.getPosition());
-        objJson["size"] = vec2ToJson(obj.getSize());
-
-        if (obj.getColour().has_value())
-        {
-            objJson["colour"] = vec3ToJson(*obj.getColour());
-        }
-
-        out["objects"].push_back(objJson);
+        out["objects"].push_back(obj->serialize());
     }
 
     std::ofstream file(path);
-    file << out;
+    file << out.dump(2);
 }
 
-bool SceneSerializer::load(Scene& scene, const std::string& path, const GameObjectRegistry& registry)
+bool SceneSerializer::load(Scene& scene, const std::string& path)
 {
     std::ifstream file(path);
     if (!file.is_open())
@@ -47,46 +32,26 @@ bool SceneSerializer::load(Scene& scene, const std::string& path, const GameObje
         return false;
     }
 
-    json saved = json::parse(file);
-    if (!saved.contains("objects")) return false;
+    json saved = json::parse(file, nullptr, /*allow exceptions*/ false);
+    if (saved.is_discarded() || !saved.contains("objects"))
+    {
+        std::cerr << "SceneSerializer::load: " << path << " isn't valid or has no \"objects\"\n";
+        return false;
+    }
 
     for (const auto& objJson : saved["objects"])
     {
-        const std::string className = objJson.at("class").get<std::string>();
-        const std::string defName = objJson.at("objectDef").get<std::string>();
-        const glm::vec2 position = vec2FromJson(objJson.at("position"));
+        const std::string defName = objJson.value("def", "");
+        const glm::vec2 position = objJson.contains("position") ? vec2FromJson(objJson.at("position")) : glm::vec2(0.0f);
 
-        GameObjectDef def;
-        if (!defName.empty())
-        {
-            try
-            {
-                def = ObjectDefs::getObjectDefinition(defName);
-            }
-            catch (const std::exception& e)
-            {
-                std::cerr << "SceneSerializer::load: " << e.what() << ", skipping one object\n";
-                std::cerr << "JSON PayLoad: \n" << objJson;
-                continue;
-            }
-        }
-
-        std::unique_ptr<GameObject> obj = registry.create(className, position, def);
+        GameObject* obj = scene.spawn(defName, position);
         if (!obj)
         {
-            std::cerr << "SceneSerializer::load: unknown class \"" << className << "\", skipping one object\n";
-            std::cerr << "JSON PayLoad: \n" << saved;
+            std::cerr << "SceneSerializer::load: skipping " << objJson << "\n";
             continue;
         }
 
-        obj->setDefName(defName);
-
-        if (objJson.contains("size"))
-        {
-            obj->setSize(vec2FromJson(objJson.at("size")));
-        }
-
-        scene.addObject(std::move(obj));
+        obj->deSerialize(objJson);
     }
     return true;
 }

@@ -4,15 +4,16 @@
 
     {
       "name": "archer",
-      "textureId": "",
+      "class": "Player",
       "size": {
-        "x" : 128.0,
-        "y":  128.0
+        "x": 128.0,
+        "y": 128.0
       },
+      "gravity": true,
       "collider": {
         "size": {
-          "x": 128.0,
-          "y": 128.0
+          "x": 30.0,
+          "y": 70.0
         },
         "offset": {
           "x": 50.0,
@@ -26,29 +27,22 @@
           {
             "state": "IDLE",
             "textureId": "player_idle",
-            "frames": 6,
-            "rows": 1,
-            "type": "CONTINOUS"
+            "frames": 6
           },
           {
             "state": "WALKING",
             "textureId": "player_walking",
-            "frames": 8,
-            "rows": 1,
-            "type": "CONTINOUS"
+            "frames": 8
           },
           {
             "state": "JUMPING",
             "textureId": "player_jumping",
-            "frames": 9,
-            "rows": 1,
-            "type": "CONTINOUS"
+            "frames": 9
           },
           {
             "state": "ATTACKING",
-            "textureId": "player_attacking",
+            "textureId": "player_shooting",
             "frames": 14,
-            "rows": 1,
             "type": "SINGULAR"
           }
         ]
@@ -56,21 +50,27 @@
     },
 
     {
+      "name": "arrow",
+      "class": "Arrow",
+      "textureId": "arrow",
+      "size": {
+        "x": 48.0,
+        "y": 48.0
+      },
+      "collider": {
+        "solid": false
+      }
+    },
+
+    {
       "name": "grass_block",
+      "class": "SceneObject",
       "textureId": "grass_block",
       "size": {
         "x": 50.0,
         "y": 50.0
       },
       "collider": {
-        "size": {
-          "x": 50.0,
-          "y": 50.0
-        },
-        "offset": {
-          "x": 0.0,
-          "y": 0.0
-        },
         "solid": true
       }
     }

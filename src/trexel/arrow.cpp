@@ -1,26 +1,30 @@
 #include "arrow.h"
 #include "entity.h"
-#include "object_defs.h"
 
-Arrow::Arrow(glm::vec2 position, glm::vec2 velocity, EntityId onwerId)
-    : GameObject(position, ObjectDefs::getObjectDefinition("Arrow"))
-    , m_velocity(velocity), m_ownerId(onwerId)
+Arrow::Arrow(const GameObjectDef& def, glm::vec2 position)
+    : GameObject(def, position)
 {
+}
+
+void Arrow::launch(glm::vec2 velocity, EntityId ownerId)
+{
+    m_velocity = velocity;
+    m_ownerId = ownerId;
 }
 
 void Arrow::update(float dt)
 {
-    setPosition(getPosition() + m_velocity * dt);
+    transform.position += m_velocity * dt;
 
     m_lifetime -= dt;
     if (m_lifetime <= 0.0f)
     {
-        setIsActive(false); // Scene::update() prunes inactive objects
+        destroy(); // Scene::update() prunes inactive objects
     }
 }
 
 void Arrow::evCollided(CollisionAxis axis)
 {
     (void)axis;
-    setIsActive(false);
+    destroy();
 }

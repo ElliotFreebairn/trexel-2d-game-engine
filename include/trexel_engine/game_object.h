@@ -1,10 +1,7 @@
 #pragma once
 
 // Library includes
-#include <SDL_render.h>
-#include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
-#include <SDL.h>
 
 // Custom includes
 #include "ISerializer.h"
@@ -18,13 +15,45 @@
 
 // C++ includes
 #include <optional>
-#include <iostream>
+#include <string>
 
+struct Transform
+{
+    glm::vec2 position      {0.0f};
+    glm::vec2 prevPosition  {0.0f};
+    glm::vec2 size          {0.0f};
+    double angle            = 0.0;
+    Flip flip               = Flip::NONE;
+};
+
+struct Body
+{
+    float velocityY = 0.0f;
+    bool gravity    = false;
+    bool grounded   = false;
+};
+
+struct Visual
+{
+    std::string textureId;
+    std::optional<Sprite> sprite;
+    std::optional<glm::vec3> colour;
+    bool visible = true;
+};
+
+/*
+ * Base for everything that lives in a Scene
+ *
+ * Don't create these directly, spawn them through the scene so the definition is looked up for you:
+ *      scene.spawn("grass_block", position);
+ *      Arrow* arrow = scene.spawn<Arrow>("arrow", position);
+ *
+ * Subclasses need a (const GameObjectDef& def, glm::vec2 position) constructor
+ */
 class GameObject : public IRenderable, public IInspectable, public ISerializer
 {
 public:
-    GameObject(glm::vec2 position, const GameObjectDef& def);
-    GameObject() = default;
+    GameObject(const GameObjectDef& def, glm::vec2 position);
 
     // Each object has a unique editor id, so copying will duplicate the id
     GameObject(const GameObject&) = delete;
@@ -36,43 +65,35 @@ public:
      * update will be called every frame
      */
     virtual void update(float dt) = 0;
+    virtual void evCollided(CollisionAxis axis) { (void)axis; }
 
-    AABB getBounds() const;
-    AABB getBoundsAt(glm::vec2 position) const;
+    void applyGravity(float dt);
 
-    // IRenderable getters
-    glm::vec2 getPosition() const override { return m_position; }
-    glm::vec2 getSize() const override { return m_size; }
-    std::string getTextureID() const override;
-    std::optional<Rect> getSourceRect() const override;
-    std::optional<glm::vec3> getColour() const override { return m_colour; }
-    double getAngle() const override { return m_angle; }
-    Flip getFlip() const override { return m_flip; }
+    // State, grouped by what it's for
+    Transform transform;
+    Body body;
+    Visual visual;
+    std::optional<Collider> collider;
 
-    // GameObject getters
-    bool isVisible() const { return m_isVisible; }
     bool isActive() const { return m_isActive; }
-    bool isGravity() const { return m_applyGravity; }
+    void destroy() { m_isActive = false; } // Scene::update() prunes inactive objects
+
+    // The definition this object was built from
+    const std::string& defName() const { return m_defName; }
 
     // Collision
-    bool hasCollider() const { return m_collider.has_value(); }
-    const std::optional<Collider>& getCollider() const { return m_collider; }
-    void addCollider(Collider c) { m_collider = c; }
-    virtual void evCollided(CollisionAxis axis) {}
+    AABB getBounds() const override;
+    AABB getBoundsAt(glm::vec2 position) const;
+    bool hasCollider() const override { return collider.has_value(); }
 
-    // IRenderable setters
-    void setPosition(glm::vec2 position) { m_position = position; }
-    void setSize(glm::vec2 size) { m_size = size; }
-    void setAngle(double angle) { m_angle = angle; }
-    void setFlip(Flip flip) { m_flip = flip; }
-
-    // GameObject setters
-    void set_isVisible(bool visible) { m_isVisible = visible; }
-    void setIsActive(bool active) { m_isActive = active; }
-
-    // previous positioning
-    glm::vec2 getPrevPosition() const { return m_prevPosition; }
-    void setPrevPosition(glm::vec2 p) { m_prevPosition = p; }
+    // IRenderable
+    glm::vec2 getPosition() const override { return transform.position; }
+    glm::vec2 getSize() const override { return transform.size; }
+    std::string getTextureID() const override;
+    std::optional<Rect> getSourceRect() const override;
+    std::optional<glm::vec3> getColour() const override { return visual.colour; }
+    double getAngle() const override { return transform.angle; }
+    Flip getFlip() const override { return transform.flip; }
 
     // IInspectable
     EntityId entityId() const override { return m_id; }
@@ -80,65 +101,14 @@ public:
     std::vector<Property> properties() const override;
     void setProperty(std::string name, const PropertyValue& value) override;
 
-    // Entity id
-    EntityId getEntityId() const { return m_id; }
-
-    // Gravity
-    void applyGravity(float dt)
-    {
-        if (!m_applyGravity) return;
-
-        if (m_isGrounded && m_velocityY >= 0.0f)
-        {
-            m_velocityY = 0.0f;
-            return;
-        }
-
-        m_velocityY += GRAVITY * dt;
-        if (m_velocityY > MAX_FALL_SPEED) m_velocityY = MAX_FALL_SPEED;
-        m_position.y += m_velocityY * dt;
-    }
-
-    bool isGrounded() const { return m_isGrounded; }
-    void setGrounded(bool grounded) { m_isGrounded = grounded; }
-
-    // object def
-    const std::string& defName() const { return m_defName; }
-    void setDefName(std::string name) { m_defName = std::move(name); }
-
-    // SERIALIZATION
-    // implemenations of this base class need to implement that for themselves
-    // maybe game object should have its default serialization state or that's handled by object definitions?
-    nlohmann::json serialize() override { return nullptr; }
-    void deSerialize(const nlohmann::json& j) override { }
-
-protected:
-    std::optional<Sprite> m_sprite;
-    std::optional<Collider> m_collider;
-
-    bool m_isVisible = true;
-    bool m_isActive = true;
-    bool m_applyGravity = false;
-    bool m_isGrounded = false;
-
-    glm::vec2 m_position = glm::vec2(0.0f);
-    glm::vec2 m_size = glm::vec2(0.0f);
-    std::string m_textureId;
-    std::optional<glm::vec3> m_colour;
-    double m_angle = 0.0;
-    Flip m_flip = Flip::NONE;
-
-    glm::vec2 m_prevPosition;
-
-    float m_velocityY = 0.0f;
-    static constexpr float GRAVITY = 1500.0f;
-    static constexpr float MAX_FALL_SPEED = 1000.0f;
-
-    // object def
-    std::string m_defName;
-
-    void updateSprite(float dt) { if (m_sprite) m_sprite->update(dt); }
+    // ISerializer
+    // Only saves what can change per object, everything else comes from the definition
+    // Subclasses that save extra state should call the base version first
+    nlohmann::json serialize() const override;
+    void deSerialize(const nlohmann::json& j) override;
 
 private:
     const EntityId m_id = allocateEntityId();
+    std::string m_defName;
+    bool m_isActive = true;
 };

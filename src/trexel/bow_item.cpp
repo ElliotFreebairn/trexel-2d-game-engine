@@ -9,5 +9,8 @@ void BowItem::onUse(Player& player, Scene& scene)
 
     const glm::vec2 origin = player.getPosition() + player.getSize() * 0.5f;
 
-    scene.createObject<Arrow>(origin, direction * ARROW_SPEED, player.getEntityId());
+    if (Arrow* arrow = scene.spawn<Arrow>("arrow", origin))
+    {
+        arrow->launch(direction * ARROW_SPEED, player.entityId());
+    }
 }

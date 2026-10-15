@@ -5,11 +5,17 @@
 #include "game_actions.h"
 #include "game_object.h"
 #include "game_object_def.h"
+#include "arrow.h"
 #include "main_scene.h"
 #include "player.h"
 #include "scene_object.h"
 #include <memory>
 #include <vector>
+
+namespace
+{
+constexpr const char* OBJECT_DEFINITIONS_PATH = "/home/elliotf/Develop/Personal/trexel/assets/definitions/objects.json";
+}
 
 Trexel::Trexel()
 {
@@ -22,15 +28,11 @@ Trexel::~Trexel()
 }
 
 
-void Trexel::registerObjectTypes(GameObjectRegistry &registry)
+void Trexel::registerObjectTypes(ObjectFactory& factory)
 {
-    registry.registerType("Player", [](glm::vec2 position, const GameObjectDef&) {
-        return std::make_unique<Player>(position);
-    });
-
-    registry.registerType("SceneObject", [](glm::vec2 position, const GameObjectDef& def) {
-        return std::make_unique<SceneObject>(position, def);
-    });
+    factory.registerType<Player>("Player");
+    factory.registerType<SceneObject>("SceneObject");
+    factory.registerType<Arrow>("Arrow");
 }
 
 Player* Trexel::getPlayer() const
@@ -76,9 +78,10 @@ void Trexel::onUpdate(float deltaTime, const InputState& input)
 void Trexel::onInit()
 {
     // initialise objects allowed in the game
-    registerObjectTypes(m_objectRegistry);
+    registerObjectTypes(m_objectFactory);
+    m_objectFactory.loadDefinitions(OBJECT_DEFINITIONS_PATH);
 
-    m_sceneManager.registerScene("main", [this] { return std::make_unique<MainScene>(this->getViewport(), this->getObjectRegistry()); });
+    m_sceneManager.registerScene("main", [this] { return std::make_unique<MainScene>(this->getViewport(), this->getObjectFactory()); });
     m_sceneManager.switchTo("main");
 }
 

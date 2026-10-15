@@ -3,7 +3,6 @@
 #include "collision.h"
 #include "common.h"
 #include "game_object.h"
-#include "object_defs.h"
 #include "property.h"
 #include "scene.h"
 #include "sprite.h"
@@ -13,22 +12,15 @@
 #include <iostream>
 #include <vector>
 
-Player::Player(glm::vec2 position)
-    : GameObject(position, ObjectDefs::getObjectDefinition("archer"))
-
+Player::Player(const GameObjectDef& def, glm::vec2 position)
+    : GameObject(def, position)
 {
-    m_applyGravity = true;
-}
-
-Player::Player() : GameObject()
-{
-
 }
 
 void Player::update(float dt)
 {
 
-    if (m_isGrounded && m_isJumping && m_velocityY >= 0.0f)
+    if (body.grounded && m_isJumping && body.velocityY >= 0.0f)
     {
         m_isJumping = false;
     }
@@ -39,25 +31,25 @@ void Player::update(float dt)
     }
 
     // The attack animation is one-shot (SINGULAR)
-    if(m_isAttacking && m_sprite && m_sprite->isFinished())
+    if(m_isAttacking && visual.sprite && visual.sprite->isFinished())
     {
         m_isAttacking = false;
     }
 
     resolveSpriteState();
-    updateSprite(dt);
+    if (visual.sprite) visual.sprite->update(dt);
     m_isMoving = false;
 }
 
 void Player::resolveSpriteState()
 {
-    if (!m_sprite) return;
+    if (!visual.sprite) return;
 
     if (m_isAttacking) return;
 
-    if (m_isJumping) m_sprite->play(SpriteMovementState::JUMPING);
-    else if (m_isMoving) m_sprite->play(SpriteMovementState::WALKING);
-    else m_sprite->play(SpriteMovementState::IDLE);
+    if (m_isJumping) visual.sprite->play(SpriteMovementState::JUMPING);
+    else if (m_isMoving) visual.sprite->play(SpriteMovementState::WALKING);
+    else visual.sprite->play(SpriteMovementState::IDLE);
 }
 
 void Player::move(glm::vec2 delta)
@@ -66,8 +58,8 @@ void Player::move(glm::vec2 delta)
     {
         m_facing = glm::vec2(delta.x < 0.0f ? -1.0f : 1.0f, 0.0f);
     }
-    setFlip(delta.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE);
-    m_position += delta * 200.0f;
+    transform.flip = delta.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
+    transform.position += delta * 200.0f;
     m_isMoving = true;
 }
 
@@ -75,8 +67,8 @@ void Player::jump()
 {
     if (m_isJumping) return;
     m_isJumping = true;
-    m_isGrounded = false;
-    m_velocityY = JUMP_FORCE;
+    body.grounded = false;
+    body.velocityY = JUMP_FORCE;
 }
 
 void Player::fire()
@@ -87,15 +79,15 @@ void Player::fire()
     m_hasFiredThisAttack = false;
     m_fireCooldown = BOW_COOLDOWN;
 
-    if (m_sprite) m_sprite->play(SpriteMovementState::ATTACKING);
+    if (visual.sprite) visual.sprite->play(SpriteMovementState::ATTACKING);
 }
 
 bool Player::wantsToReleaseArrow() const
 {
     return m_isAttacking
         &&  !m_hasFiredThisAttack
-        && m_sprite
-        && m_sprite->currentFrame() >= RELEASE_FRAME;
+        && visual.sprite
+        && visual.sprite->currentFrame() >= RELEASE_FRAME;
 }
 
 void Player::releaseArrow(Scene& scene)
@@ -109,7 +101,7 @@ void Player::evCollided(CollisionAxis axis)
     if(m_isJumping && axis == CollisionAxis::Y)
     {
         m_isJumping = false;
-        m_velocityY = 0.0f;
+        body.velocityY = 0.0f;
     }
 }
 
@@ -118,7 +110,7 @@ std::vector<Property> Player::properties() const
 {
     std::vector<Property> properties = GameObject::properties();
 
-    properties.insert(properties.end(), {Property("jumping", m_isJumping, true), Property("grounded", m_isGrounded, true)});
+    properties.insert(properties.end(), {Property("jumping", m_isJumping, true), Property("grounded", body.grounded, true)});
 
     return properties;
 }

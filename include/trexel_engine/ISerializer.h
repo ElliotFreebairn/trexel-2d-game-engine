@@ -10,7 +10,7 @@ class ISerializer
 public:
     virtual ~ISerializer() = default;
 
-    virtual nlohmann::json serialize() = 0;
+    virtual nlohmann::json serialize() const = 0;
 
     virtual void deSerialize(const nlohmann::json& j) = 0;
 };

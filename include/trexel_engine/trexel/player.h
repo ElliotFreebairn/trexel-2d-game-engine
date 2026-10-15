@@ -14,8 +14,7 @@ class Scene;
 class Player : public GameObject, public ISprite
 {
 public:
-    Player(glm::vec2 position);
-    Player();
+    Player(const GameObjectDef& def, glm::vec2 position);
     virtual ~Player() = default;
 
     void evCollided(CollisionAxis axis) override;
