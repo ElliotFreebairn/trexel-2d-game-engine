@@ -43,7 +43,8 @@
             "state": "ATTACKING",
             "textureId": "archer_shooting",
             "frames": 14,
-            "type": "SINGULAR"
+            "type": "SINGULAR",
+            "frameSpeed": 0.05
           }
         ]
       }

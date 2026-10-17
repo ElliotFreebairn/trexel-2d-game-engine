@@ -84,7 +84,9 @@ GameObjectDef parseDefinition(const json& defJson)
             // Each frame is the size of the object
             spriteAnimation.frameWidth = static_cast<int>(def.size.x);
             spriteAnimation.frameHeight = static_cast<int>(def.size.y);
-            spriteAnimation.frameDuration = frameSpeed;
+
+            // Each frame is usally defined by the generic frame speed, but some may override...
+            spriteAnimation.frameDuration = animation.value("frameSpeed", frameSpeed);
 
             SpriteMovementState state = Sprite::toSpriteMovementState(animation.at("state").get<std::string>());
             def.animations[state] = spriteAnimation;
