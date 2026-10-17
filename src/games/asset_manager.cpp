@@ -6,55 +6,45 @@
 
 #include "asset.h"
 #include "nlohmann/json.hpp"
+#include "asset_json.h"
 
 using json = nlohmann::json;
 
 void AssetManager::loadManifest(const std::filesystem::path &path)
 {
-    // check if the file exists
-    if (path.empty() || !path.has_filename()) return;
+    std::ifstream file(path);
+    if (!file) return;
 
-    // load the file
-    std::fstream file(path);
+    const auto manifest = nlohmann::json::parse(file, nullptr, false);
+    if (manifest.is_discarded() || !manifest.contains("assets")) return;
 
-    // can we open the manifest located in storage
-    if (!file.is_open()) return;
-
-    // parse the file into a json blob
-    json manifestJson = json::parse(file);
-
-    if (!manifestJson.contains("assets"))
+    m_manfiestPath = path;
+    m_assetRoot = path.parent_path() / "assets";
+    for (const auto& entry : manifest["assets"])
     {
-        std::cout << "AssetManager Error! manifest doesn't contain assets\n";
-        return;
-    }
-
-    for (const auto asset : manifestJson["assets"])
-    {
-        std::cout << asset << "\n";
-
-        // get the id
-        std::string id = asset["id"];
-
-        // get the texture type
-        std::string type = asset["type"];
-        // for now we are going to assume is Asset::Texture
-        AssetType aType = AssetType::Texture;
-
-        // get the path relative to assets/
-        // sort out this manual relative path issue !!!
-        std::filesystem::path path = std::filesystem::path("data/assets") / asset["path"];
-
-        std::cout << path << "\n";
-
-        if (id.empty() || type.empty() || path.empty())
+        try
         {
-            std::cout << "AssetManager Error! asset is mising a parameter\n";
-            continue;
+            addAsset(entry.get<Asset>());
         }
-
-        m_assets.push_back(Asset{id, path, aType});
+        catch (const nlohmann::json::exception& e)
+        {
+            std::cerr << "Bad Asset: " << e.what() << "\n";
+        }
     }
+}
+
+void AssetManager::saveManifest(const std::filesystem::path &path) const
+{
+    nlohmann::json manifest;
+    manifest["assets"] = m_assets;
+    std::ofstream(path) << manifest.dump(4);
+}
+
+bool AssetManager::addAsset(Asset asset)
+{
+    if (getAsset(asset.id)) return false;
+    m_assets.push_back(std::move(asset));
+    return true;
 }
 
 const Asset* AssetManager::getAsset(const std::string &id) const
@@ -67,4 +57,9 @@ const Asset* AssetManager::getAsset(const std::string &id) const
         }
     }
     return nullptr;
+}
+
+std::filesystem::path AssetManager::resolvePath(const Asset &a) const
+{
+    return m_assetRoot / a.filePath;
 }

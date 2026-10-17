@@ -8,6 +8,7 @@ target_sources(trexel_exec PRIVATE
     scene_manager.cpp
     scene_serializer.cpp
     texture_manager.cpp
+    asset_json.cpp
 )
 
 add_subdirectory(trexel)

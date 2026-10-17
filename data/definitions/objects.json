@@ -26,22 +26,22 @@
         "states": [
           {
             "state": "IDLE",
-            "textureId": "player_idle",
+            "textureId": "archer_idle",
             "frames": 6
           },
           {
             "state": "WALKING",
-            "textureId": "player_walking",
+            "textureId": "archer_walking",
             "frames": 8
           },
           {
             "state": "JUMPING",
-            "textureId": "player_jumping",
+            "textureId": "archer_jumping",
             "frames": 9
           },
           {
             "state": "ATTACKING",
-            "textureId": "player_shooting",
+            "textureId": "archer_shooting",
             "frames": 14,
             "type": "SINGULAR"
           }
@@ -52,7 +52,7 @@
     {
       "name": "arrow",
       "class": "Arrow",
-      "textureId": "arrow",
+      "textureId": "archer_arrow",
       "size": {
         "x": 48.0,
         "y": 48.0

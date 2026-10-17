@@ -23,11 +23,12 @@ Engine::Engine(std::unique_ptr<Game> game)
     m_game->setViewport(glm::vec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT));
     m_game->init();
 
+    const auto& assets = m_game->getAssetManager();
     for (const Asset& asset : m_game->getAssetManager().getAssets())
     {
         if (asset.type == AssetType::Texture)
         {
-            m_textureManager.load(m_sdlContext.renderer(), asset.id, asset.filePath);
+            m_textureManager.load(m_sdlContext.renderer(), asset.id, assets.resolvePath(asset).string());
         }
     }
 }
