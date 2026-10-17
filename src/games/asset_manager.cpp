@@ -1,4 +1,5 @@
 #include "asset_manager.h"
+#include <expected>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -40,11 +41,23 @@ void AssetManager::saveManifest(const std::filesystem::path &path) const
     std::ofstream(path) << manifest.dump(4);
 }
 
-bool AssetManager::addAsset(Asset asset)
+std::expected<void, AssetError> AssetManager::addAsset(Asset asset)
 {
-    if (getAsset(asset.id)) return false;
+    if (auto result = validate(asset); !result) // if-with initiaiser (c++17)
+        return result;
+
     m_assets.push_back(std::move(asset));
-    return true;
+    return {};
+}
+
+std::expected<void, AssetError> AssetManager::validate(const Asset &asset) const
+{
+    if (asset.id.empty()) return std::unexpected(AssetError::EmptyID);
+    if (getAsset(asset.id)) return std::unexpected(AssetError::DuplicateID);
+    if (asset.filePath.empty()) return std::unexpected(AssetError::EmptyPath);
+    if (!std::filesystem::exists(resolvePath(asset))) return std::unexpected(AssetError::FileNotFound);
+
+    return {}; // success, an expected <void>
 }
 
 const Asset* AssetManager::getAsset(const std::string &id) const

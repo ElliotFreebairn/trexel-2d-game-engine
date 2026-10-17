@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "asset.h"
+#include "asset_manager.h"
 #include "editor_command.h"
 #include "editor_state.h"
 #include "game.h"
@@ -17,20 +18,19 @@ Engine::Engine(std::unique_ptr<Game> game)
     : m_sdlContext("Trexel", SCREEN_WIDTH, SCREEN_HEIGHT)
     , m_gameRenderer(m_sdlContext.renderer(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
     , m_uiManager(m_sdlContext.window(), m_sdlContext.renderer())
-    , m_textureManager()
+    , m_textureManager(m_sdlContext.renderer(),
+        [this](const std::string& id) -> std::optional<std::filesystem::path>
+        {
+            const AssetManager& assets = m_game->getAssetManager();
+            const Asset* asset = assets.getAsset(id);
+            if (!asset || asset->type != AssetType::Texture) return std::nullopt;
+            return assets.resolvePath(*asset);
+        }
+    )
     , m_game(std::move(game))
 {
     m_game->setViewport(glm::vec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT));
     m_game->init();
-
-    const auto& assets = m_game->getAssetManager();
-    for (const Asset& asset : m_game->getAssetManager().getAssets())
-    {
-        if (asset.type == AssetType::Texture)
-        {
-            m_textureManager.load(m_sdlContext.renderer(), asset.id, assets.resolvePath(asset).string());
-        }
-    }
 }
 
 void Engine::run()

@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-Wall -Wextra -Werror=return-type)
 
 # find system deps
 find_package(SDL2 REQUIRED)
