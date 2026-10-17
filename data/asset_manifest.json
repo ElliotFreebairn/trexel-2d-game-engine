@@ -44,6 +44,11 @@
             "id": "dirt_block2",
             "path": "trexel/medieval/platformer/dirt_block.png",
             "type": "texture"
+        },
+        {
+            "id": "cobblestone",
+            "path": "trexel/medieval/platformer/cobblestone.png",
+            "type": "texture"
         }
     ]
 }

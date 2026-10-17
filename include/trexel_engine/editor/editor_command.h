@@ -49,11 +49,12 @@ struct EditorCommand
         return command;
     }
 
-    static EditorCommand spawnEntity(std::string textureId, glm::vec2 position)
+    static EditorCommand spawnEntity(std::string definition, glm::vec2 position)
     {
         EditorCommand command;
         command.type = EditorCommandType::SpawnEntity;
         command.position = position;
+        command.prototype = definition;
         return command;
 
     }

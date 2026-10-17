@@ -9,6 +9,7 @@ struct EditorState
 {
     bool playing = false;
     bool showColliders = false;
+    bool sceneBuilding = false;
     EntityId selected = INVALID_ENTITY;
 };
 

@@ -148,12 +148,21 @@ void UIManager::drawToolbar(EditorContext &ctx)
             }
         }
 
-        //ImGui::SameLine();
-        //if (ImGui::Button("Spawn Block"))
-        //{
-        //    const glm::vec2 centre(m_viewportSize.x * 0.5f, m_viewportSize.y * 0.5f);
-        //    ctx.commands.push(EditorCommand::spawnEntity("block", centre));
-        //}
+        ImGui::TextDisabled("SCENE MANAGEMENT");
+        if (ctx.state.sceneBuilding)
+        {
+            if (ImGui::Button("Stop Scene Building"))
+            {
+                ctx.state.sceneBuilding = false;
+            }
+        }
+        else
+        {
+            if (ImGui::Button("Start Scene Building"))
+            {
+                ctx.state.sceneBuilding = true;
+            }
+        }
 
         ImGui::Separator();
         ImGui::TextDisabled("VISUALS");
@@ -277,6 +286,12 @@ void UIManager::drawViewport(EditorContext &ctx, SDL_Texture *world_texture)
         const ImVec2 mouse = ImGui::GetMousePos();
         const glm::vec2 world_pos(mouse.x - image_pos.x, mouse.y - image_pos.y);
         ctx.state.selected = ctx.game.pick(world_pos);
+
+        // temp
+        if (ctx.state.sceneBuilding)
+        {
+            ctx.commands.push(EditorCommand::spawnEntity("grass_block", world_pos));
+        }
     }
 
     ImGui::End();

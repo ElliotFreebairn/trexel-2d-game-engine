@@ -89,7 +89,7 @@ public:
                 }
                 break;
             case EditorCommandType::SpawnEntity:
-                //scene->spawn(command.prototype, command.position);
+                scene->spawn(command.prototype, command.position);
                 break;
             case EditorCommandType::DestroyEntity:
                 m_sceneManager.current()->destroy(command.entity);
