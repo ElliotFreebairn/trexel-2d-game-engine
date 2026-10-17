@@ -10,5 +10,5 @@ struct Asset
 {
     std::string id;
     std::string filePath;
-    AssetType type;
+    AssetType type = AssetType::Texture;
 };

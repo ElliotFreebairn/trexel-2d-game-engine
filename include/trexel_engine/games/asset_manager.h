@@ -20,7 +20,7 @@ class AssetManager
 {
 public:
     void loadManifest(const std::filesystem::path& path);
-    void saveManifest(const std::filesystem::path& path) const;
+    void saveManifest() const;
 
     std::expected<void, AssetError> addAsset(Asset asset);
 

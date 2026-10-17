@@ -100,6 +100,11 @@ void Engine::applyCommands()
         {
             m_game->applyCommand(command);
         }
+
+        if (command.type == EditorCommandType::AddAsset)
+        {
+            m_textureManager.invalidate(command.asset.id);
+        }
     }
 }
 

@@ -1,40 +1,49 @@
 {
-  "assets":
-  [
-    {
-      "id": "archer_idle",
-      "type": "texture",
-      "path": "trexel/player/idle-sheet.png"
-    },
-    {
-      "id": "archer_walking",
-      "type": "texture",
-      "path": "trexel/player/walk-sheet.png"
-    },
-    {
-      "id": "archer_jumping",
-      "type": "texture",
-      "path": "trexel/player/jump-sheet.png"
-    },
-    {
-      "id": "archer_shooting",
-      "type": "texture",
-      "path": "trexel/player/shot.png"
-    },
-    {
-      "id": "archer_arrow",
-      "type": "texture",
-      "path": "trexel/player/arrow.png"
-    },
-    {
-      "id": "background",
-      "type": "texture",
-      "path": "trexel/medieval/background/background.png"
-    },
-    {
-      "id": "grass_block",
-      "type": "texture",
-      "path": "trexel/medieval/platformer/grass_block.png"
-    }
-  ]
+    "assets": [
+        {
+            "id": "archer_idle",
+            "path": "trexel/player/idle-sheet.png",
+            "type": "texture"
+        },
+        {
+            "id": "archer_walking",
+            "path": "trexel/player/walk-sheet.png",
+            "type": "texture"
+        },
+        {
+            "id": "archer_jumping",
+            "path": "trexel/player/jump-sheet.png",
+            "type": "texture"
+        },
+        {
+            "id": "archer_shooting",
+            "path": "trexel/player/shot.png",
+            "type": "texture"
+        },
+        {
+            "id": "archer_arrow",
+            "path": "trexel/player/arrow.png",
+            "type": "texture"
+        },
+        {
+            "id": "background",
+            "path": "trexel/medieval/background/background.png",
+            "type": "texture"
+        },
+        {
+            "id": "grass_block",
+            "path": "trexel/medieval/platformer/grass_block.png",
+            "type": "texture"
+        },
+        {
+            "id": "dirt_block",
+            "path": "trexel/medieval/platformer/dirt_block.png",
+            "type": "texture"
+        },
+        {
+            "id": "dirt_block2",
+            "path": "trexel/medieval/platformer/dirt_block.png",
+            "type": "texture"
+        }
+    ]
 }

@@ -6,6 +6,8 @@
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
+#include "asset_manager.h"
+#include "imgui_stdlib.h"
 #include "property.h"
 #include "file_tree_widget.h"
 
@@ -158,8 +160,42 @@ void UIManager::drawToolbar(EditorContext &ctx)
         ImGui::Separator();
         ImGui::TextDisabled("WORLD BUILDING");
 
+        ImGui::Separator();
+        ImGui::TextDisabled("Asset Management");
+        drawAssetManager(ctx);
+
         ImGui::EndTabItem();
     }
+}
+
+void UIManager::drawAssetManager(EditorContext &ctx)
+{
+    ImGui::InputText("Asset ID", &m_assetDraft.id);
+    ImGui::InputText("Asset Path", &m_assetDraft.filePath);
+
+    // must match AssetType's order
+    const char* typeNames[] = {"Texture"};
+    int typeIndex = static_cast<int>(m_assetDraft.type);
+    if (ImGui::Combo("Asset Type", &typeIndex, typeNames, IM_COUNTOF(typeNames)))
+    {
+        m_assetDraft.type = static_cast<AssetType>(typeIndex);
+    }
+
+    // same rules addAsset enforces, used here for live feedback
+    const auto check = ctx.game.getAssetManager().validate(m_assetDraft);
+    if (!check)
+    {
+        const std::string_view msg = describe(check.error());
+        ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%.*s", static_cast<int>(msg.size()), msg.data());
+    }
+
+    ImGui::BeginDisabled(!check.has_value());
+    if (ImGui::Button("Add Asset To Manifest"))
+    {
+        ctx.commands.push(EditorCommand::addAsset(m_assetDraft));  // copies the draft into the command
+        m_assetDraft = {};                                         // reset the form
+    }
+    ImGui::EndDisabled();
 }
 
 

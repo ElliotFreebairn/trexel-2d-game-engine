@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include "imgui.h"
+#include "asset.h"
 
 struct EditorContext;
 
@@ -28,9 +29,12 @@ private:
     void drawToolbar(EditorContext& ctx);
     void drawHierarchy(EditorContext& ctx);
     void drawInspector(EditorContext& ctx);
+    void drawAssetManager(EditorContext& ctx);
     void drawFileTree(EditorContext& ctx);
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
     void drawMainEditorWindow(EditorContext& ctx);
 
     ImVec2 m_viewportSize = ImVec2(0.0f, 0.0f);
+
+    Asset m_assetDraft;
 };

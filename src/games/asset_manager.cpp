@@ -34,11 +34,11 @@ void AssetManager::loadManifest(const std::filesystem::path &path)
     }
 }
 
-void AssetManager::saveManifest(const std::filesystem::path &path) const
+void AssetManager::saveManifest() const
 {
     nlohmann::json manifest;
     manifest["assets"] = m_assets;
-    std::ofstream(path) << manifest.dump(4);
+    std::ofstream(m_manfiestPath) << manifest.dump(4);
 }
 
 std::expected<void, AssetError> AssetManager::addAsset(Asset asset)
@@ -75,4 +75,16 @@ const Asset* AssetManager::getAsset(const std::string &id) const
 std::filesystem::path AssetManager::resolvePath(const Asset &a) const
 {
     return m_assetRoot / a.filePath;
+}
+
+std::string_view describe(AssetError error)
+{
+    switch (error)
+    {
+        case AssetError::EmptyID:      return "Asset ID is empty";
+        case AssetError::DuplicateID:  return "An asset with this ID already exists";
+        case AssetError::EmptyPath:    return "Asset file path is empty";
+        case AssetError::FileNotFound: return "Asset file not found";
+    }
+    return "Unknown asset error";
 }

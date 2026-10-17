@@ -97,6 +97,12 @@ public:
                 break;
             case EditorCommandType::SetPlayMode:
                 break; // owned by the game engine
+            case EditorCommandType::AddAsset:
+                if (auto result = m_assetManager.addAsset(command.asset); !result)
+                    std::cerr << "Add Asset Failed: " << describe(result.error()) << "\n";
+                else
+                    m_assetManager.saveManifest();
+                break;
         }
     }
 

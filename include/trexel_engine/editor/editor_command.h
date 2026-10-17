@@ -1,5 +1,6 @@
 #pragma once
 
+#include "asset.h"
 #include "entity.h"
 #include "property.h"
 
@@ -14,7 +15,8 @@ enum class EditorCommandType
     SetPlayMode,
     SetProperty,
     SpawnEntity,
-    DestroyEntity
+    DestroyEntity,
+    AddAsset
 };
 
 struct EditorCommand
@@ -27,6 +29,7 @@ struct EditorCommand
     std::string propertyName;
     std::string prototype; // SpawnEntity
     glm::vec2 position = glm::vec2(0.0f); // SpawnEntity
+    Asset asset;
 
     static EditorCommand setPlayMode(bool playing)
     {
@@ -63,6 +66,13 @@ struct EditorCommand
         return command;
     }
 
+    static EditorCommand addAsset(Asset asset)
+    {
+        EditorCommand command;
+        command.type = EditorCommandType::AddAsset;
+        command.asset = std::move(asset);
+        return command;
+    }
     // Complete spawnEntity and destoryEntity
 };
 
