@@ -36,7 +36,9 @@ void drawProperty(EntityId id, const Property& property, CommandQueue& commands)
     else if (auto* v = std::get_if<glm::vec2>(&edited))
         changed = ImGui::DragFloat2(label, &v->x);
     else if (auto* s = std::get_if<std::string>(&edited))
-        ImGui::LabelText(label, "%s", s->c_str());
+        changed = ImGui::InputText(label, s);
+
+        //ImGui::LabelText(label, "%s", s->c_str());
     ImGui::EndDisabled();
 
     if (changed)

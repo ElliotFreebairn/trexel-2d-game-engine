@@ -43,7 +43,6 @@ public:
         (void)input;
         m_sceneManager.update(deltaTime);
     }
-    virtual void onShutdown() = 0;
 
     // Rendering
     // game bundles up the visual state of the world into a dumb data structure
@@ -129,9 +128,10 @@ protected:
     virtual void registerObjectTypes(ObjectFactory& factory) { (void)factory; }
     virtual void onInit() = 0;
 
-    SceneManager m_sceneManager;
     AssetManager m_assetManager;
     ObjectFactory m_objectFactory;
+    SceneManager m_sceneManager;
+
     bool m_isRunning = true;
 
     glm::vec2 m_viewport = glm::vec2(0.0f);

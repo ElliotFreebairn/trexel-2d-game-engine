@@ -1,0 +1,82 @@
+{
+  "objects": [
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 500.0,
+        "y": 600.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      },
+      "textureId": "dirt_block"
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 550.0,
+        "y": 600.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 600.0,
+        "y": 600.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 650.0,
+        "y": 600.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 700.0,
+        "y": 600.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 750.0,
+        "y": 600.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "archer",
+      "position": {
+        "x": 450.0,
+        "y": 400.0
+      },
+      "size": {
+        "x": 128.0,
+        "y": 128.0
+      }
+    }
+  ]
+}

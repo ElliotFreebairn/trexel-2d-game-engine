@@ -24,7 +24,9 @@ Trexel::Trexel()
 
 Trexel::~Trexel()
 {
-    onShutdown();
+    m_sceneManager.current()->onExit();
+    m_assetManager.saveManifest();
+
 }
 
 
@@ -85,24 +87,7 @@ void Trexel::onInit()
     m_sceneManager.switchTo("main");
 }
 
-void Trexel::onShutdown()
-{
-    m_sceneManager.current()->onExit();
-}
-
 void Trexel::intialiseAssets(AssetManager& assetManager)
 {
     assetManager.loadManifest(MANIFEST_PATH);
-   // Background / Environment
-   // assets.addAsset("background", "assets/trexel/medieval/background/background.png", AssetType::Texture);
-   // assets.addAsset("grass_block", "assets/trexel/medieval/platformer/grass_block.png", AssetType::Texture);
-
-   // // player
-   // assets.addAsset("player_idle", "assets/trexel/player/idle-sheet.png", AssetType::Texture);
-   // assets.addAsset("player_walking", "assets/trexel/player/walk-sheet.png", AssetType::Texture);
-   // assets.addAsset("player_jumping", "assets/trexel/player/jump-sheet.png", AssetType::Texture);
-   // assets.addAsset("player_shooting", "assets/trexel/player/shot.png", AssetType::Texture);
-
-   // // bow
-   // assets.addAsset("arrow", "assets/trexel/player/arrow.png", AssetType::Texture);
 }

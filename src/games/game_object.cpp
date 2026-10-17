@@ -15,7 +15,7 @@ constexpr float MAX_FALL_SPEED = 1000.0f;
 }
 
 GameObject::GameObject(const GameObjectDef& def, glm::vec2 position)
-    : collider(def.collider), m_defName(def.name)
+    : collider(def.collider), m_def(&def)
 {
     transform.position = position;
     transform.prevPosition = position;
@@ -90,12 +90,13 @@ AABB GameObject::getBounds() const
 std::vector<Property> GameObject::properties() const
 {
     return {
-        Property("def", m_defName, /*READ ONLY */true),
+        Property("def", m_def->name, /*READ ONLY */true),
         Property("position", transform.position),
         Property("size", transform.size),
         Property("angle", static_cast<float>(transform.angle)),
         Property("visible", visual.visible),
         Property("active", m_isActive, /*READ ONLY */true),
+        Property("texture_id", visual.textureId)
     };
 }
 
@@ -109,17 +110,23 @@ void GameObject::setProperty(std::string name, const PropertyValue& value)
     else if (name == "size") transform.size = std::get<glm::vec2>(value);
     else if (name == "angle") transform.angle = std::get<float>(value);
     else if (name == "visible") visual.visible = std::get<bool>(value);
+    else if (name == "texture_id") visual.textureId = std::get<std::string>(value);
 }
 
 // Serialization
 nlohmann::json GameObject::serialize() const
 {
     nlohmann::json j = nlohmann::json::object();
-    j["def"] = m_defName;
+    j["def"] = m_def->name;
     j["position"] = vec2ToJson(transform.position);
     j["size"] = vec2ToJson(transform.size);
     if (transform.angle != 0.0) j["angle"] = transform.angle;
     if (!visual.visible) j["visible"] = false;
+
+    // optional, if definitions overode
+    if (transform.size != m_def->size) j["size"] = vec2ToJson(transform.size);
+    if (visual.textureId != m_def->textureId) j["textureId"] = visual.textureId;
+
     return j;
 }
 
@@ -133,4 +140,5 @@ void GameObject::deSerialize(const nlohmann::json& j)
     if (j.contains("size")) transform.size = vec2FromJson(j.at("size"));
     transform.angle = j.value("angle", transform.angle);
     visual.visible = j.value("visible", visual.visible);
+    visual.textureId = j.value("textureId", visual.textureId);
 }

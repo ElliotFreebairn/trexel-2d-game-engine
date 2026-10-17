@@ -17,7 +17,6 @@ public:
     ~Trexel();
 
     void onUpdate(float detlaTime, const InputState& state) override;
-    void onShutdown() override;
 
 public:
     static inline constexpr const char* MANIFEST_PATH = "/home/elliotf/Develop/Personal/trexel/data/asset_manifest.json";

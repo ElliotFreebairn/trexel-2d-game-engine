@@ -79,7 +79,8 @@ public:
     void destroy() { m_isActive = false; } // Scene::update() prunes inactive objects
 
     // The definition this object was built from
-    const std::string& defName() const { return m_defName; }
+    const GameObjectDef& def() const { return *m_def; }
+    const std::string& defName() const { return m_def->name; }
 
     // Collision
     AABB getBounds() const override;
@@ -109,6 +110,6 @@ public:
 
 private:
     const EntityId m_id = allocateEntityId();
-    std::string m_defName;
+    const GameObjectDef* m_def;
     bool m_isActive = true;
 };
