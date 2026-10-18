@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 /*
  * Creates game objects from their definitions (assets/definitions/objects.json)
@@ -38,6 +39,9 @@ public:
 
     // nullptr if the definition or its class doesn't exist
     std::unique_ptr<GameObject> create(const std::string& defName, glm::vec2 position) const;
+
+    // expose a public facing function to get the different defintions via id
+    std::vector<std::string> getDefinitions() const;
 
 private:
     std::unordered_map<std::string, GameObjectDef> m_definitions;

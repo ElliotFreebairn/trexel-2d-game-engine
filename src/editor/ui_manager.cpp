@@ -119,9 +119,10 @@ void UIManager::drawMainEditorWindow(EditorContext &ctx)
         // 2. Draw your hierarchy tab right next to it
         drawFileTree(ctx);
 
-        drawInspector(ctx);
+        // 3. Draw your scene manager next to it
+        drawSceneManager(ctx);
 
-        drawHierarchy(ctx);
+        drawInspector(ctx);
 
         ImGui::EndTabBar();
     }
@@ -148,22 +149,6 @@ void UIManager::drawToolbar(EditorContext &ctx)
             }
         }
 
-        ImGui::TextDisabled("SCENE MANAGEMENT");
-        if (ctx.state.sceneBuilding)
-        {
-            if (ImGui::Button("Stop Scene Building"))
-            {
-                ctx.state.sceneBuilding = false;
-            }
-        }
-        else
-        {
-            if (ImGui::Button("Start Scene Building"))
-            {
-                ctx.state.sceneBuilding = true;
-            }
-        }
-
         ImGui::Separator();
         ImGui::TextDisabled("VISUALS");
         ImGui::Checkbox("Collision Boxes", &ctx.state.showColliders);
@@ -177,6 +162,63 @@ void UIManager::drawToolbar(EditorContext &ctx)
 
         ImGui::EndTabItem();
     }
+}
+
+void UIManager::drawSceneManager(EditorContext &ctx)
+{
+    if (ImGui::BeginTabItem("Scene Manager"))
+    {
+        // we need a way for the the ui/user to know which scene
+        // they are manipulating, such as the main_scene ...
+        ImGui::SeparatorText("Scene Builder");
+        drawSceneBuilder(ctx);
+
+        // the asset manager is not scene specific, but for now is alright here
+        ImGui::SeparatorText("Scene Assets");
+        drawAssetManager(ctx);
+
+        ImGui::PopID();
+    }
+}
+
+void UIManager::drawSceneBuilder(EditorContext &ctx)
+{
+    if (ctx.state.sceneBuilding)
+    {
+        if (ImGui::Button("Stop Scene Building"))
+        {
+            ctx.state.sceneBuilding = false;
+        }
+    }
+    else
+    {
+        if (ImGui::Button("Start Scene Building"))
+        {
+            ctx.state.sceneBuilding = true;
+        }
+    }
+
+    ImGui::Indent(4.0f);
+
+    // expose the option to choose which definition they would like to spawn in the game
+    // that means we need to be able to grab the object definitions from the game
+    std::vector<std::string> definitions = ctx.game.getObjectFactory().getDefinitions();
+    static size_t defintionsSelectedIndex = 0;
+
+    if (ImGui::BeginListBox("available object definitions"))
+    {
+        for (size_t defIndex = 0; defIndex < definitions.size(); defIndex++)
+        {
+           const bool isSelected = defintionsSelectedIndex == defIndex;
+           if (ImGui::Selectable(definitions.at(defIndex).c_str(), isSelected))
+           {
+               defintionsSelectedIndex = defIndex;
+               ctx.state.defintion = definitions.at(defIndex);
+           }
+        }
+    }
+
+    ImGui::EndListBox();
 }
 
 void UIManager::drawAssetManager(EditorContext &ctx)
@@ -210,31 +252,6 @@ void UIManager::drawAssetManager(EditorContext &ctx)
 }
 
 
-void UIManager::drawHierarchy(EditorContext &ctx)
-{
-    if (ImGui::BeginTabItem("Hiearchy"))
-    {
-        for (const EntityInfo& info : ctx.game.getEntities())
-        {
-            ImGui::PushID(static_cast<int>(info.id));
-            if (ImGui::Selectable(info.name.c_str(), ctx.state.selected == info.id))
-            {
-                ctx.state.selected = info.id;
-            }
-            ImGui::PopID();
-        }
-
-        if (ctx.state.selected != INVALID_ENTITY)
-        {
-            ImGui::Separator();
-            if (ImGui::Button("Delete Selected"))
-            {
-                ctx.commands.push(EditorCommand::destroyEntity(ctx.state.selected));
-            }
-        }
-        ImGui::EndTabItem();}
-}
-
 void UIManager::drawInspector(EditorContext &ctx)
 {
     if (ImGui::BeginTabItem("Inspector"))
@@ -258,7 +275,33 @@ void UIManager::drawInspector(EditorContext &ctx)
                 ctx.commands.push(EditorCommand::destroyEntity(ctx.state.selected));
             }
         }
+
+        ImGui::SeparatorText("All Objects");
+        drawHierarchy(ctx);
+
         ImGui::EndTabItem();
+    }
+}
+
+void UIManager::drawHierarchy(EditorContext &ctx)
+{
+    for (const EntityInfo& info : ctx.game.getEntities())
+    {
+        ImGui::PushID(static_cast<int>(info.id));
+        if (ImGui::Selectable(info.name.c_str(), ctx.state.selected == info.id))
+        {
+            ctx.state.selected = info.id;
+        }
+        ImGui::PopID();
+    }
+
+    if (ctx.state.selected != INVALID_ENTITY)
+    {
+        ImGui::Separator();
+        if (ImGui::Button("Delete Selected"))
+        {
+            ctx.commands.push(EditorCommand::destroyEntity(ctx.state.selected));
+        }
     }
 }
 
@@ -294,7 +337,7 @@ void UIManager::drawViewport(EditorContext &ctx, SDL_Texture *world_texture)
         // temp
         if (ctx.state.sceneBuilding)
         {
-            ctx.commands.push(EditorCommand::spawnEntity("grass_block", world_pos));
+            ctx.commands.push(EditorCommand::spawnEntity(ctx.state.defintion, world_pos));
         }
     }
 

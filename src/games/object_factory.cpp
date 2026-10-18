@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 /*
  * Object Definition JSON Example
@@ -151,4 +152,15 @@ std::unique_ptr<GameObject> ObjectFactory::create(const std::string& defName, gl
     }
 
     return it->second(*def, position);
+}
+
+std::vector<std::string> ObjectFactory::getDefinitions() const
+{
+    std::vector<std::string> definitions;
+
+    std::for_each(m_definitions.begin(), m_definitions.end(), [&](std::pair<std::string, GameObjectDef> p) {
+       definitions.push_back(p.first);
+    });
+
+    return definitions;
 }

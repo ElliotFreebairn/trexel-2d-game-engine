@@ -11,6 +11,7 @@ struct EditorState
     bool showColliders = false;
     bool sceneBuilding = false;
     EntityId selected = INVALID_ENTITY;
+    std::string defintion = "";
 };
 
 struct EditorContext

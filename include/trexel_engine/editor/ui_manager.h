@@ -27,6 +27,8 @@ public:
     bool wantsKeyboard() const; // when UI widget should get keyboard input
 private:
     void drawToolbar(EditorContext& ctx);
+    void drawSceneManager(EditorContext& ctx);
+    void drawSceneBuilder(EditorContext& ctx);
     void drawHierarchy(EditorContext& ctx);
     void drawInspector(EditorContext& ctx);
     void drawAssetManager(EditorContext& ctx);

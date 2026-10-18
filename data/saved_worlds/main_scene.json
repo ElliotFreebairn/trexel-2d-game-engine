@@ -32,8 +32,7 @@
       "size": {
         "x": 50.0,
         "y": 50.0
-      },
-      "textureId": "cobblestone"
+      }
     },
     {
       "def": "grass_block",
@@ -44,8 +43,7 @@
       "size": {
         "x": 50.0,
         "y": 50.0
-      },
-      "textureId": "cobblestone"
+      }
     },
     {
       "def": "grass_block",
@@ -67,14 +65,13 @@
       "size": {
         "x": 50.0,
         "y": 50.0
-      },
-      "textureId": "cobblestone"
+      }
     },
     {
       "def": "archer",
       "position": {
-        "x": 492.8348083496094,
-        "y": 1886.64892578125
+        "x": 526.9568481445313,
+        "y": 474.1725158691406
       },
       "size": {
         "x": 128.0,
@@ -82,14 +79,234 @@
       }
     },
     {
-      "def": "arrow",
+      "def": "grass_block",
       "position": {
-        "x": 701.2830810546875,
-        "y": 1790.1512451171875
+        "x": 348.0,
+        "y": 604.0
       },
       "size": {
-        "x": 48.0,
-        "y": 48.0
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 503.0,
+        "y": 405.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 454.0,
+        "y": 562.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 393.0,
+        "y": 382.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 550.0,
+        "y": 297.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 517.0,
+        "y": 368.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 503.0,
+        "y": 291.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 445.0,
+        "y": 286.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 398.0,
+        "y": 259.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 361.0,
+        "y": 262.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 345.0,
+        "y": 262.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 322.0,
+        "y": 262.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 285.0,
+        "y": 268.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 285.0,
+        "y": 268.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 285.0,
+        "y": 268.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 285.0,
+        "y": 270.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 334.0,
+        "y": 121.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 329.0,
+        "y": 164.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 835.0,
+        "y": 319.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 846.0,
+        "y": 556.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
+      }
+    },
+    {
+      "def": "grass_block",
+      "position": {
+        "x": 853.0,
+        "y": 454.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0
       }
     }
   ]
