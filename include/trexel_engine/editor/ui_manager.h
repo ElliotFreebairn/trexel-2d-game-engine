@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include "game_object_def.h"
 #include "imgui.h"
 #include "asset.h"
 
@@ -32,6 +33,7 @@ private:
     void drawHierarchy(EditorContext& ctx);
     void drawInspector(EditorContext& ctx);
     void drawAssetManager(EditorContext& ctx);
+    void drawDefinitionsManager(EditorContext& ctx);
     void drawFileTree(EditorContext& ctx);
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
     void drawMainEditorWindow(EditorContext& ctx);
@@ -39,4 +41,7 @@ private:
     ImVec2 m_viewportSize = ImVec2(0.0f, 0.0f);
 
     Asset m_assetDraft;
+
+    std::string m_selecteDefName;
+    GameObjectDef m_defDraft;
 };

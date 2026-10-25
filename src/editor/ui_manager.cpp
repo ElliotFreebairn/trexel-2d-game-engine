@@ -1,8 +1,10 @@
 #include "ui_manager.h"
+#include "IRenderable.h"
 #include "editor_command.h"
 #include "editor_state.h"
 #include "entity.h"
 #include "game.h"
+#include "game_object_def.h"
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
@@ -153,13 +155,6 @@ void UIManager::drawToolbar(EditorContext &ctx)
         ImGui::TextDisabled("VISUALS");
         ImGui::Checkbox("Collision Boxes", &ctx.state.showColliders);
 
-        ImGui::Separator();
-        ImGui::TextDisabled("WORLD BUILDING");
-
-        ImGui::Separator();
-        ImGui::TextDisabled("Asset Management");
-        drawAssetManager(ctx);
-
         ImGui::EndTabItem();
     }
 }
@@ -176,6 +171,10 @@ void UIManager::drawSceneManager(EditorContext &ctx)
         // the asset manager is not scene specific, but for now is alright here
         ImGui::SeparatorText("Scene Assets");
         drawAssetManager(ctx);
+
+        // the definition manager
+        ImGui::SeparatorText("Scene definitions");
+        drawDefinitionsManager(ctx);
 
         ImGui::PopID();
     }
@@ -202,10 +201,10 @@ void UIManager::drawSceneBuilder(EditorContext &ctx)
 
     // expose the option to choose which definition they would like to spawn in the game
     // that means we need to be able to grab the object definitions from the game
-    std::vector<std::string> definitions = ctx.game.getObjectFactory().getDefinitions();
+    std::vector<std::string> definitions = ctx.game.getObjectFactory().getDefinitionsKeys();
     static size_t defintionsSelectedIndex = 0;
 
-    if (ImGui::BeginListBox("available object definitions"))
+    if (ImGui::BeginListBox("object definitions to use"))
     {
         for (size_t defIndex = 0; defIndex < definitions.size(); defIndex++)
         {
@@ -219,6 +218,55 @@ void UIManager::drawSceneBuilder(EditorContext &ctx)
     }
 
     ImGui::EndListBox();
+}
+
+void UIManager::drawDefinitionsManager(EditorContext &ctx)
+{
+    // rough display a list of definitions
+    std::vector<GameObjectDef> definitions = ctx.game.getObjectFactory().getDefinitionsValues();
+
+    if (ImGui::BeginListBox("id"))
+    {
+        for (const GameObjectDef& def : definitions)
+        {
+            bool isSelected = def.name == m_selecteDefName;
+
+            if (ImGui::Selectable(def.name.c_str(), isSelected))
+            {
+                m_selecteDefName = def.name;
+                m_defDraft = def;
+            }
+        }
+
+        ImGui::EndListBox();
+    }
+
+    if (m_selecteDefName.empty()) return; // nothing selected
+
+    ImGui::InputText("class", &m_defDraft.className);
+    ImGui::InputFloat2("size", &m_defDraft.size.x);
+    ImGui::Checkbox("gravity", &m_defDraft.gravity);
+
+    if (m_defDraft.collider.has_value())
+    {
+        ImGui::InputFloat2("collider size", &m_defDraft.collider->size.x);
+        ImGui::InputFloat2("collider offset", &m_defDraft.collider->offset.x);
+    }
+
+    int animationsCount = 0;
+    if (!m_defDraft.animations.empty())
+    {
+        for (const auto& [state, animation] : m_defDraft.animations)
+        {
+           animationsCount++;
+        }
+    }
+    ImGui::Text("Total No. Animations %d", animationsCount);
+
+    if (ImGui::Button("Apply"))
+    {
+
+    }
 }
 
 void UIManager::drawAssetManager(EditorContext &ctx)
@@ -250,7 +298,6 @@ void UIManager::drawAssetManager(EditorContext &ctx)
     }
     ImGui::EndDisabled();
 }
-
 
 void UIManager::drawInspector(EditorContext &ctx)
 {

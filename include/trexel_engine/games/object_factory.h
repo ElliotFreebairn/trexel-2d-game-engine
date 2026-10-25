@@ -41,7 +41,10 @@ public:
     std::unique_ptr<GameObject> create(const std::string& defName, glm::vec2 position) const;
 
     // expose a public facing function to get the different defintions via id
-    std::vector<std::string> getDefinitions() const;
+    std::vector<std::string> getDefinitionsKeys() const;
+
+    // expose a public facing function to get the actual game object definitios
+    std::vector<GameObjectDef> getDefinitionsValues() const;
 
 private:
     std::unordered_map<std::string, GameObjectDef> m_definitions;

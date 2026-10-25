@@ -154,12 +154,23 @@ std::unique_ptr<GameObject> ObjectFactory::create(const std::string& defName, gl
     return it->second(*def, position);
 }
 
-std::vector<std::string> ObjectFactory::getDefinitions() const
+std::vector<std::string> ObjectFactory::getDefinitionsKeys() const
 {
     std::vector<std::string> definitions;
 
     std::for_each(m_definitions.begin(), m_definitions.end(), [&](std::pair<std::string, GameObjectDef> p) {
        definitions.push_back(p.first);
+    });
+
+    return definitions;
+}
+
+std::vector<GameObjectDef> ObjectFactory::getDefinitionsValues() const
+{
+    std::vector<GameObjectDef> definitions;
+
+    std::for_each(m_definitions.begin(), m_definitions.end(), [&](std::pair<std::string, GameObjectDef> p) {
+        definitions.push_back(p.second);
     });
 
     return definitions;
