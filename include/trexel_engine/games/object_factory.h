@@ -34,6 +34,10 @@ public:
 
     bool loadDefinitions(const std::string& path);
 
+    bool saveDefinitions(const std::string& path);
+
+    bool addDefinition(const GameObjectDef& def);
+
     // nullptr if there is no definition with that name
     const GameObjectDef* getDefinition(const std::string& name) const;
 

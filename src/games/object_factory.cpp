@@ -4,6 +4,7 @@
 #include "json_utility.h"
 #include "sprite.h"
 
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -96,6 +97,43 @@ GameObjectDef parseDefinition(const json& defJson)
 
     return def;
 }
+
+json parseDefinition(const GameObjectDef& def)
+{
+    json saved;
+    saved["name"] = def.name;
+    saved["class"] = def.className;
+    saved["textureId"] = def.textureId.empty() ? "" : def.textureId;
+    saved["size"] = vec2ToJson(def.size);
+    saved["gravity"] = def.gravity;
+
+    // optional definitions
+    if (def.collider.has_value())
+    {
+        json collider;
+        collider["size"] = vec2ToJson(def.collider->size);
+        collider["offset"] = vec2ToJson(def.collider->offset);
+        collider["solid"] = def.collider->isSolid;
+
+        saved["collider"] = collider;
+    }
+
+    if (def.animations.size() > 0)
+    {
+        json animations;
+        for (const auto&[state, animation] : def.animations)
+        {
+            json st;
+            st["textureId"] = animation.textureID;
+            st["frames"] = animation.columns;
+            st["rows"] = animation.rows;
+
+        }
+    }
+
+
+    return saved;
+}
 }
 
 bool ObjectFactory::loadDefinitions(const std::string& path)
@@ -127,6 +165,41 @@ bool ObjectFactory::loadDefinitions(const std::string& path)
         }
     }
     return true;
+}
+
+// potentially timestamp and only save definitions has been modified
+bool ObjectFactory::saveDefinitions(const std::string &path)
+{
+    std::ofstream file(path);
+    if (!file.is_open())
+    {
+        std::cerr << "ObjectFactory::saveDefinitions: cannot open " << path << "\n";
+        return false;
+    }
+
+    if (m_definitions.empty())
+    {
+        std::cerr << "ObjectFactory::saveDefinitions: not definitions to save" << "\n";
+        return false;
+    }
+
+    constexpr const char* JSON_HEADER = "definitions";
+    json saved;
+
+    // go through each entry in the definitions map
+    for (const auto&[id, def] : m_definitions)
+    {
+        try
+        {
+            json definition =
+        }
+        catch (const std::exception)
+        {
+            std::cerr << "ObjectFactory::saveDefinitions: "
+        }
+    }
+
+
 }
 
 const GameObjectDef* ObjectFactory::getDefinition(const std::string& name) const
@@ -174,4 +247,16 @@ std::vector<GameObjectDef> ObjectFactory::getDefinitionsValues() const
     });
 
     return definitions;
+}
+
+bool ObjectFactory::addDefinition(const GameObjectDef &def)
+{
+    if (m_constructors.contains(def.name))
+    {
+        std::cerr << "ObjectFactory::addDefinition - Error! defintion with name " << def.name << " already exists!";
+        return false;
+    }
+
+    m_definitions[def.name] = def;
+    return true;
 }
