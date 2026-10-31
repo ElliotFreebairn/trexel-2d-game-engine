@@ -27,16 +27,19 @@
           {
             "state": "IDLE",
             "textureId": "archer_idle",
+            "type": "CONTINOUS",
             "frames": 6
           },
           {
             "state": "WALKING",
             "textureId": "archer_walking",
+            "type": "CONTINOUS",
             "frames": 8
           },
           {
             "state": "JUMPING",
             "textureId": "archer_jumping",
+            "type": "CONTINOUS",
             "frames": 9
           },
           {

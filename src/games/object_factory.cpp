@@ -1,5 +1,6 @@
 #include "object_factory.h"
 #include "collision.h"
+#include "enum_strings.h"
 #include "game_object_def.h"
 #include "json_utility.h"
 #include "sprite.h"
@@ -7,6 +8,7 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <vector>
 
 /*
@@ -81,7 +83,11 @@ GameObjectDef parseDefinition(const json& defJson)
             spriteAnimation.textureID = animation.at("textureId").get<std::string>();
             spriteAnimation.columns = animation.at("frames").get<int>();
             spriteAnimation.rows = animation.value("rows", 1);
-            spriteAnimation.animationType = Sprite::toAnimationType(animation.value("type", "CONTINOUS"));
+
+            auto type = fromString<AnimationType>(animation.at("type").get<std::string>());
+            if (!type)
+                throw std::runtime_error("Unkown animation type");
+            spriteAnimation.animationType = *type;
 
             // Each frame is the size of the object
             spriteAnimation.frameWidth = static_cast<int>(def.size.x);
@@ -90,8 +96,10 @@ GameObjectDef parseDefinition(const json& defJson)
             // Each frame is usally defined by the generic frame speed, but some may override...
             spriteAnimation.frameDuration = animation.value("frameSpeed", frameSpeed);
 
-            SpriteMovementState state = Sprite::toSpriteMovementState(animation.at("state").get<std::string>());
-            def.animations[state] = spriteAnimation;
+            auto state = fromString<SpriteMovementState>(animation.at("state").get<std::string>());
+            if (!state)
+                throw std::runtime_error("Uknown animation state");
+            def.animations[*state] = spriteAnimation;
         }
     }
 
@@ -127,11 +135,15 @@ json parseDefinition(const GameObjectDef& def)
             st["textureId"] = animation.textureID;
             st["frames"] = animation.columns;
             st["rows"] = animation.rows;
-
+            st["type"] = toString(animation.animationType);
+            st["frameWdth"] = def.size.x;
+            st["frameHeight"] = def.size.y;
+            st["frameDuration"] = animation.frameDuration;
+            st["state"] = toString(state);
+            animations["states"] += st;
         }
+        saved["animations"] += animations;
     }
-
-
     return saved;
 }
 }
@@ -191,15 +203,16 @@ bool ObjectFactory::saveDefinitions(const std::string &path)
     {
         try
         {
-            json definition =
+            json definition = parseDefinition(def);
+            saved[JSON_HEADER] += definition;
         }
         catch (const std::exception)
         {
-            std::cerr << "ObjectFactory::saveDefinitions: "
+            std::cerr << "ObjectFactory::saveDefinitions: " << "\n";
+            return false;
         }
     }
-
-
+    return true;
 }
 
 const GameObjectDef* ObjectFactory::getDefinition(const std::string& name) const
@@ -251,11 +264,12 @@ std::vector<GameObjectDef> ObjectFactory::getDefinitionsValues() const
 
 bool ObjectFactory::addDefinition(const GameObjectDef &def)
 {
-    if (m_constructors.contains(def.name))
-    {
-        std::cerr << "ObjectFactory::addDefinition - Error! defintion with name " << def.name << " already exists!";
-        return false;
-    }
+    // for now allow editing
+    //if (m_definitions.contains(def.name))
+    //{
+    //    std::cerr << "ObjectFactory::addDefinition - Error! defintion with name " << def.name << " already exists!";
+    //    return false;
+    //}
 
     m_definitions[def.name] = def;
     return true;

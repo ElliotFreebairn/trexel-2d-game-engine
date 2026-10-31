@@ -265,7 +265,7 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
 
     if (ImGui::Button("Apply"))
     {
-
+        ctx.commands.push(EditorCommand::addObjectDefinition(m_defDraft));
     }
 }
 

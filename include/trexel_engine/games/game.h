@@ -102,6 +102,11 @@ public:
                 else
                     m_assetManager.saveManifest();
                 break;
+            case EditorCommandType::AddObjectDefinition:
+                if(bool result = m_objectFactory.addDefinition(command.objectDef); !result)
+                    std::cerr << "Add Object Def Failed!\n";
+                else
+                    m_objectFactory.saveDefinitions("data/definitions/new_objects.json");
         }
     }
 

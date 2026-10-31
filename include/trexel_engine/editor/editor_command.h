@@ -2,6 +2,7 @@
 
 #include "asset.h"
 #include "entity.h"
+#include "game_object_def.h"
 #include "property.h"
 
 #include <glm/glm.hpp>
@@ -16,7 +17,8 @@ enum class EditorCommandType
     SetProperty,
     SpawnEntity,
     DestroyEntity,
-    AddAsset
+    AddAsset,
+    AddObjectDefinition,
 };
 
 struct EditorCommand
@@ -30,6 +32,7 @@ struct EditorCommand
     std::string prototype; // SpawnEntity
     glm::vec2 position = glm::vec2(0.0f); // SpawnEntity
     Asset asset;
+    GameObjectDef objectDef;
 
     static EditorCommand setPlayMode(bool playing)
     {
@@ -74,7 +77,16 @@ struct EditorCommand
         command.asset = std::move(asset);
         return command;
     }
+
+    static EditorCommand addObjectDefinition(GameObjectDef def)
+    {
+        EditorCommand command;
+        command.type = EditorCommandType::AddObjectDefinition;
+        command.objectDef = std::move(def);
+        return command;
+    }
     // Complete spawnEntity and destoryEntity
+
 };
 
 class CommandQueue

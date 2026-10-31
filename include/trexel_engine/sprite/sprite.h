@@ -1,10 +1,12 @@
 #pragma once
 
 #include "common.h"
+#include "enum_strings.h"
 
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <string_view>
 #include <unordered_map>
 #include <string>
 #include <functional>
@@ -20,13 +22,31 @@ enum class SpriteMovementState
     JUMPING,
     ATTACKING
 };
+template<>
+struct EnumStrings<SpriteMovementState>
+{
+    static constexpr std::array<std::pair<SpriteMovementState, std::string_view>, 5> entries{{
+        { SpriteMovementState::IDLE, "IDLE" },
+        { SpriteMovementState::WALKING, "WALKING" },
+        { SpriteMovementState::RUNNING, "RUNNING" },
+        { SpriteMovementState::JUMPING, "JUMPING" },
+        { SpriteMovementState::ATTACKING, "ATTACKING" },
+    }};
+};
 
 enum class AnimationType
 {
     SINGULAR,
     CONTINUOUS
 };
-
+template<>
+struct EnumStrings<AnimationType>
+{
+    static constexpr std::array<std::pair<AnimationType, std::string_view>, 2> entries{{
+        { AnimationType::SINGULAR, "SINGULAR" },
+        { AnimationType::CONTINUOUS, "CONTINOUS" },
+    }};
+};
 struct SpriteAnimation
 {
     std::string textureID;
@@ -55,10 +75,6 @@ public:
     Rect getSrcRect() const;
     bool isFinished() const { return m_finished; }
     int currentFrame() const { return m_currentFrame; }
-
-    // TEMP HELPER METHODS
-    static AnimationType toAnimationType(std::string input);
-    static SpriteMovementState toSpriteMovementState(std::string input);
 
 private:
     std::unordered_map<SpriteMovementState, SpriteAnimation> m_animations;
