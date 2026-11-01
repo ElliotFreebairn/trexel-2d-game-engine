@@ -75,7 +75,6 @@ GameObjectDef parseDefinition(const json& defJson)
     if (defJson.contains("animations"))
     {
         const json& aJson = defJson.at("animations");
-        const float frameSpeed = aJson.value("frameSpeed", 0.2f);
 
         for (const auto& animation : aJson.at("states"))
         {
@@ -94,7 +93,7 @@ GameObjectDef parseDefinition(const json& defJson)
             spriteAnimation.frameHeight = static_cast<int>(def.size.y);
 
             // Each frame is usally defined by the generic frame speed, but some may override...
-            spriteAnimation.frameDuration = animation.value("frameSpeed", frameSpeed);
+            spriteAnimation.frameDuration = animation.value("frameSpeed", 0.2);
 
             auto state = fromString<SpriteMovementState>(animation.at("state").get<std::string>());
             if (!state)
@@ -136,13 +135,13 @@ json parseDefinition(const GameObjectDef& def)
             st["frames"] = animation.columns;
             st["rows"] = animation.rows;
             st["type"] = toString(animation.animationType);
-            st["frameWdth"] = def.size.x;
+            st["frameWidth"] = def.size.x;
             st["frameHeight"] = def.size.y;
             st["frameDuration"] = animation.frameDuration;
             st["state"] = toString(state);
             animations["states"] += st;
         }
-        saved["animations"] += animations;
+        saved["animations"] = animations;
     }
     return saved;
 }
@@ -212,6 +211,8 @@ bool ObjectFactory::saveDefinitions(const std::string &path)
             return false;
         }
     }
+
+    file << saved.dump(4);
     return true;
 }
 

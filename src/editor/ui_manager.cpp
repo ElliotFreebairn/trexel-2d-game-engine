@@ -18,7 +18,6 @@
 #include <filesystem>
 #include <vector>
 
-
 namespace fs = std::filesystem;
 
 // Draws one property. If the user edits it, emits a SetProperty command.
@@ -263,7 +262,7 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
     }
     ImGui::Text("Total No. Animations %d", animationsCount);
 
-    if (ImGui::Button("Apply"))
+    if (ImGui::Button("Apply Edit"))
     {
         ctx.commands.push(EditorCommand::addObjectDefinition(m_defDraft));
     }
