@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ability_registry.h"
 #include "game_object.h"
 #include "game_object_def.h"
 
@@ -32,6 +33,12 @@ public:
         };
     }
 
+    template <typename T>
+    void registerAbility(const std::string& name)
+    {
+        m_abilities.registerType<T>(name);
+    }
+
     bool loadDefinitions(const std::string& path);
 
     bool saveDefinitions(const std::string& path);
@@ -51,6 +58,10 @@ public:
     std::vector<GameObjectDef> getDefinitionsValues() const;
 
 private:
+    // throws if a definition names an ability that isn't registered
+    void resolveAbility(GameObjectDef& def) const;
+
     std::unordered_map<std::string, GameObjectDef> m_definitions;
     std::unordered_map<std::string, Constructor> m_constructors;
+    AbilityRegistry m_abilities;
 };

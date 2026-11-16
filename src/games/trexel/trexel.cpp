@@ -1,4 +1,6 @@
 #include "trexel.h"
+#include "bow_ability.h"
+#include "sword_ability.h"
 #include "IRenderable.h"
 #include "asset.h"
 #include "asset_manager.h"
@@ -11,6 +13,7 @@
 #include "scene_object.h"
 #include <memory>
 #include <vector>
+#include "bow_ability.h"
 
 namespace
 {
@@ -35,6 +38,9 @@ void Trexel::registerObjectTypes(ObjectFactory& factory)
     factory.registerType<Player>("Player");
     factory.registerType<SceneObject>("SceneObject");
     factory.registerType<Arrow>("Arrow");
+
+    factory.registerAbility<BowAbility>("bow");
+    factory.registerAbility<SwordAbility>("sword");
 }
 
 Player* Trexel::getPlayer() const
@@ -62,14 +68,14 @@ void Trexel::onUpdate(float deltaTime, const InputState& input)
         }
         if (input.firePressed)
         {
-           player->fire();
+           player->attack();
         }
 
-        if (player->wantsToReleaseArrow())
+        if (player->wanstToTriggerAbility())
         {
             if (MainScene* scene = dynamic_cast<MainScene*>(m_sceneManager.current()))
             {
-                player->releaseArrow(*scene);
+                player->triggerAbility(*scene);
             }
         }
     }

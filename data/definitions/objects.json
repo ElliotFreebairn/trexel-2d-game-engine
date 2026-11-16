@@ -21,6 +21,11 @@
         },
         "solid": true
       },
+      "character": {
+        "moveSpeed": 200,
+        "jumpForce": -500,
+        "ability": { "name": "bow", "cooldown": 0.4, "triggerFrame": 13 }
+      },
       "animations": {
         "frameSpeed": 0.2,
         "states": [
@@ -48,6 +53,62 @@
             "frames": 14,
             "type": "SINGULAR",
             "frameSpeed": 0.05
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "swordsman",
+      "class": "Player",
+      "size": {
+        "x": 128.0,
+        "y": 128.0
+      },
+      "gravity": true,
+      "collider": {
+        "size": {
+          "x": 30.0,
+          "y": 70.0
+        },
+        "offset": {
+          "x": 40.0,
+          "y": 57.0
+        },
+        "solid": true
+      },
+      "character": {
+        "moveSpeed": 170,
+        "jumpForce": -450,
+        "ability": { "name": "sword", "cooldown": 0.5, "triggerFrame": 4 }
+      },
+      "animations": {
+        "frameSpeed": 0.15,
+        "states": [
+          {
+            "state": "IDLE",
+            "textureId": "knight_idle",
+            "type": "CONTINOUS",
+            "frames": 8
+          },
+          {
+            "state": "WALKING",
+            "textureId": "knight_walking",
+            "type": "CONTINOUS",
+            "frames": 8
+          },
+          {
+            "state": "JUMPING",
+            "textureId": "knight_jumping",
+            "type": "CONTINOUS",
+            "frames": 8
+          },
+          {
+            "state": "ATTACKING",
+            "textureId": "knight_attack",
+            "type": "SINGULAR",
+            "frames": 4,
+            "frameSpeed": 0.07
           }
         ]
       }

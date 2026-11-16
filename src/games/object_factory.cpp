@@ -1,4 +1,5 @@
 #include "object_factory.h"
+#include "ability_registry.h"
 #include "collision.h"
 #include "enum_strings.h"
 #include "game_object_def.h"
@@ -102,6 +103,29 @@ GameObjectDef parseDefinition(const json& defJson)
         }
     }
 
+    if (defJson.contains("character"))
+    {
+        const json& cJson = defJson.at("character");
+
+        CharacterStats stats;
+        stats.moveSpeed = cJson.value("moveSpeed", stats.moveSpeed);
+        stats.jumpForce = cJson.value("jumpForce", stats.jumpForce);
+
+        if (cJson.contains("ability"))
+        {
+            const json& aJson = cJson.at("ability");
+
+            AbilityDef ability;
+            ability.name = aJson.at("name").get<std::string>();
+            ability.cooldown = aJson.value("cooldown", ability.cooldown);
+            ability.triggerFrame = aJson.value("triggerFrame", ability.triggerFrame);
+
+            stats.ability = ability;
+        }
+
+        def.character = stats;
+    }
+
     return def;
 }
 
@@ -143,6 +167,26 @@ json parseDefinition(const GameObjectDef& def)
         }
         saved["animations"] = animations;
     }
+
+    if (def.character.has_value())
+    {
+        json character;
+        character["moveSpeed"] = def.character->moveSpeed;
+        character["jumpForce"] = def.character->jumpForce;
+
+       if (def.character->ability.has_value())
+       {
+           const AbilityDef& ability = *def.character->ability;
+           character["ability"] =
+           {
+               {"name", ability.name},
+               {"cooldown", ability.cooldown},
+               {"triggerFrame", ability.triggerFrame}
+           }; // make is deliberately not saved
+       }
+
+       saved["character"] = character;
+    }
     return saved;
 }
 }
@@ -168,6 +212,7 @@ bool ObjectFactory::loadDefinitions(const std::string& path)
         try
         {
             GameObjectDef def = parseDefinition(defJson);
+            resolveAbility(def);
             m_definitions[def.name] = def;
         }
         catch (const json::exception& e)
@@ -265,13 +310,31 @@ std::vector<GameObjectDef> ObjectFactory::getDefinitionsValues() const
 
 bool ObjectFactory::addDefinition(const GameObjectDef &def)
 {
-    // for now allow editing
-    //if (m_definitions.contains(def.name))
-    //{
-    //    std::cerr << "ObjectFactory::addDefinition - Error! defintion with name " << def.name << " already exists!";
-    //    return false;
-    //}
+    GameObjectDef resolved = def;
+    try
+    {
+        resolveAbility(resolved);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "ObjectFactory::addDefinition: " << e.what() << "\n";
+        return false;
+    }
 
-    m_definitions[def.name] = def;
+    m_definitions[resolved.name] = std::move(resolved);
     return true;
+}
+
+void ObjectFactory::resolveAbility(GameObjectDef &def) const
+{
+    if (!def.character || !def.character->ability) return;
+
+    AbilityDef& ability = *def.character->ability;
+    const AbilityRegistry::Maker* maker = m_abilities.find(ability.name);
+
+    if (!maker)
+    {
+        throw std::runtime_error("unkown ability \"" + ability.name + "\" in definition \"" + def.name + "\"");
+    }
+    ability.make = *maker;
 }

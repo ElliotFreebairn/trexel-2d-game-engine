@@ -2,32 +2,27 @@
     "assets": [
         {
             "id": "archer_idle",
-            "path": "trexel/player/idle-sheet.png",
+            "path": "trexel/player/archer/idle-sheet.png",
             "type": "texture"
         },
         {
             "id": "archer_walking",
-            "path": "trexel/player/walk-sheet.png",
+            "path": "trexel/player/archer/walk-sheet.png",
             "type": "texture"
         },
         {
             "id": "archer_jumping",
-            "path": "trexel/player/jump-sheet.png",
+            "path": "trexel/player/archer/jump-sheet.png",
             "type": "texture"
         },
         {
             "id": "archer_shooting",
-            "path": "trexel/player/shot.png",
+            "path": "trexel/player/archer/shot.png",
             "type": "texture"
         },
         {
             "id": "archer_arrow",
-            "path": "trexel/player/arrow.png",
-            "type": "texture"
-        },
-        {
-            "id": "background",
-            "path": "trexel/medieval/background/background.png",
+            "path": "trexel/player/archer/arrow.png",
             "type": "texture"
         },
         {
@@ -48,6 +43,31 @@
         {
             "id": "cobblestone",
             "path": "trexel/medieval/platformer/cobblestone.png",
+            "type": "texture"
+        },
+        {
+            "id": "background",
+            "path": "trexel/world/background-4.png",
+            "type": "texture"
+        },
+        {
+            "id": "knight_idle",
+            "path": "trexel/player/knight/Idle.png",
+            "type": "texture"
+        },
+        {
+            "id": "knight_walking",
+            "path": "trexel/player/knight/Walk.png",
+            "type": "texture"
+        },
+        {
+            "id": "knight_jumping",
+            "path": "trexel/player/knight/Jump.png",
+            "type": "texture"
+        },
+        {
+            "id": "knight_attack",
+            "path": "trexel/player/knight/Attack_1.png",
             "type": "texture"
         }
     ]

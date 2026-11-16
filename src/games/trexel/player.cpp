@@ -3,6 +3,7 @@
 #include "collision.h"
 #include "common.h"
 #include "game_object.h"
+#include "game_object_def.h"
 #include "property.h"
 #include "scene.h"
 #include "sprite.h"
@@ -15,6 +16,17 @@
 Player::Player(const GameObjectDef& def, glm::vec2 position)
     : GameObject(def, position)
 {
+    if (stats().ability && stats().ability->make)
+    {
+        m_ability = stats().ability->make();
+    }
+}
+
+const CharacterStats& Player::stats() const
+{
+   // A "player" definition with no "character" still works, using deafults
+   static const CharacterStats defaults;
+   return def().character ? *def().character : defaults;
 }
 
 void Player::update(float dt)
@@ -44,7 +56,6 @@ void Player::update(float dt)
 void Player::resolveSpriteState()
 {
     if (!visual.sprite) return;
-
     if (m_isAttacking) return;
 
     if (m_isJumping) visual.sprite->play(SpriteMovementState::JUMPING);
@@ -57,9 +68,9 @@ void Player::move(glm::vec2 delta)
     if (delta.x != 0.0f)
     {
         m_facing = glm::vec2(delta.x < 0.0f ? -1.0f : 1.0f, 0.0f);
+        transform.flip = delta.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
     }
-    transform.flip = delta.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
-    transform.position += delta * 200.0f;
+    transform.position += delta * stats().moveSpeed;
     m_isMoving = true;
 }
 
@@ -68,32 +79,34 @@ void Player::jump()
     if (m_isJumping) return;
     m_isJumping = true;
     body.grounded = false;
-    body.velocityY = JUMP_FORCE;
+    body.velocityY = stats().jumpForce;
 }
 
-void Player::fire()
+void Player::attack()
 {
-    if (m_fireCooldown > 0.0f) return;
+    if (!m_ability || m_fireCooldown > 0.0f) return;
 
     m_isAttacking = true;
-    m_hasFiredThisAttack = false;
-    m_fireCooldown = BOW_COOLDOWN;
+    m_hasTriggered = false;
+    m_fireCooldown = stats().ability->cooldown;
 
     if (visual.sprite) visual.sprite->play(SpriteMovementState::ATTACKING);
 }
 
-bool Player::wantsToReleaseArrow() const
+bool Player::wanstToTriggerAbility() const
 {
-    return m_isAttacking
-        &&  !m_hasFiredThisAttack
+    return m_ability
+        && m_isAttacking
+        && !m_hasTriggered
         && visual.sprite
-        && visual.sprite->currentFrame() >= RELEASE_FRAME;
+        && visual.sprite->currentFrame() >= stats().ability->triggerFrame;
 }
 
-void Player::releaseArrow(Scene& scene)
+void Player::triggerAbility(Scene& scene)
 {
-    m_bow.onUse(*this, scene);
-    m_hasFiredThisAttack = true;
+    if (!m_ability) return;
+    m_ability->trigger(*this, m_facing, scene);
+    m_hasTriggered = true;
 }
 
 void Player::evCollided(CollisionAxis axis)
