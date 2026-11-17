@@ -1,5 +1,6 @@
 #include "trexel.h"
 #include "bow_ability.h"
+#include "enemy.h"
 #include "sword_ability.h"
 #include "IRenderable.h"
 #include "asset.h"
@@ -37,6 +38,7 @@ void Trexel::registerObjectTypes(ObjectFactory& factory)
 {
     factory.registerType<Player>("Player");
     factory.registerType<SceneObject>("SceneObject");
+    factory.registerType<Enemy>("Enemy");
     factory.registerType<Arrow>("Arrow");
 
     factory.registerAbility<BowAbility>("bow");

@@ -69,6 +69,11 @@
             "id": "knight_attack",
             "path": "trexel/player/knight/Attack_1.png",
             "type": "texture"
+        },
+        {
+            "id": "golem_idle",
+            "path": "trexel/enemy/golem_idle_sheet.png",
+            "type": "texture"
         }
     ]
 }

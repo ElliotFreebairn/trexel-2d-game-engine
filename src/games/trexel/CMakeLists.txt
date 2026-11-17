@@ -7,4 +7,5 @@ target_sources(trexel_exec PRIVATE
     bow_item.cpp
     bow_ability.cpp
     sword_ability.cpp
+    enemy.cpp
 )
