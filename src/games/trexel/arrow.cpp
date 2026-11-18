@@ -23,8 +23,8 @@ void Arrow::update(float dt)
     }
 }
 
-void Arrow::evCollided(CollisionAxis axis)
+void Arrow::evCollided(const CollisionInfo& hit)
 {
-    (void)axis;
+    (void)hit;
     destroy();
 }

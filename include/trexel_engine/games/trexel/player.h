@@ -23,7 +23,7 @@ public:
     Player(const GameObjectDef& def, glm::vec2 position);
     virtual ~Player() = default;
 
-    void evCollided(CollisionAxis axis) override;
+    void evCollided(const CollisionInfo& hit) override;
 
     // Custom player functions
     void move(glm::vec2 delta);

@@ -5,15 +5,20 @@
       "name": "golem",
       "class": "Enemy",
       "size": {
-        "x": 78.0,
+        "x": 79.0,
         "y": 64.0
       },
+      "gravity": true,
       "collider": {
         "solid": true,
         "size":
         {
           "x": 50.0,
           "y": 64.0
+        },
+        "offset": {
+          "x": 14.5,
+          "y": 0.0
         }
       },
       "animations": {
@@ -24,6 +29,12 @@
             "textureId": "golem_idle",
             "type": "CONTINOUS",
             "frames": 11
+          },
+          {
+            "state": "WALKING",
+            "textureId": "golem_walking",
+            "type": "CONTINOUS",
+            "frames": 17
           }
         ]
       }

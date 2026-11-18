@@ -12,7 +12,7 @@ public:
     void launch(glm::vec2 velocity, EntityId ownerId);
 
     void update(float dt) override;
-    void evCollided(CollisionAxis axis) override;
+    void evCollided(const CollisionInfo& hit) override;
 
     std::string typeName() const override { return "Arrow"; }
 

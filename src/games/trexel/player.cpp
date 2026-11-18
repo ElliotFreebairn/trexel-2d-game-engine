@@ -109,9 +109,9 @@ void Player::triggerAbility(Scene& scene)
     m_hasTriggered = true;
 }
 
-void Player::evCollided(CollisionAxis axis)
+void Player::evCollided(const CollisionInfo& hit)
 {
-    if(m_isJumping && axis == CollisionAxis::Y)
+    if(m_isJumping && hit.axis == CollisionAxis::Y)
     {
         m_isJumping = false;
         body.velocityY = 0.0f;

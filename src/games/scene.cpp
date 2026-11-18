@@ -80,17 +80,21 @@ void Scene::resolveCollisions(GameObject &mover)
         else if (yAlone && !xAlone) resolveX = false;  // clearly a floor/ceiling hit
         else                        resolveX = overlapX < overlapY; // ambiguous corner: fall back to old heuristic
 
+        // normal = the direction the mover gets pushed out, away from the surface it hit
+        glm::vec2 normal{0.0f};
         glm::vec2 pos = currPos;
         if (resolveX)
         {
-            pos.x += (moverBounds.min.x < otherBounds.min.x) ? -overlapX : overlapX;
+            normal.x = (moverBounds.min.x < otherBounds.min.x) ? -1.0f : 1.0f;
+            pos.x += normal.x * overlapX;
         }
         else
         {
-            pos.y += (moverBounds.min.y < otherBounds.min.y) ? -overlapY : overlapY;
+            normal.y = (moverBounds.min.y < otherBounds.min.y) ? -1.0f : 1.0f;
+            pos.y += normal.y * overlapY;
         }
         mover.transform.position = pos;
-        mover.evCollided(resolveX ? CollisionAxis::X : CollisionAxis::Y);
+        mover.evCollided({resolveX ? CollisionAxis::X : CollisionAxis::Y, normal, other});
     }
 }
 

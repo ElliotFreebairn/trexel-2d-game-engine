@@ -2,6 +2,7 @@
 #include "arrow.h"
 #include "collision.h"
 #include "game_object.h"
+#include "player.h"
 #include "scene.h"
 #include "scene_object.h"
 #include "scene_serializer.h"
@@ -33,11 +34,18 @@ void MainScene::update(float dt)
 {
     Scene::update(dt);
 
-    if (Player* player = getPlayer())
+    /*
+     * Should this be moved to scene as it
+     */
+    for (const auto& obj : m_objects)
     {
-        resolveCollisions(*player);
-        player->body.grounded = isGroundedOn(*player);
+        if (obj->collider.has_value() && obj->body.gravity == true)
+        {
+            resolveCollisions(*obj);
+            obj->body.grounded = isGroundedOn(*obj);
+        }
     }
+
 
     // Arrows react to a hit (stop/despawn) rather than resolve collisions, so don't use resolveCollisions
     for (auto& objPtr : m_objects)
@@ -45,19 +53,17 @@ void MainScene::update(float dt)
         Arrow* arrow = dynamic_cast<Arrow*>(objPtr.get());
         if (arrow && arrow->isActive() && overlapsSolid(*arrow, arrow->ownerId()))
         {
-            arrow->evCollided(CollisionAxis::X);
+            arrow->evCollided({CollisionAxis::X});
         }
     }
 }
 
 void MainScene::buildEnvironment()
 {
-    spawn("grass_block", glm::vec2(500.0f, 600.0f));
-    spawn("grass_block", glm::vec2(550.0f, 600.0f));
-    spawn("grass_block", glm::vec2(600.0f, 600.0f));
-    spawn("grass_block", glm::vec2(650.0f, 600.0f));
-    spawn("grass_block", glm::vec2(700.0f, 600.0f));
-    spawn("grass_block", glm::vec2(750.0f, 600.0f));
+    for (size_t i = 0; i < 20; i++)
+    {
+        spawn("grass_block", glm::vec2(50.0f * i, 635.0f));
+    }
 }
 
 void MainScene::onEnter()

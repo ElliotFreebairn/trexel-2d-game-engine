@@ -65,7 +65,7 @@ public:
      * update will be called every frame
      */
     virtual void update(float dt) = 0;
-    virtual void evCollided(CollisionAxis axis) { (void)axis; }
+    virtual void evCollided(const CollisionInfo& hit) { (void)hit; }
 
     void applyGravity(float dt);
 
