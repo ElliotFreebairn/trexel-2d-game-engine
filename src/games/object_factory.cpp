@@ -100,6 +100,7 @@ GameObjectDef parseDefinition(const json& defJson)
             spriteAnimation.animationType = *type;
 
             // each frame is the size of the object
+            // ADD CHECK TO SEE IF FRAMEWIDTH AND/OR FRAMEHEIGHT ARE CUSTOMISED!
             spriteAnimation.frameWidth = static_cast<int>(def.size.x);
             spriteAnimation.frameHeight = static_cast<int>(def.size.y);
 
@@ -207,8 +208,8 @@ json parseDefinition(const GameObjectDef& def)
             st["frames"] = animation.columns;
             st["rows"] = animation.rows;
             st["type"] = toString(animation.animationType);
-            st["frameWidth"] = def.size.x;
-            st["frameHeight"] = def.size.y;
+            st["frameWidth"] = animation.frameWidth != - 1 ? animation.frameWidth : def.size.x; // frameWidth is custom
+            st["frameHeight"] = animation.frameHeight != - 1 ? animation.frameHeight : def.size.y; // frameHieght is custom
             st["frameDuration"] = animation.frameDuration;
             st["state"] = toString(state);
             animations["states"] += st;

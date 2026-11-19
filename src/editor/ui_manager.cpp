@@ -125,6 +125,9 @@ void UIManager::drawMainEditorWindow(EditorContext &ctx)
         // 3. Draw your scene manager next to it
         drawSceneManager(ctx);
 
+        // 4. Draw data manager
+        drawDataManager(ctx);
+
         drawInspector(ctx);
 
         ImGui::EndTabBar();
@@ -169,17 +172,21 @@ void UIManager::drawSceneManager(EditorContext &ctx)
         ImGui::SeparatorText("Scene Builder");
         drawSceneBuilder(ctx);
 
-        // the asset manager is not scene specific, but for now is alright here
-        ImGui::SeparatorText("Scene Assets");
+        ImGui::PopID();
+    }
+}
+
+void UIManager::drawDataManager(EditorContext &ctx)
+{
+    if (ImGui::BeginTabItem("Data Manager"))
+    {
+        ImGui::SeparatorText("Assets Manifest");
         drawAssetManager(ctx);
 
-        // the definition manager
-        ImGui::SeparatorText("Scene definitions");
-        drawDefinitionsManager(ctx);
+        ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
-        // the animations manager
-        ImGui::SeparatorText("Scene Animations");
-        drawAnimationsManager(ctx);
+        ImGui::SeparatorText("Object Definitions");
+        drawDefinitionsManager(ctx);
 
         ImGui::PopID();
     }
@@ -225,17 +232,66 @@ void UIManager::drawSceneBuilder(EditorContext &ctx)
     ImGui::EndListBox();
 }
 
-void UIManager::drawAnimationsManager(EditorContext &ctx)
+void UIManager::drawDefinitionsManager(EditorContext &ctx)
+{
+    // rough display a list of definitions
+    std::vector<GameObjectDef> definitions = ctx.game.getObjectFactory().getDefinitionsValues();
+
+    if (ImGui::BeginCombo("id", m_selecteDefName.c_str(), 0))
+    {
+        for (const GameObjectDef& def : definitions)
+        {
+            bool isSelected = def.name == m_selecteDefName;
+
+            if (ImGui::Selectable(def.name.c_str(), isSelected))
+            {
+                m_selecteDefName = def.name;
+                m_selectedAnimationState = ""; // we need to reset
+                m_defDraft = def;
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+
+    if (m_selecteDefName.empty()) return; // nothing selected
+
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+    ImGui::Indent(5.0f);
+
+    ImGui::InputFloat2("size", &m_defDraft.size.x);
+    if (m_defDraft.body.has_value())
+    {
+        ImGui::Checkbox("gravity", &m_defDraft.body->gravity);
+    }
+
+    if (m_defDraft.collider.has_value())
+    {
+        ImGui::InputFloat2("collider size", &m_defDraft.collider->size.x);
+        ImGui::InputFloat2("collider offset", &m_defDraft.collider->offset.x);
+    }
+
+    ImGui::Spacing();
+    drawAnimationsManager(ctx, m_defDraft);
+
+    if (ImGui::Button("Apply Edit"))
+    {
+        std::cout << m_defDraft.animations.at(SpriteMovementState::ATTACKING).frameWidth << "\n";
+        ctx.commands.push(EditorCommand::addObjectDefinition(m_defDraft));
+    }
+
+    ImGui::Unindent();
+}
+
+void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDef& def)
 {
     // animations manager per selected definition name
     //  - we are interested by the definitions animation state
     //  - we have to take the const reference to the definiton, so build up a editable state to send as a game command
-    const GameObjectDef* def = ctx.game.getObjectFactory().getDefinition(m_selecteDefName);
-    if (def == nullptr) return;
 
     if (ImGui::BeginListBox("animation id"))
     {
-        for (const auto&[state, anim] : def->animations)
+        for (const auto&[state, anim] : def.animations)
         {
             std::string stateString(toString(state));
             bool isSelected = stateString == m_selectedAnimationState;
@@ -251,60 +307,17 @@ void UIManager::drawAnimationsManager(EditorContext &ctx)
     // for now - lets select a animation and it views it live data
     std::optional<SpriteMovementState> stateEnum = fromString<SpriteMovementState>(m_selectedAnimationState);
     if (!stateEnum.has_value()) return;
-    SpriteAnimation currentAnimation = def->animations.at(stateEnum.value());
+
+    SpriteAnimation& currentAnimation = def.animations.at(stateEnum.value());
 
     ImGui::InputText("animation id", &currentAnimation.textureID);
-}
-
-void UIManager::drawDefinitionsManager(EditorContext &ctx)
-{
-    // rough display a list of definitions
-    std::vector<GameObjectDef> definitions = ctx.game.getObjectFactory().getDefinitionsValues();
-
-    if (ImGui::BeginListBox("id"))
-    {
-        for (const GameObjectDef& def : definitions)
-        {
-            bool isSelected = def.name == m_selecteDefName;
-
-            if (ImGui::Selectable(def.name.c_str(), isSelected))
-            {
-                m_selecteDefName = def.name;
-                m_defDraft = def;
-            }
-        }
-
-        ImGui::EndListBox();
-    }
-
-    if (m_selecteDefName.empty()) return; // nothing selected
-
-    ImGui::InputFloat2("size", &m_defDraft.size.x);
-    if (m_defDraft.body.has_value())
-    {
-        ImGui::Checkbox("gravity", &m_defDraft.body->gravity);
-    }
-
-    if (m_defDraft.collider.has_value())
-    {
-        ImGui::InputFloat2("collider size", &m_defDraft.collider->size.x);
-        ImGui::InputFloat2("collider offset", &m_defDraft.collider->offset.x);
-    }
-
-    int animationsCount = 0;
-    if (!m_defDraft.animations.empty())
-    {
-        for (const auto& [state, animation] : m_defDraft.animations)
-        {
-           animationsCount++;
-        }
-    }
-    ImGui::Text("Total No. Animations %d", animationsCount);
-
-    if (ImGui::Button("Apply Edit"))
-    {
-        ctx.commands.push(EditorCommand::addObjectDefinition(m_defDraft));
-    }
+    ImGui::InputInt("frame width", &currentAnimation.frameWidth);
+    ImGui::InputInt("frame hieght", &currentAnimation.frameHeight);
+    ImGui::InputInt("sheet rows", &currentAnimation.rows);
+    ImGui::InputInt("sheet columns", &currentAnimation.columns);
+    ImGui::InputFloat("frame duration", &currentAnimation.frameDuration);
+    //std::cout << "currentAnimation frameWdith: " << currentAnimation.frameHeight << "\n";
+    // need to add animation type
 }
 
 void UIManager::drawAssetManager(EditorContext &ctx)

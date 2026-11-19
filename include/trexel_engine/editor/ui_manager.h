@@ -29,15 +29,16 @@ public:
 private:
     void drawToolbar(EditorContext& ctx);
     void drawSceneManager(EditorContext& ctx);
+    void drawDataManager(EditorContext& ctx);
     void drawSceneBuilder(EditorContext& ctx);
     void drawHierarchy(EditorContext& ctx);
     void drawInspector(EditorContext& ctx);
     void drawAssetManager(EditorContext& ctx);
     void drawDefinitionsManager(EditorContext& ctx);
-    void drawAnimationsManager(EditorContext& ctx);
     void drawFileTree(EditorContext& ctx);
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
     void drawMainEditorWindow(EditorContext& ctx);
+    void drawAnimationsManager(EditorContext& ctx, GameObjectDef& def);
 
     ImVec2 m_viewportSize = ImVec2(0.0f, 0.0f);
 

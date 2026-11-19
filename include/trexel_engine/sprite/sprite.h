@@ -50,8 +50,8 @@ struct EnumStrings<AnimationType>
 struct SpriteAnimation
 {
     std::string textureID;
-    int frameWidth;
-    int frameHeight;
+    int frameWidth = -1;
+    int frameHeight = -1;
     int columns;
     int rows = 1;
     float frameDuration = 0.15f;
