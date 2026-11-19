@@ -12,6 +12,7 @@
 #include "property.h"
 #include "sprite.h"
 #include "collision.h"
+#include "input_state.h"
 
 // C++ includes
 #include <optional>
@@ -20,7 +21,6 @@
 struct Transform
 {
     glm::vec2 position      {0.0f};
-    glm::vec2 prevPosition  {0.0f};
     glm::vec2 size          {0.0f};
     double angle            = 0.0;
     Flip flip               = Flip::NONE;
@@ -28,9 +28,9 @@ struct Transform
 
 struct Body
 {
-    float velocityY = 0.0f;
+    glm::vec2 velocity {0.0f};
     bool gravity    = false;
-    bool grounded   = false;
+    bool grounded   = false; // changed only be scene
 };
 
 struct Visual
@@ -39,6 +39,14 @@ struct Visual
     std::optional<Sprite> sprite;
     std::optional<glm::vec3> colour;
     bool visible = true;
+};
+
+class Scene;
+struct FrameContext
+{
+    float dt;
+    const InputState& input;
+    Scene& scene;
 };
 
 /*
@@ -64,10 +72,9 @@ public:
     /*
      * update will be called every frame
      */
-    virtual void update(float dt) = 0;
+    virtual void update(const FrameContext& ctx) { (void)ctx; }
     virtual void evCollided(const CollisionInfo& hit) { (void)hit; }
-
-    void applyGravity(float dt);
+    virtual SpriteMovementState animationState() { return SpriteMovementState::IDLE; }
 
     // State, grouped by what it's for
     Transform transform;
@@ -84,7 +91,6 @@ public:
 
     // Collision
     AABB getBounds() const override;
-    AABB getBoundsAt(glm::vec2 position) const;
     bool hasCollider() const override { return collider.has_value(); }
 
     // IRenderable

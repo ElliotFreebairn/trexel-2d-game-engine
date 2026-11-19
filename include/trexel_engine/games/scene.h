@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "game_actions.h"
 #include "game_object.h"
+#include "input_state.h"
 #include "object_factory.h"
 #include "property.h"
 #include <vector>
@@ -21,10 +22,8 @@ public:
     virtual void onPause() {};
     virtual void onResume() {};
 
-    virtual void update(float dt);
+    virtual void update(float dt, const InputState& input);
     virtual void onViewportResized(glm::vec2 newSize) { (void)newSize; }
-
-    void snapshotPositions();
 
     std::vector<const IRenderable*> getRenderables() const;
 
@@ -61,25 +60,22 @@ public:
     // Editor: changes
     virtual void destroy(EntityId id);
 
-    // Does probe overlap something, doesn't actually resolve the collision
-    bool overlapsSolid(const GameObject& probe, EntityId ignore = INVALID_ENTITY) const;
-
-    // SCENE LOADING AND PARSING -- TEMP
-    void loadScene(std::string mapPath);
-    void saveScene(std::string mapPath);
-
+    void setControlled(EntityId id) { m_controlled = id; }
 
 protected:
     std::vector<std::unique_ptr<GameObject>> m_objects;
-
-    void resolveCollisions(GameObject& mover);
-
-    bool isGroundedOn(const GameObject& probe, float skinWidth = 1.0f, EntityId ignore = INVALID_ENTITY);
+    std::vector<std::unique_ptr<GameObject>> m_pending;
 
 private:
+    EntityId m_controlled = INVALID_ENTITY;
     std::string m_name;
     std::string m_background = "";
     const ObjectFactory& m_factory;
+    bool m_inUpdate = false;
 
+    void integrate(GameObject& obj, float dt);
+    void moveAxis(GameObject& obj, glm::vec2 delta);
+    void reportOverlaps();
+    void flushPending();
     void pruneInactive();
 };

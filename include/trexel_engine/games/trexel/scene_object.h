@@ -15,7 +15,7 @@ public:
     SceneObject(const GameObjectDef& def, glm::vec2 position);
     ~SceneObject() = default;
 
-    void update(float dt) override;
+    void update(const FrameContext& ctx) override;
 
     void addBehaviour(std::unique_ptr<IBehaviour> b) { m_behaviours.push_back(std::move(b)); }
 

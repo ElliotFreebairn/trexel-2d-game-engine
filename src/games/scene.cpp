@@ -3,34 +3,128 @@
 #include "entity.h"
 #include "game_object.h"
 #include "game_object_def.h"
+#include "input_state.h"
 #include "player.h"
 #include "property.h"
 #include "scene_object.h"
+#include <cmath>
 #include <fstream>
 #include <vector>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-void Scene::update(float dt)
+namespace
 {
+    constexpr float GRAVITY = 1500.0f;
+    constexpr float MAX_FALL_SPEED = 1000.0f;
+};
+
+void Scene::update(float dt, const InputState& input)
+{
+    m_inUpdate = true;
+
+    // 1. think -> objects set velocity, tick timers, spawn things etc...
+    static const InputState NO_INPUT{};
     for (auto& obj : m_objects)
     {
-        if (obj->isActive())
-        {
-            obj->update(dt);
-            obj->applyGravity(dt);
-        }
+        if (!obj->isActive()) continue;
+        const FrameContext ctx {dt, obj->entityId() == m_controlled ? input : NO_INPUT, *this};
+        obj->update(ctx);
     }
 
+    // 2. physics -> only place where we move objects
+    for (auto& obj : m_objects)
+    {
+        if (obj->isActive()) integrate(*obj, dt);
+    }
+
+    // 3. triggers -> non-blocking overlaps (arrows, future pickups, hitboxes etc...)
+    reportOverlaps();
+
+    // 4. animate
+    for (auto& obj : m_objects)
+    {
+        if (!obj->isActive() || !obj->visual.sprite) continue;
+        obj->visual.sprite->play(obj->animationState());
+        obj->visual.sprite->update(dt);
+    }
+
+    m_inUpdate = false;
+    flushPending();
     pruneInactive();
+}
+
+void Scene::integrate(GameObject &obj, float dt)
+{
+    Body& body = obj.body;
+    if (body.gravity)
+        body.velocity.y = std::min(body.velocity.y + GRAVITY * dt, MAX_FALL_SPEED);
+
+    body.grounded = false; // decided every frame in moveAxis
+    moveAxis(obj, {body.velocity.x * dt, 0.0f});
+    moveAxis(obj, {0.0f, body.velocity.y * dt});
+}
+
+void Scene::moveAxis(GameObject &obj, glm::vec2 delta)
+{
+    if (delta == glm::vec2(0.0f)) return;
+    obj.transform.position += delta;
+
+    // triggers aren't pushed. they find about overlaps through reportOverlaps
+    if (!obj.collider || !obj.collider->isSolid) return;
+
+    for (auto& otherPtr : m_objects)
+    {
+        GameObject& other = *otherPtr;
+        if (&other == &obj || !other.isActive()) continue;
+        if (!other.collider || !other.collider->isSolid) continue;
+
+        const AABB a = obj.getBounds();
+        const AABB b = other.getBounds();
+        if (!aabbIntersects(a, b)) continue;
+
+        // we moved along exactly one axis, so the side we hit is known
+        CollisionInfo hit {.other = &other};
+        if (delta.x > 0)        { obj.transform.position.x -= a.max.x - b.min.x; hit.normal = {-1, 0}; }
+        else if (delta.x < 0)   { obj.transform.position.x += b.max.x - a.min.x; hit.normal = {1, 0};  }
+        else if (delta.y > 0)   { obj.transform.position.y -= a.max.y - b.min.y; hit.normal = {0, -1}; obj.body.grounded = true; }
+        else                    { obj.transform.position.y += b.max.y - a.min.y; hit.normal = {0, 1};  }
+
+        (hit.normal.x != 0 ? obj.body.velocity.x : obj.body.velocity.y) = 0.0f;
+        obj.evCollided(hit);
+    }
+}
+
+void Scene::reportOverlaps()
+{
+    for (size_t i = 0; i < m_objects.size(); i++)
+    {
+        for (size_t j = i + 1; j < m_objects.size(); j++)
+        {
+            GameObject& a = *m_objects[i];
+            GameObject& b = *m_objects[j];
+            if (!a.isActive() || !b.isActive() || !a.collider || !b.collider) continue;
+            if (a.collider->isSolid && b.collider->isSolid) continue; // physics already handled this
+            if (!aabbIntersects(a.getBounds(), b.getBounds())) continue;
+
+            a.evCollided({.other = &b});
+            b.evCollided({.other = &a});
+        }
+    }
 }
 
 GameObject& Scene::addObject(std::unique_ptr<GameObject> obj)
 {
     GameObject& ref = *obj;
-    m_objects.push_back(std::move(obj));
+    (m_inUpdate ? m_pending : m_objects).push_back(std::move(obj));
     return ref;
+}
+
+void Scene::flushPending()
+{
+    for (auto& o : m_pending) m_objects.push_back(std::move(o));
+    m_pending.clear();
 }
 
 GameObject* Scene::spawn(const std::string& defName, glm::vec2 position)
@@ -40,104 +134,6 @@ GameObject* Scene::spawn(const std::string& defName, glm::vec2 position)
     return &addObject(std::move(obj));
 }
 
-void Scene::snapshotPositions()
-{
-    for (auto& objPtr : m_objects)
-    {
-        objPtr->transform.prevPosition = objPtr->transform.position;
-    }
-}
-
-void Scene::resolveCollisions(GameObject &mover)
-{
-    if (!mover.hasCollider()) return;
-
-    for (auto& objPtr : m_objects)
-    {
-        GameObject* other = objPtr.get();
-        if (other == &mover) continue;
-        if (!other->hasCollider() || !other->collider->isSolid) continue;
-
-        AABB moverBounds = mover.getBounds();
-        AABB otherBounds = other->getBounds();
-
-        if (!aabbOverlap(moverBounds, otherBounds)) continue;
-
-        glm::vec2 prevPos = mover.transform.prevPosition;
-        glm::vec2 currPos = mover.transform.position;
-
-        // Isolate each axis: does moving *only* on that axis explain the overlap?
-        bool xAlone = aabbOverlap(mover.getBoundsAt({currPos.x, prevPos.y}), otherBounds);
-        bool yAlone = aabbOverlap(mover.getBoundsAt({prevPos.x, currPos.y}), otherBounds);
-
-        float overlapX = std::min(moverBounds.max.x, otherBounds.max.x)
-            - std::max(moverBounds.min.x, otherBounds.min.x);
-        float overlapY = std::min(moverBounds.max.y, otherBounds.max.y)
-            - std::max(moverBounds.min.y, otherBounds.min.y);
-
-        bool resolveX;
-        if (xAlone && !yAlone)      resolveX = true;   // clearly a side bump
-        else if (yAlone && !xAlone) resolveX = false;  // clearly a floor/ceiling hit
-        else                        resolveX = overlapX < overlapY; // ambiguous corner: fall back to old heuristic
-
-        // normal = the direction the mover gets pushed out, away from the surface it hit
-        glm::vec2 normal{0.0f};
-        glm::vec2 pos = currPos;
-        if (resolveX)
-        {
-            normal.x = (moverBounds.min.x < otherBounds.min.x) ? -1.0f : 1.0f;
-            pos.x += normal.x * overlapX;
-        }
-        else
-        {
-            normal.y = (moverBounds.min.y < otherBounds.min.y) ? -1.0f : 1.0f;
-            pos.y += normal.y * overlapY;
-        }
-        mover.transform.position = pos;
-        mover.evCollided({resolveX ? CollisionAxis::X : CollisionAxis::Y, normal, other});
-    }
-}
-
-bool Scene::overlapsSolid(const GameObject &probe, EntityId ignore) const
-{
-    if (!probe.hasCollider()) return false;
-
-    const AABB probeBounds = probe.getBounds();
-    for (const auto& objPtr : m_objects)
-    {
-        const GameObject* other = objPtr.get();
-        if (other == &probe) continue;
-        if (ignore != INVALID_ENTITY && other->entityId() == ignore) continue;
-        if (!other->hasCollider() || !other->collider->isSolid) continue;
-
-        if (aabbOverlap(probeBounds, other->getBounds())) return true;
-    }
-    return false;
-}
-
-bool Scene::isGroundedOn(const GameObject &probe, float skinWidth, EntityId ignore)
-{
-    if (!probe.hasCollider()) return false;
-
-    AABB bounds = probe.getBounds();
-
-    bounds.min.x += 2.0f;
-    bounds.max.x -= 2.0f;
-
-    bounds.min.y += skinWidth;
-    bounds.max.y += skinWidth;
-
-    for (const auto& objPtr : m_objects)
-    {
-        const GameObject* other = objPtr.get();
-        if (other == &probe) continue;
-        if (ignore != INVALID_ENTITY && other->entityId() == ignore) continue;
-        if (!other->hasCollider() || !other->collider->isSolid) continue;
-
-        if (aabbOverlap(bounds, other->getBounds())) return true;
-    }
-    return false;
-}
 
 std::vector<const IRenderable*> Scene::getRenderables() const
 {

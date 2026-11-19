@@ -45,43 +45,8 @@ void Trexel::registerObjectTypes(ObjectFactory& factory)
     factory.registerAbility<SwordAbility>("sword");
 }
 
-Player* Trexel::getPlayer() const
-{
-    MainScene* scene = dynamic_cast<MainScene*>(m_sceneManager.current());
-    return scene ? scene->getPlayer() : nullptr;
-}
-
 void Trexel::onUpdate(float deltaTime, const InputState& input)
 {
-    if (Scene* scene = m_sceneManager.current())
-    {
-        scene->snapshotPositions();
-    }
-
-    if (Player* player = getPlayer())
-    {
-        if (input.move != glm::vec2(0.0f))
-        {
-            player->move(input.move * deltaTime);
-        }
-        if (input.jumpPressed)
-        {
-            player->jump();
-        }
-        if (input.firePressed)
-        {
-           player->attack();
-        }
-
-        if (player->wanstToTriggerAbility())
-        {
-            if (MainScene* scene = dynamic_cast<MainScene*>(m_sceneManager.current()))
-            {
-                player->triggerAbility(*scene);
-            }
-        }
-    }
-
     Game::onUpdate(deltaTime, input);
 }
 

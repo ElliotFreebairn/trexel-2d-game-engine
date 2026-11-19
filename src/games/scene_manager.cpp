@@ -1,5 +1,6 @@
 #include "scene_manager.h"
 #include "IRenderable.h"
+#include "input_state.h"
 #include <vector>
 
 void SceneManager::switchTo(const std::string &id)
@@ -32,11 +33,11 @@ void SceneManager::pop()
     }
 }
 
-void SceneManager::update(float dt)
+void SceneManager::update(float dt, const InputState& input)
 {
     if (!m_stack.empty())
     {
-        m_stack.back()->update(dt);
+        m_stack.back()->update(dt, input);
     }
 }
 

@@ -1,5 +1,6 @@
 #include "enemy.h"
 #include "collision.h"
+#include "common.h"
 #include "game_object.h"
 #include "sprite.h"
 
@@ -13,28 +14,21 @@ Enemy::Enemy(const GameObjectDef& def, glm::vec2 startingPosition)
 
 }
 
-void Enemy::update(float dt)
+void Enemy::update(const FrameContext& ctx)
 {
-    transform.position.x += (50 * dt) * m_facing.x;
+    body.velocity.x = 50.0f * m_facing.x;
     transform.flip = m_facing.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
-    resolveSpriteState();
-    if (visual.sprite) visual.sprite->update(dt);
 }
 
 void Enemy::evCollided(const CollisionInfo& hit)
 {
-    // walk away from whatever wall we hit. Setting (not toggling) means hitting
-    // several stacked blocks in one frame still gives the same direction
     if (hit.normal.x != 0.0f)
     {
-        m_facing.x = hit.normal.x;
+        m_facing.x = hit.normal.x; // trigger overlaps have normal 0
     }
 }
 
-void Enemy::resolveSpriteState()
+SpriteMovementState Enemy::animationState()
 {
-    if (!visual.sprite) return;
-
-    if (m_isMoving) visual.sprite->play(SpriteMovementState::WALKING);
-    else visual.sprite->play(SpriteMovementState::IDLE);
+    return SpriteMovementState::WALKING;
 }

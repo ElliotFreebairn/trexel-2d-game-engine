@@ -27,7 +27,7 @@ void SwordAbility::trigger(GameObject& user, glm::vec2 facing, Scene& scene)
         GameObject& other = *objPtr;
         if (&other == &user || !other.isActive() || !other.hasCollider()) continue;
 
-        if (aabbOverlap(hitbox, other.getBounds()))
+        if (aabbIntersects(hitbox, other.getBounds()))
         {
             // TODO: apply damage once objects have health
             std::cout << "SwordAbility: hit \"" << other.defName() << "\" (entity " << other.entityId() << ")\n";

@@ -5,6 +5,7 @@
 #include "editor_state.h"
 #include "game.h"
 #include "input_state.h"
+#include "player.h"
 #include "texture_manager.h"
 #include "ui_manager.h"
 
@@ -110,6 +111,9 @@ void Engine::applyCommands()
 
 void Engine::update(float frameTime)
 {
+    constexpr float STEP = 1.0f / 60.0f;
+    constexpr float MAX_FRAME = 0.25f;
+
     applyCommands();
 
     // We always want to sample for edge detection
@@ -124,17 +128,23 @@ void Engine::update(float frameTime)
     {
         m_jumpQueued = false;
         m_fireQueued = false;
+        m_accumulator = 0.0f;
         return;
     }
 
     if (input.jumpPressed) m_jumpQueued = true;
     if (input.firePressed) m_fireQueued = true;
 
-    input.jumpPressed = m_jumpQueued;
-    input.firePressed = m_fireQueued;
-    m_game->onUpdate(frameTime, input);
-    m_jumpQueued = false;
-    m_fireQueued = false;
+    m_accumulator += std::min(frameTime, MAX_FRAME);
+    while (m_accumulator >= STEP)
+    {
+        input.jumpPressed = m_jumpQueued;
+        input.firePressed = m_fireQueued;
+        m_game->onUpdate(STEP, input);
+        m_jumpQueued = false;
+        m_fireQueued = false;
+        m_accumulator -= STEP;
+    }
 }
 
 

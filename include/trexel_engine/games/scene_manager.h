@@ -2,6 +2,7 @@
 
 #include "IRenderable.h"
 #include "game_actions.h"
+#include "input_state.h"
 #include "scene.h"
 #include <memory>
 #include <unordered_map>
@@ -23,7 +24,7 @@ public:
 
     void pop();
 
-    void update(float dt);
+    void update(float dt, const InputState& input);
 
     std::vector<const IRenderable*> getRenderables() const;
 

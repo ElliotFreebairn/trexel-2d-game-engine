@@ -40,8 +40,7 @@ public:
 
     virtual void onUpdate(float deltaTime, const InputState& input)
     {
-        (void)input;
-        m_sceneManager.update(deltaTime);
+        m_sceneManager.update(deltaTime, input);
     }
 
     // Rendering

@@ -4,6 +4,7 @@
 #include "common.h"
 #include "game_object.h"
 #include "game_object_def.h"
+#include "input_state.h"
 #include "property.h"
 #include "scene.h"
 #include "sprite.h"
@@ -29,101 +30,55 @@ const CharacterStats& Player::stats() const
    return def().character ? *def().character : defaults;
 }
 
-void Player::update(float dt)
+void Player::update(const FrameContext& ctx)
 {
+    const InputState& in = ctx.input;
 
-    if (body.grounded && m_isJumping && body.velocityY >= 0.0f)
+    // intent -> velocity. scene does the moving
+    body.velocity.x = in.move.x * stats().moveSpeed;
+    if (in.move.x != 0.0f)
     {
-        m_isJumping = false;
+        m_facing.x = in.move.x < 0.0f ? -1.0f : 1.0f;
+        transform.flip = m_facing.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
     }
 
-    if (m_fireCooldown > 0.0f)
+    if (in.jumpPressed && body.grounded) // grounded = end of last frame's physics
+        body.velocity.y = stats().jumpForce;
+
+    m_cooldown = std::max(0.0f, m_cooldown - ctx.dt);
+    if (in.firePressed && m_ability && m_cooldown == 0.0f)
     {
-        m_fireCooldown -= dt;
+        m_isAttacking = true;
+        m_hasTriggered = false;
+        m_cooldown = stats().ability->cooldown;
+        // start now so currentFrame() below is the attack's
+        if (visual.sprite) visual.sprite->play(SpriteMovementState::ATTACKING);
     }
 
-    // The attack animation is one-shot (SINGULAR)
-    if(m_isAttacking && visual.sprite && visual.sprite->isFinished())
+    if (m_isAttacking && visual.sprite)
     {
-        m_isAttacking = false;
-    }
-
-    resolveSpriteState();
-    if (visual.sprite) visual.sprite->update(dt);
-    m_isMoving = false;
-}
-
-void Player::resolveSpriteState()
-{
-    if (!visual.sprite) return;
-    if (m_isAttacking) return;
-
-    if (m_isJumping) visual.sprite->play(SpriteMovementState::JUMPING);
-    else if (m_isMoving) visual.sprite->play(SpriteMovementState::WALKING);
-    else visual.sprite->play(SpriteMovementState::IDLE);
-}
-
-void Player::move(glm::vec2 delta)
-{
-    if (delta.x != 0.0f)
-    {
-        m_facing = glm::vec2(delta.x < 0.0f ? -1.0f : 1.0f, 0.0f);
-        transform.flip = delta.x < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
-    }
-    transform.position += delta * stats().moveSpeed;
-    m_isMoving = true;
-}
-
-void Player::jump()
-{
-    if (m_isJumping) return;
-    m_isJumping = true;
-    body.grounded = false;
-    body.velocityY = stats().jumpForce;
-}
-
-void Player::attack()
-{
-    if (!m_ability || m_fireCooldown > 0.0f) return;
-
-    m_isAttacking = true;
-    m_hasTriggered = false;
-    m_fireCooldown = stats().ability->cooldown;
-
-    if (visual.sprite) visual.sprite->play(SpriteMovementState::ATTACKING);
-}
-
-bool Player::wanstToTriggerAbility() const
-{
-    return m_ability
-        && m_isAttacking
-        && !m_hasTriggered
-        && visual.sprite
-        && visual.sprite->currentFrame() >= stats().ability->triggerFrame;
-}
-
-void Player::triggerAbility(Scene& scene)
-{
-    if (!m_ability) return;
-    m_ability->trigger(*this, m_facing, scene);
-    m_hasTriggered = true;
-}
-
-void Player::evCollided(const CollisionInfo& hit)
-{
-    if(m_isJumping && hit.axis == CollisionAxis::Y)
-    {
-        m_isJumping = false;
-        body.velocityY = 0.0f;
+        if (!m_hasTriggered && visual.sprite->currentFrame() >= stats().ability->triggerFrame)
+        {
+            m_ability->trigger(*this, m_facing, ctx.scene);
+            m_hasTriggered = true;
+        }
+        if (visual.sprite->isFinished()) m_isAttacking = false;
     }
 }
 
-// Editor
+SpriteMovementState Player::animationState()
+{
+    if (m_isAttacking)             return SpriteMovementState::ATTACKING;
+    if (!body.grounded)            return SpriteMovementState::JUMPING;
+    if (body.velocity.x != 0.0f)   return SpriteMovementState::WALKING;
+    return SpriteMovementState::IDLE;
+}
+
 std::vector<Property> Player::properties() const
 {
     std::vector<Property> properties = GameObject::properties();
 
-    properties.insert(properties.end(), {Property("jumping", m_isJumping, true), Property("grounded", body.grounded, true)});
+    properties.insert(properties.end(),{Property("grounded", body.grounded, true)});
 
     return properties;
 }

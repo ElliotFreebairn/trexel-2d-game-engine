@@ -27,6 +27,5 @@ protected:
     void registerObjectTypes(ObjectFactory& factory) override;
 
 private:
-    Player* getPlayer() const;
 
 };

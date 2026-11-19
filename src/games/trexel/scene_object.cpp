@@ -6,7 +6,7 @@ SceneObject::SceneObject(const GameObjectDef& def, glm::vec2 position) : GameObj
 {
 }
 
-void SceneObject::update(float dt)
+void SceneObject::update(const FrameContext& ctx)
 {
 
 }

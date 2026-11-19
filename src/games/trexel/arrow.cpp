@@ -1,5 +1,6 @@
 #include "arrow.h"
 #include "entity.h"
+#include "game_object.h"
 
 Arrow::Arrow(const GameObjectDef& def, glm::vec2 position)
     : GameObject(def, position)
@@ -8,23 +9,19 @@ Arrow::Arrow(const GameObjectDef& def, glm::vec2 position)
 
 void Arrow::launch(glm::vec2 velocity, EntityId ownerId)
 {
-    m_velocity = velocity;
+    body.velocity = velocity;
     m_ownerId = ownerId;
 }
 
-void Arrow::update(float dt)
+void Arrow::update(const FrameContext& ctx)
 {
-    transform.position += m_velocity * dt;
-
-    m_lifetime -= dt;
-    if (m_lifetime <= 0.0f)
-    {
-        destroy(); // Scene::update() prunes inactive objects
-    }
+    m_lifetime -= ctx.dt;
+    if (m_lifetime <= 0.0f) destroy();
 }
 
 void Arrow::evCollided(const CollisionInfo& hit)
 {
-    (void)hit;
+    if (hit.other->entityId() == m_ownerId) return;
+    if (!hit.other->collider->isSolid) return; // ignore other arrows / triggers
     destroy();
 }

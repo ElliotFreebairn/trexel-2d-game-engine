@@ -2,6 +2,7 @@
 #include "arrow.h"
 #include "collision.h"
 #include "game_object.h"
+#include "input_state.h"
 #include "player.h"
 #include "scene.h"
 #include "scene_object.h"
@@ -18,44 +19,9 @@ MainScene::MainScene(glm::vec2 viewportSize, const ObjectFactory& factory)
 {
 }
 
-Player* MainScene::getPlayer() const
+void MainScene::update(float dt, const InputState& input)
 {
-    for (const auto& obj : m_objects)
-    {
-        if (Player* player = dynamic_cast<Player*>(obj.get()))
-        {
-            return player;
-        }
-    }
-    return nullptr;
-}
-
-void MainScene::update(float dt)
-{
-    Scene::update(dt);
-
-    /*
-     * Should this be moved to scene as it
-     */
-    for (const auto& obj : m_objects)
-    {
-        if (obj->collider.has_value() && obj->body.gravity == true)
-        {
-            resolveCollisions(*obj);
-            obj->body.grounded = isGroundedOn(*obj);
-        }
-    }
-
-
-    // Arrows react to a hit (stop/despawn) rather than resolve collisions, so don't use resolveCollisions
-    for (auto& objPtr : m_objects)
-    {
-        Arrow* arrow = dynamic_cast<Arrow*>(objPtr.get());
-        if (arrow && arrow->isActive() && overlapsSolid(*arrow, arrow->ownerId()))
-        {
-            arrow->evCollided({CollisionAxis::X});
-        }
-    }
+    Scene::update(dt, input);
 }
 
 void MainScene::buildEnvironment()
@@ -74,6 +40,15 @@ void MainScene::onEnter()
     {
         buildEnvironment();
         spawn("archer", glm::vec2(450.0f, 400.0f));
+    }
+
+    for (const auto& obj : m_objects)
+    {
+        if (dynamic_cast<Player*>(obj.get()))
+        {
+            setControlled(obj->entityId());
+            break;
+        }
     }
 }
 

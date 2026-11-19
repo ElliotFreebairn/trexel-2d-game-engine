@@ -15,8 +15,6 @@ struct Collider
     glm::vec2 offset {0.0f, 0.0f};
 };
 
-enum class CollisionAxis { X, Y };
-
 class GameObject;
 
 /*
@@ -28,19 +26,13 @@ class GameObject;
  */
 struct CollisionInfo
 {
-    CollisionAxis axis;
     glm::vec2 normal {0.0f};
     GameObject* other = nullptr;
 };
-inline bool aabbOverlap(const AABB& a, const AABB& b)
-{
-    bool aIsToTheRightOfB = a.min.x > b.max.x;
-    bool aIsToTheLeftOfB = a.max.x < b.min.x;
-    bool aIsAboveB = a.max.y < b.min.y;
-    bool aIsBelowB = a.min.y > b.max.y;
 
-    return !(aIsToTheRightOfB
-        || aIsToTheLeftOfB
-        || aIsAboveB
-        || aIsBelowB);
+inline bool aabbIntersects(const AABB& a, const AABB& b)
+{
+    constexpr float EPS = 0.001f;
+    return a.min.x < b.max.x - EPS && a.max.x > b.min.x + EPS
+        && a.min.y < b.max.y - EPS && a.max.y > b.min.y + EPS;
 }
