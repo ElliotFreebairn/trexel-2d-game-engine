@@ -19,6 +19,7 @@ enum class EditorCommandType
     DestroyEntity,
     AddAsset,
     AddObjectDefinition,
+    SetControlledEntity,
 };
 
 struct EditorCommand
@@ -83,6 +84,14 @@ struct EditorCommand
         EditorCommand command;
         command.type = EditorCommandType::AddObjectDefinition;
         command.objectDef = std::move(def);
+        return command;
+    }
+
+    static EditorCommand setControlledEntity(EntityId id)
+    {
+        EditorCommand command;
+        command.type = EditorCommandType::SetControlledEntity;
+        command.entity = id;
         return command;
     }
     // Complete spawnEntity and destoryEntity

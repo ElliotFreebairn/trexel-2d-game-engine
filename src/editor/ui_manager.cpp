@@ -316,6 +316,10 @@ void UIManager::drawInspector(EditorContext &ctx)
             {
                 drawProperty(ctx.state.selected, p, ctx.commands);
             }
+            if (ImGui::Button("Take Control"))
+            {
+                ctx.commands.push(EditorCommand::setControlledEntity(ctx.state.selected));
+            }
             if (ImGui::Button("Delete"))
             {
                 ctx.commands.push(EditorCommand::destroyEntity(ctx.state.selected));

@@ -106,6 +106,9 @@ public:
                     std::cerr << "Add Object Def Failed!\n";
                 else
                     m_objectFactory.saveDefinitions("data/definitions/new_objects.json");
+            case EditorCommandType::SetControlledEntity:
+                scene->setControlled(command.entity);
+                break;
         }
     }
 
