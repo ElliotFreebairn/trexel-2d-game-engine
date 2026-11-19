@@ -2,6 +2,7 @@
 #include "editor_command.h"
 #include "editor_state.h"
 #include "entity.h"
+#include "enum_strings.h"
 #include "game.h"
 #include "game_object_def.h"
 #include "imgui.h"
@@ -11,6 +12,7 @@
 #include "imgui_stdlib.h"
 #include "property.h"
 #include "file_tree_widget.h"
+#include "sprite.h"
 
 #include <glm/glm.hpp>
 #include <stdexcept>
@@ -175,6 +177,10 @@ void UIManager::drawSceneManager(EditorContext &ctx)
         ImGui::SeparatorText("Scene definitions");
         drawDefinitionsManager(ctx);
 
+        // the animations manager
+        ImGui::SeparatorText("Scene Animations");
+        drawAnimationsManager(ctx);
+
         ImGui::PopID();
     }
 }
@@ -217,6 +223,37 @@ void UIManager::drawSceneBuilder(EditorContext &ctx)
     }
 
     ImGui::EndListBox();
+}
+
+void UIManager::drawAnimationsManager(EditorContext &ctx)
+{
+    // animations manager per selected definition name
+    //  - we are interested by the definitions animation state
+    //  - we have to take the const reference to the definiton, so build up a editable state to send as a game command
+    const GameObjectDef* def = ctx.game.getObjectFactory().getDefinition(m_selecteDefName);
+    if (def == nullptr) return;
+
+    if (ImGui::BeginListBox("animation id"))
+    {
+        for (const auto&[state, anim] : def->animations)
+        {
+            std::string stateString(toString(state));
+            bool isSelected = stateString == m_selectedAnimationState;
+
+            if (ImGui::Selectable(stateString.c_str(), isSelected))
+            {
+                m_selectedAnimationState = stateString;
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    // for now - lets select a animation and it views it live data
+    std::optional<SpriteMovementState> stateEnum = fromString<SpriteMovementState>(m_selectedAnimationState);
+    if (!stateEnum.has_value()) return;
+    SpriteAnimation currentAnimation = def->animations.at(stateEnum.value());
+
+    ImGui::InputText("animation id", &currentAnimation.textureID);
 }
 
 void UIManager::drawDefinitionsManager(EditorContext &ctx)

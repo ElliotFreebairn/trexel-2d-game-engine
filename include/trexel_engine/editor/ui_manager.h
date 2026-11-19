@@ -34,6 +34,7 @@ private:
     void drawInspector(EditorContext& ctx);
     void drawAssetManager(EditorContext& ctx);
     void drawDefinitionsManager(EditorContext& ctx);
+    void drawAnimationsManager(EditorContext& ctx);
     void drawFileTree(EditorContext& ctx);
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
     void drawMainEditorWindow(EditorContext& ctx);
@@ -43,5 +44,6 @@ private:
     Asset m_assetDraft;
 
     std::string m_selecteDefName;
+    std::string m_selectedAnimationState;
     GameObjectDef m_defDraft;
 };
