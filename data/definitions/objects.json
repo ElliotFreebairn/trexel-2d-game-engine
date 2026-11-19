@@ -20,7 +20,7 @@
           "y": 0.0
         }
       },
-      "locomotion": {
+      "movement": {
         "moveSpeed": 50
       },
       "patrol": true,
@@ -66,7 +66,7 @@
         },
         "solid": true
       },
-      "locomotion": {
+      "movement": {
         "moveSpeed": 200,
         "jumpForce": -500
       },
@@ -129,7 +129,7 @@
         },
         "solid": true
       },
-      "locomotion": {
+      "movement": {
         "moveSpeed": 170,
         "jumpForce": -450
       },
@@ -208,6 +208,14 @@
       },
       "collider": {
         "solid": true
+      }
+    },
+    {
+      "name": "fence",
+      "textureId": "fence",
+      "size": {
+        "x" : 50.0,
+        "y": 50.0
       }
     }
   ]

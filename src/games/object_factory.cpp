@@ -28,7 +28,7 @@
  *              Every section below is optional, present = the entity gets that component
  *
  *              "body": { "gravity": bool }, (moves under physics)
- *              "locomotion": { "moveSpeed": float, "jumpForce": float },
+ *              "movement": { "moveSpeed": float, "jumpForce": float },
  *              "attack": { "ability": string (registered name), "cooldown": float, "triggerFrame": int },
  *              "health": { "max": int },
  *              "projectile": { "lifetime": float },
@@ -121,13 +121,13 @@ GameObjectDef parseDefinition(const json& defJson)
         def.body = body;
     }
 
-    if (defJson.contains("locomotion"))
+    if (defJson.contains("movement"))
     {
-        const json& j = defJson.at("locomotion");
-        Locomotion loco;
-        loco.moveSpeed = j.value("moveSpeed", loco.moveSpeed);
-        loco.jumpForce = j.value("jumpForce", loco.jumpForce);
-        def.locomotion = loco;
+        const json& j = defJson.at("movement");
+        Movement movement;
+        movement.moveSpeed = j.value("moveSpeed", movement.moveSpeed);
+        movement.jumpForce = j.value("jumpForce", movement.jumpForce);
+        def.movement = movement;
     }
 
     if (defJson.contains("attack"))
@@ -216,10 +216,10 @@ json parseDefinition(const GameObjectDef& def)
 
     // Components: only written when present, so a saved file looks like a hand written one
     if (def.body) saved["body"] = {{"gravity", def.body->gravity}};
-    if (def.locomotion)
+    if (def.movement)
     {
-        saved["locomotion"] = {{"moveSpeed", def.locomotion->moveSpeed},
-                               {"jumpForce", def.locomotion->jumpForce}};
+        saved["movement"] = {{"moveSpeed", def.movement->moveSpeed},
+                               {"jumpForce", def.movement->jumpForce}};
     }
     if (def.attack)
     {
@@ -344,7 +344,7 @@ EntityId ObjectFactory::spawn(Registry& reg, const std::string& defName, glm::ve
     // Optional data components: copied from the definition, so each entity has its own
     if (def->collider)    reg.add<Collider>(e, *def->collider);
     if (def->body)        reg.add<Body>(e, *def->body);
-    if (def->locomotion)  reg.add<Locomotion>(e, *def->locomotion);
+    if (def->movement)  reg.add<Movement>(e, *def->movement);
     if (def->health)      reg.add<Health>(e, *def->health);
     if (def->projectile)  reg.add<Projectile>(e, *def->projectile);
     if (def->damageOnHit) reg.add<DamageOnHit>(e, *def->damageOnHit);
@@ -364,7 +364,7 @@ EntityId ObjectFactory::spawn(Registry& reg, const std::string& defName, glm::ve
     }
 
     // Anything that can act needs an Intent for brains to write into. Plumbing, so not in JSON
-    if (def->locomotion || def->attack || def->patrol || def->playerControlled)
+    if (def->movement || def->attack || def->patrol || def->playerControlled)
     {
         reg.add<Intent>(e);
     }

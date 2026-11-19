@@ -4,6 +4,7 @@
 #include "ecs/systems.h"
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 #include <variant>
 
@@ -16,7 +17,7 @@ void Scene::update(float dt, const InputState& input)
     playerInputSystem(m_reg, input);
 
     // 2. Bodies act on what was decided
-    locomotionSystem(m_reg);
+    movementSystem(m_reg);
     attackSystem(*this, dt);
 
     // 3. Physics: the only place positions change; records collisions
@@ -129,7 +130,7 @@ std::optional<InspectorData> Scene::inspect(EntityId id)
         props.push_back({"velocity", b->velocity, true});
         props.push_back({"grounded", b->grounded, true});
     }
-    if (Locomotion* l = m_reg.get<Locomotion>(id))
+    if (Movement* l = m_reg.get<Movement>(id))
     {
         props.push_back({"move_speed", l->moveSpeed});
         props.push_back({"jump_force", l->jumpForce});
@@ -156,7 +157,7 @@ void Scene::setProperty(EntityId id, const std::string& name, const PropertyValu
         if      (name == "visible")    v->visible   = std::get<bool>(value);
         else if (name == "texture_id") v->textureId = std::get<std::string>(value);
     }
-    if (Locomotion* l = m_reg.get<Locomotion>(id))
+    if (Movement* l = m_reg.get<Movement>(id))
     {
         if      (name == "move_speed") l->moveSpeed = std::get<float>(value);
         else if (name == "jump_force") l->jumpForce = std::get<float>(value);

@@ -34,17 +34,17 @@ void patrolAISystem(Registry& reg)
 
 // --- Bodies ---
 
-void locomotionSystem(Registry& reg)
+void movementSystem(Registry& reg)
 {
-    reg.each<Intent, Locomotion, Body, Transform>(
-        [](EntityId, Intent& intent, Locomotion& loco, Body& body, Transform& t) {
-            body.velocity.x = intent.moveX * loco.moveSpeed;
+    reg.each<Intent, Movement, Body, Transform>(
+        [](EntityId, Intent& intent, Movement& movement, Body& body, Transform& t) {
+            body.velocity.x = intent.moveX * movement.moveSpeed;
 
             if (intent.moveX != 0.0f)
                 t.flip = intent.moveX < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
 
             if (intent.jump && body.grounded) // grounded = result of last frame's physics
-                body.velocity.y = loco.jumpForce;
+                body.velocity.y = movement.jumpForce;
         });
 }
 

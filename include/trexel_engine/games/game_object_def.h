@@ -38,7 +38,7 @@ struct GameObjectDef
     // Optional components
     std::optional<Collider>    collider;
     std::optional<Body>        body;
-    std::optional<Locomotion>  locomotion;
+    std::optional<Movement>    movement;
     std::optional<AbilityDef>  attack;
     std::optional<Health>      health;
     std::optional<Projectile>  projectile;

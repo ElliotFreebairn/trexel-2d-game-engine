@@ -79,6 +79,11 @@
             "id": "golem_walking",
             "path": "trexel/enemy/golem_walking_sheet.png",
             "type": "texture"
+        },
+        {
+            "id": "fence",
+            "path": "trexel/world/fence.png",
+            "type": "texture"
         }
     ]
 }

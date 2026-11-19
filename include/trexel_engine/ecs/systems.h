@@ -19,7 +19,7 @@ void patrolAISystem(Registry& reg);
 void playerInputSystem(Registry& reg, const InputState& input);
 
 // bodies: read Intent
-void locomotionSystem(Registry& reg);
+void movementSystem(Registry& reg);
 void attackSystem(Scene& scene, float dt);
 
 // the only place where positions are allowed to change

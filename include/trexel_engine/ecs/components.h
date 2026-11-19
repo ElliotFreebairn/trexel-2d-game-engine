@@ -58,7 +58,7 @@ struct PlayerControlled {};
 struct PatrolAI {};
 
 // Replaces CharacterStats
-struct Locomotion
+struct Movement
 {
     float moveSpeed = 200.0f;
     float jumpForce = -500.0f;
