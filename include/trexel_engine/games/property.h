@@ -17,17 +17,10 @@ struct Property
     bool readOnly = false;
 };
 
-class IInspectable
+// A snapshot of one entity for the inspector. Edits go back through EditorCommand::SetProperty
+struct InspectorData
 {
-public:
-    virtual ~IInspectable() = default;
-
-    virtual EntityId entityId() const = 0;
-    virtual std::string typeName() const = 0;
-
-    // Read: Describe every editable value
-    virtual std::vector<Property> properties() const = 0;
-
-    // Write: apply one edited value
-    virtual void setProperty(std::string name, const PropertyValue& value)= 0;
+    EntityId id = INVALID_ENTITY;
+    std::string name;
+    std::vector<Property> properties;
 };

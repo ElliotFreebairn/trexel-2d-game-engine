@@ -1,36 +1,26 @@
 #include "sword_ability.h"
 #include "collision.h"
-#include "game_object.h"
+#include "ecs/components.h"
+#include "ecs/registry.h"
 #include "scene.h"
 
-#include <iostream>
-
-void SwordAbility::trigger(GameObject& user, glm::vec2 facing, Scene& scene)
+void SwordAbility::trigger(Scene& scene, EntityId user, float facing)
 {
-    const AABB body = user.getBounds();
+    Registry& reg = scene.registry();
 
-    // The hitbox spans the user's height and extends REACH pixels out from whichever side they face
-    AABB hitbox{ body.min, body.max };
-    if (facing.x >= 0.0f)
-    {
-        hitbox.min.x = body.max.x;
-        hitbox.max.x = body.max.x + REACH;
-    }
-    else
-    {
-        hitbox.min.x = body.min.x - REACH;
-        hitbox.max.x = body.min.x;
-    }
+    const Transform* t = reg.get<Transform>(user);
+    if (!t) return;
+    const AABB body = worldBounds(*t, reg.get<Collider>(user));
 
-    for (const auto& objPtr : scene.getObjects())
-    {
-        GameObject& other = *objPtr;
-        if (&other == &user || !other.isActive() || !other.hasCollider()) continue;
+    // Spans the user's height, extends REACH out from whichever side they face
+    AABB hitbox{body.min, body.max};
+    if (facing >= 0.0f) { hitbox.min.x = body.max.x;          hitbox.max.x = body.max.x + REACH; }
+    else                { hitbox.min.x = body.min.x - REACH;  hitbox.max.x = body.min.x; }
 
-        if (aabbIntersects(hitbox, other.getBounds()))
-        {
-            // TODO: apply damage once objects have health
-            std::cout << "SwordAbility: hit \"" << other.defName() << "\" (entity " << other.entityId() << ")\n";
-        }
-    }
+    // Only things with Health can be hurt, so only query those
+    reg.each<Health, Transform>([&](EntityId other, Health& hp, Transform& ot) {
+        if (other == user) return;
+        if (aabbIntersects(hitbox, worldBounds(ot, reg.get<Collider>(other))))
+            hp.current -= DAMAGE;
+    });
 }

@@ -1,5 +1,4 @@
 #include "ui_manager.h"
-#include "IRenderable.h"
 #include "editor_command.h"
 #include "editor_state.h"
 #include "entity.h"
@@ -16,6 +15,7 @@
 #include <glm/glm.hpp>
 #include <stdexcept>
 #include <filesystem>
+#include <optional>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -242,9 +242,11 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
 
     if (m_selecteDefName.empty()) return; // nothing selected
 
-    ImGui::InputText("class", &m_defDraft.className);
     ImGui::InputFloat2("size", &m_defDraft.size.x);
-    ImGui::Checkbox("gravity", &m_defDraft.gravity);
+    if (m_defDraft.body.has_value())
+    {
+        ImGui::Checkbox("gravity", &m_defDraft.body->gravity);
+    }
 
     if (m_defDraft.collider.has_value())
     {
@@ -302,17 +304,17 @@ void UIManager::drawInspector(EditorContext &ctx)
 {
     if (ImGui::BeginTabItem("Inspector"))
     {
-        // works for any game, the UI only knows IInspectable
-        const IInspectable* object = ctx.game.findInspectable(ctx.state.selected);
+        // works for any game, the UI only knows InspectorData
+        std::optional<InspectorData> object = ctx.game.inspect(ctx.state.selected);
         if (!object)
         {
             ImGui::TextUnformatted("Nothing Selected");
         }
         else
         {
-            ImGui::Text("%s (id %u)", object->typeName().c_str(), static_cast<unsigned>(object->entityId()));
+            ImGui::Text("%s (id %u)", object->name.c_str(), static_cast<unsigned>(object->id));
             ImGui::Separator();
-            for (const Property& p : object->properties())
+            for (const Property& p : object->properties)
             {
                 drawProperty(ctx.state.selected, p, ctx.commands);
             }

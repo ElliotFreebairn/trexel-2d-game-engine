@@ -1,19 +1,17 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "entity.h"
 
-class GameObject;
 class Scene;
 
 /*
- * Something the character does when it attacks: fires an arrow, swings a sword etc...
+ * Something an entity does when it attacks: fires an arrow, swings a sword etc...
  *
- *  The character decides when (input, cooldown, animation frame)
+ * attackSystem decides WHEN (input, cooldown, animation frame), the ability decides WHAT
  */
 class IAbility
 {
 public:
     virtual ~IAbility() = default;
-
-    virtual void trigger(GameObject& user, glm::vec2 facing, Scene& scene) = 0;
+    virtual void trigger(Scene& scene, EntityId user, float facing) = 0;
 };

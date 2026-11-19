@@ -3,6 +3,7 @@
 #include "collision.h"
 #include "enum_strings.h"
 #include "game_object_def.h"
+#include "ecs/components.h"
 #include "json_utility.h"
 #include "sprite.h"
 
@@ -20,10 +21,20 @@
  *      [
  *          {
  *              "name" : string, (example "archer")
- *              "class" : string, (the registered C++ class to build, default "SceneObject")
  *              "textureId" : string, (example "archer_idle", if the animations are defined the texture is unused)
  *              "size": glm::vec2, (the size of the image)
- *              "gravity": bool, (default false)
+ *              "layer": int, (draw order, higher is on top, default 0)
+ *
+ *              Every section below is optional, present = the entity gets that component
+ *
+ *              "body": { "gravity": bool }, (moves under physics)
+ *              "locomotion": { "moveSpeed": float, "jumpForce": float },
+ *              "attack": { "ability": string (registered name), "cooldown": float, "triggerFrame": int },
+ *              "health": { "max": int },
+ *              "projectile": { "lifetime": float },
+ *              "damageOnHit": { "amount": int },
+ *              "patrol": bool, (walks back and forth, turning at walls)
+ *              "playerControlled": bool, (starts under player control)
  *              "collider" : (optional)
  *                  {
  *                      "size" : glm::vec2,  (default is the object size)
@@ -56,10 +67,9 @@ GameObjectDef parseDefinition(const json& defJson)
 {
     GameObjectDef def;
     def.name = defJson.at("name").get<std::string>();
-    def.className = defJson.value("class", def.className);
     def.textureId = defJson.value("textureId", "");
     def.size = vec2FromJson(defJson.at("size"));
-    def.gravity = defJson.value("gravity", false);
+    def.layer = defJson.value("layer", 0);
 
     if (defJson.contains("collider"))
     {
@@ -103,28 +113,65 @@ GameObjectDef parseDefinition(const json& defJson)
         }
     }
 
-    if (defJson.contains("character"))
+    // Components. The struct's own defaults are the fallbacks, so defaults live in one place
+    if (defJson.contains("body"))
     {
-        const json& cJson = defJson.at("character");
-
-        CharacterStats stats;
-        stats.moveSpeed = cJson.value("moveSpeed", stats.moveSpeed);
-        stats.jumpForce = cJson.value("jumpForce", stats.jumpForce);
-
-        if (cJson.contains("ability"))
-        {
-            const json& aJson = cJson.at("ability");
-
-            AbilityDef ability;
-            ability.name = aJson.at("name").get<std::string>();
-            ability.cooldown = aJson.value("cooldown", ability.cooldown);
-            ability.triggerFrame = aJson.value("triggerFrame", ability.triggerFrame);
-
-            stats.ability = ability;
-        }
-
-        def.character = stats;
+        Body body;
+        body.gravity = defJson.at("body").value("gravity", body.gravity);
+        def.body = body;
     }
+
+    if (defJson.contains("locomotion"))
+    {
+        const json& j = defJson.at("locomotion");
+        Locomotion loco;
+        loco.moveSpeed = j.value("moveSpeed", loco.moveSpeed);
+        loco.jumpForce = j.value("jumpForce", loco.jumpForce);
+        def.locomotion = loco;
+    }
+
+    if (defJson.contains("attack"))
+    {
+        const json& j = defJson.at("attack");
+        AbilityDef attack;
+        attack.name = j.at("ability").get<std::string>();
+        attack.cooldown = j.value("cooldown", attack.cooldown);
+        attack.triggerFrame = j.value("triggerFrame", attack.triggerFrame);
+        def.attack = attack;
+    }
+
+    if (defJson.contains("health"))
+    {
+        const int max = defJson.at("health").value("max", Health{}.max);
+        def.health = Health{max, max};
+    }
+
+    if (defJson.contains("projectile"))
+    {
+        Projectile projectile;
+        projectile.lifetime = defJson.at("projectile").value("lifetime", projectile.lifetime);
+        def.projectile = projectile;
+    }
+
+    if (defJson.contains("damageOnHit"))
+    {
+        def.damageOnHit = DamageOnHit{defJson.at("damageOnHit").value("amount", DamageOnHit{}.amount)};
+    }
+
+    // Catch data mistakes at load time instead of an attack that silently never fires
+    if (def.attack)
+    {
+        auto it = def.animations.find(SpriteMovementState::ATTACKING);
+        if (it != def.animations.end() && def.attack->triggerFrame >= it->second.columns)
+        {
+            std::cerr << "ObjectFactory: \"" << def.name << "\" attack triggerFrame " << def.attack->triggerFrame
+                      << " is never reached, ATTACKING has frames 0-" << it->second.columns - 1 << "\n";
+        }
+    }
+
+    // Tags
+    def.patrol = defJson.value("patrol", false);
+    def.playerControlled = defJson.value("playerControlled", false);
 
     return def;
 }
@@ -133,10 +180,9 @@ json parseDefinition(const GameObjectDef& def)
 {
     json saved;
     saved["name"] = def.name;
-    saved["class"] = def.className;
     saved["textureId"] = def.textureId.empty() ? "" : def.textureId;
     saved["size"] = vec2ToJson(def.size);
-    saved["gravity"] = def.gravity;
+    if (def.layer != 0) saved["layer"] = def.layer;
 
     // optional definitions
     if (def.collider.has_value())
@@ -168,25 +214,24 @@ json parseDefinition(const GameObjectDef& def)
         saved["animations"] = animations;
     }
 
-    if (def.character.has_value())
+    // Components: only written when present, so a saved file looks like a hand written one
+    if (def.body) saved["body"] = {{"gravity", def.body->gravity}};
+    if (def.locomotion)
     {
-        json character;
-        character["moveSpeed"] = def.character->moveSpeed;
-        character["jumpForce"] = def.character->jumpForce;
-
-       if (def.character->ability.has_value())
-       {
-           const AbilityDef& ability = *def.character->ability;
-           character["ability"] =
-           {
-               {"name", ability.name},
-               {"cooldown", ability.cooldown},
-               {"triggerFrame", ability.triggerFrame}
-           }; // make is deliberately not saved
-       }
-
-       saved["character"] = character;
+        saved["locomotion"] = {{"moveSpeed", def.locomotion->moveSpeed},
+                               {"jumpForce", def.locomotion->jumpForce}};
     }
+    if (def.attack)
+    {
+        saved["attack"] = {{"ability", def.attack->name},
+                           {"cooldown", def.attack->cooldown},
+                           {"triggerFrame", def.attack->triggerFrame}}; // make is deliberately not saved
+    }
+    if (def.health)      saved["health"] = {{"max", def.health->max}};
+    if (def.projectile)  saved["projectile"] = {{"lifetime", def.projectile->lifetime}};
+    if (def.damageOnHit) saved["damageOnHit"] = {{"amount", def.damageOnHit->amount}};
+    if (def.patrol)           saved["patrol"] = true;
+    if (def.playerControlled) saved["playerControlled"] = true;
     return saved;
 }
 }
@@ -267,23 +312,64 @@ const GameObjectDef* ObjectFactory::getDefinition(const std::string& name) const
     return it != m_definitions.end() ? &it->second : nullptr;
 }
 
-std::unique_ptr<GameObject> ObjectFactory::create(const std::string& defName, glm::vec2 position) const
+EntityId ObjectFactory::spawn(Registry& reg, const std::string& defName, glm::vec2 position) const
 {
     const GameObjectDef* def = getDefinition(defName);
     if (!def)
     {
-        std::cerr << "ObjectFactory::create: no definition called \"" << defName << "\"\n";
-        return nullptr;
+        std::cerr << "ObjectFactory::spawn: no definition called \"" << defName << "\"\n";
+        return INVALID_ENTITY;
     }
 
-    auto it = m_constructors.find(def->className);
-    if (it == m_constructors.end())
+    EntityId e = reg.create();
+
+    // Every entity
+    reg.add<Prefab>(e, {def->name});
+    reg.add<Transform>(e, {.position = position, .size = def->size});
+
+    Visual visual;
+    visual.textureId = def->textureId;
+    visual.colour = def->colour;
+    visual.layer = def->layer;
+    if (!def->animations.empty())
     {
-        std::cerr << "ObjectFactory::create: class \"" << def->className << "\" isn't registered\n";
-        return nullptr;
+        visual.sprite = Sprite();
+        for (const auto& [state, animation] : def->animations)
+        {
+            visual.sprite->addAnimation(state, animation);
+        }
+    }
+    reg.add<Visual>(e, std::move(visual));
+
+    // Optional data components: copied from the definition, so each entity has its own
+    if (def->collider)    reg.add<Collider>(e, *def->collider);
+    if (def->body)        reg.add<Body>(e, *def->body);
+    if (def->locomotion)  reg.add<Locomotion>(e, *def->locomotion);
+    if (def->health)      reg.add<Health>(e, *def->health);
+    if (def->projectile)  reg.add<Projectile>(e, *def->projectile);
+    if (def->damageOnHit) reg.add<DamageOnHit>(e, *def->damageOnHit);
+
+    // Tags
+    if (def->patrol)           reg.add<PatrolAI>(e);
+    if (def->playerControlled) reg.add<PlayerControlled>(e);
+
+    // Attack needs a fresh ability object per entity
+    if (def->attack)
+    {
+        Attack attack;
+        attack.ability = def->attack->make();
+        attack.cooldown = def->attack->cooldown;
+        attack.triggerFrame = def->attack->triggerFrame;
+        reg.add<Attack>(e, std::move(attack));
     }
 
-    return it->second(*def, position);
+    // Anything that can act needs an Intent for brains to write into. Plumbing, so not in JSON
+    if (def->locomotion || def->attack || def->patrol || def->playerControlled)
+    {
+        reg.add<Intent>(e);
+    }
+
+    return e;
 }
 
 std::vector<std::string> ObjectFactory::getDefinitionsKeys() const
@@ -327,9 +413,9 @@ bool ObjectFactory::addDefinition(const GameObjectDef &def)
 
 void ObjectFactory::resolveAbility(GameObjectDef &def) const
 {
-    if (!def.character || !def.character->ability) return;
+    if (!def.attack) return;
 
-    AbilityDef& ability = *def.character->ability;
+    AbilityDef& ability = *def.attack;
     const AbilityRegistry::Maker* maker = m_abilities.find(ability.name);
 
     if (!maker)

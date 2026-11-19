@@ -5,7 +5,6 @@
 #include "editor_state.h"
 #include "game.h"
 #include "input_state.h"
-#include "player.h"
 #include "texture_manager.h"
 #include "ui_manager.h"
 

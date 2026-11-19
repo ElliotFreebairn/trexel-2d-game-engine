@@ -1,5 +1,4 @@
 #include "scene_manager.h"
-#include "IRenderable.h"
 #include "input_state.h"
 #include <vector>
 
@@ -41,14 +40,14 @@ void SceneManager::update(float dt, const InputState& input)
     }
 }
 
-std::vector<const IRenderable*> SceneManager::getRenderables() const
+std::vector<RenderCommand> SceneManager::getRenderables() const
 {
     // draw bottom-up
-    std::vector<const IRenderable*> out;
+    std::vector<RenderCommand> out;
     for (auto& scene : m_stack)
     {
-        auto renderables = scene->getRenderables();
-        out.insert(out.end(), renderables.begin(), renderables.end());
+        std::vector<RenderCommand> cmds = scene->getRenderables();
+        out.insert(out.end(), std::make_move_iterator(cmds.begin()), std::make_move_iterator(cmds.end()));
     }
     return out;
 }

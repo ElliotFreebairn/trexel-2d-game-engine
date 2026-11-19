@@ -1,7 +1,6 @@
 target_sources(trexel_exec PRIVATE
     asset_manager.cpp
     game.cpp
-    game_object.cpp
     game_renderer.cpp
     object_factory.cpp
     scene.cpp

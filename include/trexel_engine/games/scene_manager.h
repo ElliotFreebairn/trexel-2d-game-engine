@@ -1,8 +1,8 @@
 #pragma once
 
-#include "IRenderable.h"
 #include "game_actions.h"
 #include "input_state.h"
+#include "render_command.h"
 #include "scene.h"
 #include <memory>
 #include <unordered_map>
@@ -26,7 +26,7 @@ public:
 
     void update(float dt, const InputState& input);
 
-    std::vector<const IRenderable*> getRenderables() const;
+    std::vector<RenderCommand> getRenderables() const;
 
     Scene* current() const { return m_stack.empty() ? nullptr : m_stack.back().get(); }
 

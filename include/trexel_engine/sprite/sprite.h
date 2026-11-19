@@ -76,6 +76,8 @@ public:
     bool isFinished() const { return m_finished; }
     int currentFrame() const { return m_currentFrame; }
 
+    bool hasAnimation(SpriteMovementState state) const { return m_animations.contains(state); }
+
 private:
     std::unordered_map<SpriteMovementState, SpriteAnimation> m_animations;
     SpriteMovementState m_currentState = SpriteMovementState::IDLE;

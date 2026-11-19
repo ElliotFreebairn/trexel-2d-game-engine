@@ -1,18 +1,17 @@
 {
-  "definitions":
-  [
+  "definitions": [
     {
       "name": "golem",
-      "class": "Enemy",
       "size": {
         "x": 79.0,
         "y": 64.0
       },
-      "gravity": true,
+      "body": {
+        "gravity": true
+      },
       "collider": {
         "solid": true,
-        "size":
-        {
+        "size": {
           "x": 50.0,
           "y": 64.0
         },
@@ -20,6 +19,13 @@
           "x": 14.5,
           "y": 0.0
         }
+      },
+      "locomotion": {
+        "moveSpeed": 50
+      },
+      "patrol": true,
+      "health": {
+        "max": 5
       },
       "animations": {
         "frameSpeed": 0.2,
@@ -41,12 +47,14 @@
     },
     {
       "name": "archer",
-      "class": "Player",
       "size": {
         "x": 128.0,
         "y": 128.0
       },
-      "gravity": true,
+      "playerControlled": true,
+      "body": {
+        "gravity": true
+      },
       "collider": {
         "size": {
           "x": 30.0,
@@ -58,10 +66,17 @@
         },
         "solid": true
       },
-      "character": {
+      "locomotion": {
         "moveSpeed": 200,
-        "jumpForce": -500,
-        "ability": { "name": "bow", "cooldown": 0.4, "triggerFrame": 13 }
+        "jumpForce": -500
+      },
+      "attack": {
+        "ability": "bow",
+        "cooldown": 0.4,
+        "triggerFrame": 13
+      },
+      "health": {
+        "max": 3
       },
       "animations": {
         "frameSpeed": 0.2,
@@ -94,15 +109,15 @@
         ]
       }
     },
-
     {
       "name": "swordsman",
-      "class": "Player",
       "size": {
         "x": 128.0,
         "y": 128.0
       },
-      "gravity": true,
+      "body": {
+        "gravity": true
+      },
       "collider": {
         "size": {
           "x": 30.0,
@@ -114,10 +129,17 @@
         },
         "solid": true
       },
-      "character": {
+      "locomotion": {
         "moveSpeed": 170,
-        "jumpForce": -450,
-        "ability": { "name": "sword", "cooldown": 0.5, "triggerFrame": 4 }
+        "jumpForce": -450
+      },
+      "attack": {
+        "ability": "sword",
+        "cooldown": 0.5,
+        "triggerFrame": 3
+      },
+      "health": {
+        "max": 4
       },
       "animations": {
         "frameSpeed": 0.15,
@@ -150,25 +172,35 @@
         ]
       }
     },
-
     {
       "name": "arrow",
-      "class": "Arrow",
       "textureId": "archer_arrow",
       "size": {
         "x": 48.0,
         "y": 48.0
       },
+      "layer": 1,
+      "body": {},
       "collider": {
-        "size": {"x": 48, "y": 10},
-        "offset": {"x": 0, "y": 20},
+        "size": {
+          "x": 48,
+          "y": 10
+        },
+        "offset": {
+          "x": 0,
+          "y": 20
+        },
         "solid": false
+      },
+      "projectile": {
+        "lifetime": 4
+      },
+      "damageOnHit": {
+        "amount": 1
       }
     },
-
     {
       "name": "grass_block",
-      "class": "SceneObject",
       "textureId": "grass_block",
       "size": {
         "x": 50.0,
@@ -178,6 +210,5 @@
         "solid": true
       }
     }
-
   ]
 }

@@ -1,14 +1,22 @@
 #include "bow_ability.h"
-#include "arrow.h"
+#include "common.h"
+#include "ecs/components.h"
+#include "ecs/registry.h"
+#include "entity.h"
 #include "scene.h"
-#include "game_object.h"
 
-void BowAbility::trigger(GameObject &user, glm::vec2 facing, Scene &scene)
+void BowAbility::trigger(Scene& scene, EntityId user, float facing)
 {
-    const glm::vec2 origin = user.getPosition() + user.getSize() * 0.5f;
+    Registry& reg = scene.registry();
 
-    if (Arrow* arrow = scene.spawn<Arrow>("arrow", origin))
-    {
-        arrow->launch(facing * ARROW_SPEED, user.entityId());
-    }
+    const Transform* t = reg.get<Transform>(user);
+    if (!t) return;
+    const glm::vec2 origin = t->position + t->size * 0.5f; // copy what we need before spawning
+
+    EntityId arrow = scene.spawn("arrow", origin);
+    if (arrow == INVALID_ENTITY) return;
+
+    if (Body* body = reg.get<Body>(arrow)) body->velocity = {facing * ARROW_SPEED, 0.0f};
+    if (Projectile* p = reg.get<Projectile>(arrow)) p->owner = user;
+    if (Transform* at = reg.get<Transform>(arrow)) at->flip = facing < 0.0f ? Flip::HORIZONTAL : Flip::NONE;
 }

@@ -1,6 +1,6 @@
 #pragma once
+#include "entity.h"
 #include <glm/glm.hpp>
-#include <optional>
 
 struct AABB
 {
@@ -8,6 +8,7 @@ struct AABB
     glm::vec2 max;
 };
 
+// Used directly as a component
 struct Collider
 {
     bool isSolid = true;
@@ -15,19 +16,16 @@ struct Collider
     glm::vec2 offset {0.0f, 0.0f};
 };
 
-class GameObject;
-
 /*
- * Passed to GameObject::evCollided when a collision is resolved
+ * Gets recorded by the physicsSystem the reaction systems read this afterwards
  *
- * normal points away from the surface that was hit, i.e. the direction the mover was pushed:
- *      (-1, 0) wall on the right   (1, 0) wall on the left
- *      (0, -1) standing on floor   (0, 1) hit a ceiling
+ * normal points way from the surface self hit (-1, 0) = wall on the right etc...
  */
-struct CollisionInfo
+struct CollisionEvent
 {
+    EntityId self   = INVALID_ENTITY;
+    EntityId other  = INVALID_ENTITY;
     glm::vec2 normal {0.0f};
-    GameObject* other = nullptr;
 };
 
 inline bool aabbIntersects(const AABB& a, const AABB& b)

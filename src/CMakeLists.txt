@@ -21,8 +21,10 @@ target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexe
 target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel_engine/sprite)
 target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel_engine/utilities)
 target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel_engine/editor)
+target_include_directories(trexel_exec PRIVATE ${CMAKE_SOURCE_DIR}/include/trexel_engine/ecs)
 
 add_subdirectory(games)
 add_subdirectory(editor)
 add_subdirectory(sprite)
 add_subdirectory(utilities)
+add_subdirectory(ecs)

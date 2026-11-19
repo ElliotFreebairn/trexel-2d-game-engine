@@ -1,11 +1,7 @@
 #include "main_scene.h"
-#include "arrow.h"
-#include "collision.h"
-#include "game_object.h"
+#include "ecs/components.h"
 #include "input_state.h"
-#include "player.h"
 #include "scene.h"
-#include "scene_object.h"
 #include "scene_serializer.h"
 
 namespace
@@ -42,14 +38,13 @@ void MainScene::onEnter()
         spawn("archer", glm::vec2(450.0f, 400.0f));
     }
 
-    for (const auto& obj : m_objects)
-    {
-        if (dynamic_cast<Player*>(obj.get()))
-        {
-            setControlled(obj->entityId());
-            break;
-        }
-    }
+    // Definitions can mark several entities as player controlled, keep only the oldest.
+    // Lowest id (not "first found") because unordered_map order isn't predictable
+    EntityId first = INVALID_ENTITY;
+    registry().each<PlayerControlled>([&](EntityId e, PlayerControlled&) {
+        if (first == INVALID_ENTITY || e < first) first = e;
+    });
+    if (first != INVALID_ENTITY) setControlled(first);
 }
 
 void MainScene::onExit()

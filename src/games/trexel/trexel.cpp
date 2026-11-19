@@ -1,20 +1,10 @@
 #include "trexel.h"
-#include "bow_ability.h"
-#include "enemy.h"
-#include "sword_ability.h"
-#include "IRenderable.h"
-#include "asset.h"
 #include "asset_manager.h"
-#include "game_actions.h"
-#include "game_object.h"
-#include "game_object_def.h"
-#include "arrow.h"
-#include "main_scene.h"
-#include "player.h"
-#include "scene_object.h"
-#include <memory>
-#include <vector>
 #include "bow_ability.h"
+#include "main_scene.h"
+#include "sword_ability.h"
+
+#include <memory>
 
 namespace
 {
@@ -36,11 +26,7 @@ Trexel::~Trexel()
 
 void Trexel::registerObjectTypes(ObjectFactory& factory)
 {
-    factory.registerType<Player>("Player");
-    factory.registerType<SceneObject>("SceneObject");
-    factory.registerType<Enemy>("Enemy");
-    factory.registerType<Arrow>("Arrow");
-
+    // No classes to register: definitions describe entities by their components
     factory.registerAbility<BowAbility>("bow");
     factory.registerAbility<SwordAbility>("sword");
 }

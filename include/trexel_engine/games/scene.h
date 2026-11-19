@@ -1,81 +1,65 @@
 #pragma once
 
-#include "IRenderable.h"
+#include "collision.h"
+#include "ecs/registry.h"
 #include "entity.h"
-#include "game_actions.h"
-#include "game_object.h"
 #include "input_state.h"
 #include "object_factory.h"
 #include "property.h"
-#include <vector>
-#include <string>
-#include <memory>
+#include "render_command.h"
 
+#include <optional>
+#include <string>
+#include <vector>
+
+/*
+ * Owns the entities of one level (the Registry) and runs the systems over them each frame
+ */
 class Scene
 {
 public:
-    Scene(std::string name, const ObjectFactory& factory) : m_name(std::move(name)), m_factory(factory) {};
+    Scene(std::string name, const ObjectFactory& factory) : m_name(std::move(name)), m_factory(factory) {}
     virtual ~Scene() = default;
 
-    virtual void onEnter() {};
-    virtual void onExit() {};
-    virtual void onPause() {};
-    virtual void onResume() {};
+    virtual void onEnter()  {}
+    virtual void onExit()   {}
+    virtual void onPause()  {}
+    virtual void onResume() {}
 
     virtual void update(float dt, const InputState& input);
     virtual void onViewportResized(glm::vec2 newSize) { (void)newSize; }
 
-    std::vector<const IRenderable*> getRenderables() const;
+    // Spawns from a definition, INVALID_ENTITY if there is no such definition
+    EntityId spawn(const std::string& defName, glm::vec2 position);
 
-    // Creates an object from its definition and adds it to the scene, nullptr if it couldn't be created
-    GameObject* spawn(const std::string& defName, glm::vec2 position);
+    Registry& registry() { return m_reg; }
+    const ObjectFactory& factory() const { return m_factory; }
 
-    // Same as above but returns the class you expect, nullptr (and nothing added) if the definition builds something else
-    template <typename T>
-    T* spawn(const std::string& defName, glm::vec2 position)
-    {
-        static_assert(std::is_base_of_v<GameObject, T>, "T must derive from game object");
-        std::unique_ptr<GameObject> obj = m_factory.create(defName, position);
-
-        T* typed = dynamic_cast<T*>(obj.get());
-        if (!typed) return nullptr;
-
-        addObject(std::move(obj));
-        return typed;
-    }
-
-    GameObject& addObject(std::unique_ptr<GameObject> obj);
-    const std::vector<std::unique_ptr<GameObject>>& getObjects() const { return m_objects; }
+    std::vector<RenderCommand> getRenderables();
 
     const std::string& getName() const { return m_name; }
     const std::string& getBackground() const { return m_background; }
-
     void setBackground(std::string textureId) { m_background = std::move(textureId); }
 
-    // Edtior: read-only queries
-    std::vector<EntityInfo> getEntities() const;
-    IInspectable* findInspectable(EntityId id) const;
-    EntityId  pick(glm::vec2 worldPos) const;
+    // Editor: reads
+    std::vector<EntityInfo> getEntities();
+    std::optional<InspectorData> inspect(EntityId id);
+    EntityId pick(glm::vec2 worldPos);
 
-    // Editor: changes
+    // Editor: writes
+    void setProperty(EntityId id, const std::string& name, const PropertyValue& value);
     virtual void destroy(EntityId id);
-
-    void setControlled(EntityId id) { m_controlled = id; }
-
-protected:
-    std::vector<std::unique_ptr<GameObject>> m_objects;
-    std::vector<std::unique_ptr<GameObject>> m_pending;
+    void setControlled(EntityId id);
 
 private:
-    EntityId m_controlled = INVALID_ENTITY;
-    std::string m_name;
-    std::string m_background = "";
-    const ObjectFactory& m_factory;
-    bool m_inUpdate = false;
+    // Visible entities, back to front: sorted by (layer, id)
+    // Shared by getRenderables() and pick() so clicking always selects what's drawn on top
+    std::vector<EntityId> drawOrder();
 
-    void integrate(GameObject& obj, float dt);
-    void moveAxis(GameObject& obj, glm::vec2 delta);
-    void reportOverlaps();
-    void flushPending();
-    void pruneInactive();
+    Registry m_reg;
+    std::vector<CollisionEvent> m_collisions; // this frame's, cleared at the start of update()
+
+    std::string m_name;
+    std::string m_background;
+    const ObjectFactory& m_factory;
 };

@@ -14,12 +14,12 @@ class Scene;
  *  ]
  * }
  *
- * Each object is whatever its serialize() returns, "def" is used to spawn it again on load
+ * "def" is used to spawn it again on load, everything else is only saved when it differs from the definition
  */
 class SceneSerializer
 {
 public:
-    static void save(const Scene& scene, const std::string& path);
+    static void save(Scene& scene, const std::string& path);
 
     static bool load(Scene& scene, const std::string& path);
 };

@@ -1,38 +1,26 @@
 #pragma once
 
 #include "ability_registry.h"
-#include "game_object.h"
+#include "ecs/registry.h"
 #include "game_object_def.h"
 
-#include <functional>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 /*
- * Creates game objects from their definitions (assets/definitions/objects.json)
+ * Loads definitions (data/definitions/objects.json) and spawns entities from them
  *
- * Each definition says which class it builds, e.g. "class": "Player", that class must be registered first:
- *      factory.registerType<Player>("Player");
+ * A definition describes an entity by the components it has, abilities named in JSON
+ * must be registered first:
+ *      factory.registerAbility<BowAbility>("bow");
  *
- * Then any definition can be built by name:
- *      factory.create("archer", position);
+ * Then any definition can be spawned by name:
+ *      factory.spawn(registry, "archer", position);
  */
 class ObjectFactory
 {
 public:
-    using Constructor = std::function<std::unique_ptr<GameObject>(const GameObjectDef& def, glm::vec2 position)>;
-
-    template <typename T>
-    void registerType(const std::string& className)
-    {
-        static_assert(std::is_base_of_v<GameObject, T>, "T must derive from game object");
-        m_constructors[className] = [](const GameObjectDef& def, glm::vec2 position) {
-            return std::make_unique<T>(def, position);
-        };
-    }
-
     template <typename T>
     void registerAbility(const std::string& name)
     {
@@ -48,8 +36,8 @@ public:
     // nullptr if there is no definition with that name
     const GameObjectDef* getDefinition(const std::string& name) const;
 
-    // nullptr if the definition or its class doesn't exist
-    std::unique_ptr<GameObject> create(const std::string& defName, glm::vec2 position) const;
+    // Builds the entity in reg, INVALID_ENTITY if there is no such definition
+    EntityId spawn(Registry& reg, const std::string& defName, glm::vec2 position) const;
 
     // expose a public facing function to get the different defintions via id
     std::vector<std::string> getDefinitionsKeys() const;
@@ -62,6 +50,5 @@ private:
     void resolveAbility(GameObjectDef& def) const;
 
     std::unordered_map<std::string, GameObjectDef> m_definitions;
-    std::unordered_map<std::string, Constructor> m_constructors;
     AbilityRegistry m_abilities;
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 // Library includes
-#include "IRenderable.h"
+#include "render_command.h"
 
 // Custom includes
 #include "asset_manager.h"
@@ -14,10 +14,10 @@
 #include "property.h"
 #include "scene.h"
 #include "scene_manager.h"
-#include "scene_object.h"
 
 // C++ includes
 #include <cerrno>
+#include <optional>
 #include <filesystem>
 #include <vector>
 
@@ -45,7 +45,7 @@ public:
 
     // Rendering
     // game bundles up the visual state of the world into a dumb data structure
-    virtual std::vector<const IRenderable*> getRenderables() { return m_sceneManager.getRenderables(); }
+    virtual std::vector<RenderCommand> getRenderables() { return m_sceneManager.getRenderables(); }
 
     std::string getBackground() const
     {
@@ -60,10 +60,12 @@ public:
         return scene ? scene->getEntities() : std::vector<EntityInfo>{};
     }
 
-    const IInspectable* findInspectable(EntityId id) const
+    // A snapshot of one entity for the inspector, nullopt if it doesn't exist
+    std::optional<InspectorData> inspect(EntityId id) const
     {
         Scene* scene = m_sceneManager.current();
-        return scene ? scene->findInspectable(id) : nullptr;
+        if (!scene) return std::nullopt;
+        return scene->inspect(id);
     }
 
     // Which entity is under this world position
@@ -82,10 +84,7 @@ public:
         switch (command.type)
         {
             case EditorCommandType::SetProperty:
-                if (IInspectable* object = scene->findInspectable(command.entity))
-                {
-                    object->setProperty(command.propertyName, command.propertyValue);
-                }
+                scene->setProperty(command.entity, command.propertyName, command.propertyValue);
                 break;
             case EditorCommandType::SpawnEntity:
                 scene->spawn(command.prototype, command.position);
@@ -106,6 +105,7 @@ public:
                     std::cerr << "Add Object Def Failed!\n";
                 else
                     m_objectFactory.saveDefinitions("data/definitions/new_objects.json");
+                break;
             case EditorCommandType::SetControlledEntity:
                 scene->setControlled(command.entity);
                 break;

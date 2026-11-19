@@ -1,5 +1,5 @@
 #include "game_renderer.h"
-#include "IRenderable.h"
+#include "render_command.h"
 #include "common.h"
 #include "game.h"
 #include "mydefines.h"
@@ -50,21 +50,21 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     }
 
     // --- scene contents go here ---
-    const std::vector<const IRenderable*> renderables = game->getRenderables();
-    for (const IRenderable* cmd : renderables)
+    const std::vector<RenderCommand> renderables = game->getRenderables();
+    for (const RenderCommand& cmd : renderables)
     {
         SDL_Rect rect = {
-            static_cast<int>(cmd->getPosition().x),
-            static_cast<int>(cmd->getPosition().y),
-            static_cast<int>(cmd->getSize().x),
-            static_cast<int>(cmd->getSize().y)
+            static_cast<int>(cmd.position.x),
+            static_cast<int>(cmd.position.y),
+            static_cast<int>(cmd.size.x),
+            static_cast<int>(cmd.size.y)
         };
-        SDL_Texture* tex = textures.get(cmd->getTextureID());
+        SDL_Texture* tex = textures.get(cmd.textureId);
         if (tex)
         {
             SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 
-            auto srcRectOpt = cmd->getSourceRect();
+            const std::optional<Rect>& srcRectOpt = cmd.sourceRect;
             SDL_Rect sdlSrc;
             const SDL_Rect* srcRect = nullptr;
             if (srcRectOpt)
@@ -73,7 +73,7 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
                 srcRect = &sdlSrc;
             }
             SDL_RendererFlip sdlFlip = SDL_FLIP_NONE;
-            Flip f = cmd->getFlip();
+            Flip f = cmd.flip;
             switch (f)
             {
                 case Flip::NONE:
@@ -86,12 +86,12 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
                     sdlFlip = SDL_FLIP_VERTICAL;
                     break;
             }
-            SDL_RenderCopyEx(renderer, tex, srcRect, &rect, cmd->getAngle(), NULL, sdlFlip);
+            SDL_RenderCopyEx(renderer, tex, srcRect, &rect, cmd.angle, NULL, sdlFlip);
         }
         else
         {
             // falback renderer if tex is missing
-            glm::vec3 colour = cmd->getColour().value_or(glm::vec3(0.0f, 0.0f, 0.0f));
+            glm::vec3 colour = cmd.colour.value_or(glm::vec3(0.0f, 0.0f, 0.0f));
             SDL_SetRenderDrawColor(renderer, (Uint8)colour.x, (Uint8)colour.y, (Uint8)colour.z, 255); // Magenta error box
             SDL_RenderFillRect(renderer, &rect);
         }
@@ -101,10 +101,10 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     if (options.showColliders)
     {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        for (const IRenderable* cmd : renderables)
+        for (const RenderCommand& cmd : renderables)
         {
-            if (!cmd->hasCollider()) continue;
-            AABB b = cmd->getBounds();
+            if (!cmd.collider) continue;
+            const AABB& b = *cmd.collider;
             SDL_Rect r{
                 static_cast<int>(b.min.x),
                 static_cast<int>(b.min.y),
