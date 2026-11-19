@@ -99,21 +99,24 @@ GameObjectDef parseDefinition(const json& defJson)
                 throw std::runtime_error("Unkown animation type");
             spriteAnimation.animationType = *type;
 
-            // Each frame is the size of the object
+            // each frame is the size of the object
             spriteAnimation.frameWidth = static_cast<int>(def.size.x);
             spriteAnimation.frameHeight = static_cast<int>(def.size.y);
 
-            // Each frame is usally defined by the generic frame speed, but some may override...
+            // each frame can be defined by a generic frame speed or overriden in the state
             spriteAnimation.frameDuration = animation.value("frameSpeed", 0.2);
 
             auto state = fromString<SpriteMovementState>(animation.at("state").get<std::string>());
             if (!state)
+            {
+                // we should fail here
                 throw std::runtime_error("Uknown animation state");
+            }
             def.animations[*state] = spriteAnimation;
         }
     }
 
-    // Components. The struct's own defaults are the fallbacks, so defaults live in one place
+    // components - defaults are defined in the structs
     if (defJson.contains("body"))
     {
         Body body;
@@ -158,7 +161,6 @@ GameObjectDef parseDefinition(const json& defJson)
         def.damageOnHit = DamageOnHit{defJson.at("damageOnHit").value("amount", DamageOnHit{}.amount)};
     }
 
-    // Catch data mistakes at load time instead of an attack that silently never fires
     if (def.attack)
     {
         auto it = def.animations.find(SpriteMovementState::ATTACKING);
@@ -184,7 +186,7 @@ json parseDefinition(const GameObjectDef& def)
     saved["size"] = vec2ToJson(def.size);
     if (def.layer != 0) saved["layer"] = def.layer;
 
-    // optional definitions
+    // components - optional definitions
     if (def.collider.has_value())
     {
         json collider;
@@ -214,24 +216,35 @@ json parseDefinition(const GameObjectDef& def)
         saved["animations"] = animations;
     }
 
-    // Components: only written when present, so a saved file looks like a hand written one
-    if (def.body) saved["body"] = {{"gravity", def.body->gravity}};
+    // components are only written if they are present
+    if (def.body) {
+        saved["body"] = {{"gravity", def.body->gravity}};
+    }
     if (def.movement)
     {
-        saved["movement"] = {{"moveSpeed", def.movement->moveSpeed},
-                               {"jumpForce", def.movement->jumpForce}};
+        saved["movement"] = {{"moveSpeed", def.movement->moveSpeed}, {"jumpForce", def.movement->jumpForce}};
     }
     if (def.attack)
     {
         saved["attack"] = {{"ability", def.attack->name},
-                           {"cooldown", def.attack->cooldown},
-                           {"triggerFrame", def.attack->triggerFrame}}; // make is deliberately not saved
+            {"cooldown", def.attack->cooldown},
+            {"triggerFrame", def.attack->triggerFrame}};
     }
-    if (def.health)      saved["health"] = {{"max", def.health->max}};
-    if (def.projectile)  saved["projectile"] = {{"lifetime", def.projectile->lifetime}};
-    if (def.damageOnHit) saved["damageOnHit"] = {{"amount", def.damageOnHit->amount}};
-    if (def.patrol)           saved["patrol"] = true;
-    if (def.playerControlled) saved["playerControlled"] = true;
+    if (def.health) {
+        saved["health"] = {{"max", def.health->max}};
+    }
+    if (def.projectile) {
+        saved["projectile"] = {{"lifetime", def.projectile->lifetime}};
+    }
+    if (def.damageOnHit) {
+        saved["damageOnHit"] = {{"amount", def.damageOnHit->amount}};
+    }
+    if (def.patrol) {
+        saved["patrol"] = true;
+    }
+    if (def.playerControlled) {
+        saved["playerControlled"] = true;
+    }
     return saved;
 }
 }
@@ -323,7 +336,7 @@ EntityId ObjectFactory::spawn(Registry& reg, const std::string& defName, glm::ve
 
     EntityId e = reg.create();
 
-    // Every entity
+    // every entity has a prefab, transform and visual component
     reg.add<Prefab>(e, {def->name});
     reg.add<Transform>(e, {.position = position, .size = def->size});
 
@@ -341,19 +354,43 @@ EntityId ObjectFactory::spawn(Registry& reg, const std::string& defName, glm::ve
     }
     reg.add<Visual>(e, std::move(visual));
 
-    // Optional data components: copied from the definition, so each entity has its own
-    if (def->collider)    reg.add<Collider>(e, *def->collider);
-    if (def->body)        reg.add<Body>(e, *def->body);
-    if (def->movement)  reg.add<Movement>(e, *def->movement);
-    if (def->health)      reg.add<Health>(e, *def->health);
-    if (def->projectile)  reg.add<Projectile>(e, *def->projectile);
-    if (def->damageOnHit) reg.add<DamageOnHit>(e, *def->damageOnHit);
+    // optional data components
+    if (def->collider)
+    {
+        reg.add<Collider>(e, *def->collider);
+    }
+    if (def->body)
+    {
+        reg.add<Body>(e, *def->body);
+    }
+    if (def->movement)
+    {
+        reg.add<Movement>(e, *def->movement);
+    }
+    if (def->health)
+    {
+        reg.add<Health>(e, *def->health);
+    }
+    if (def->projectile)
+    {
+        reg.add<Projectile>(e, *def->projectile);
+    }
+    if (def->damageOnHit)
+    {
+        reg.add<DamageOnHit>(e, *def->damageOnHit);
+    }
 
-    // Tags
-    if (def->patrol)           reg.add<PatrolAI>(e);
-    if (def->playerControlled) reg.add<PlayerControlled>(e);
+    // tags
+    if (def->patrol)
+    {
+        reg.add<PatrolAI>(e);
+    }
+    if (def->playerControlled)
+    {
+        reg.add<PlayerControlled>(e);
+    }
 
-    // Attack needs a fresh ability object per entity
+    // attacks need a fresh ability per entity
     if (def->attack)
     {
         Attack attack;
@@ -363,7 +400,7 @@ EntityId ObjectFactory::spawn(Registry& reg, const std::string& defName, glm::ve
         reg.add<Attack>(e, std::move(attack));
     }
 
-    // Anything that can act needs an Intent for brains to write into. Plumbing, so not in JSON
+    // anything that can act needs an intent for us to write to. Not to be saved in JSON!!!
     if (def->movement || def->attack || def->patrol || def->playerControlled)
     {
         reg.add<Intent>(e);

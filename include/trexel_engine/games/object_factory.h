@@ -36,13 +36,11 @@ public:
     // nullptr if there is no definition with that name
     const GameObjectDef* getDefinition(const std::string& name) const;
 
-    // Builds the entity in reg, INVALID_ENTITY if there is no such definition
+    // builds the entity in the registry, return INVALID_ENTITY if failire
     EntityId spawn(Registry& reg, const std::string& defName, glm::vec2 position) const;
 
-    // expose a public facing function to get the different defintions via id
     std::vector<std::string> getDefinitionsKeys() const;
 
-    // expose a public facing function to get the actual game object definitios
     std::vector<GameObjectDef> getDefinitionsValues() const;
 
 private:

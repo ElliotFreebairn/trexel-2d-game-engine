@@ -44,7 +44,6 @@ struct Prefab
 };
 
 // --- Gameplay ---
-
 // What the entity WANTS to do this frame. Brains write it, bodies read it
 struct Intent
 {

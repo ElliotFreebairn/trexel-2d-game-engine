@@ -78,6 +78,7 @@
       "health": {
         "max": 3
       },
+      "layer": 1,
       "animations": {
         "frameSpeed": 0.2,
         "states": [
