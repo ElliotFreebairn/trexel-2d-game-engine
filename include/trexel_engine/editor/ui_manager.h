@@ -7,6 +7,16 @@
 
 struct EditorContext;
 
+// Every object that needs to be stored between frames, let's say for editing values of an object
+// use this format, so that the there is an temporary object but also a strucuted way of storing
+// id's for which elements are browsing through
+struct GameObjectDefDraft
+{
+    GameObjectDef def;
+
+    std::string animTypeOptionSelected;
+};
+
 class UIManager
 {
 public:
@@ -38,14 +48,12 @@ private:
     void drawFileTree(EditorContext& ctx);
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
     void drawMainEditorWindow(EditorContext& ctx);
-    void drawAnimationsManager(EditorContext& ctx, GameObjectDef& def);
+    void drawAnimationsManager(EditorContext& ctx, GameObjectDefDraft& draft);
 
     ImVec2 m_viewportSize = ImVec2(0.0f, 0.0f);
 
+    GameObjectDefDraft m_gameObjectDefDraft;
     Asset m_assetDraft;
 
-    std::string m_selecteDefName;
     std::string m_selectedAnimationState;
-    std::string m_selectedAnimationType;
-    GameObjectDef m_defDraft;
 };

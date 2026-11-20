@@ -238,77 +238,81 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
     // rough display a list of definitions
     std::vector<GameObjectDef> definitions = ctx.game.getObjectFactory().getDefinitionsValues();
 
-    if (ImGui::BeginCombo("id", m_selecteDefName.c_str(), 0))
+    std::string defDraftName = m_gameObjectDefDraft.def.name;
+    if (ImGui::BeginCombo("id", defDraftName.c_str(), 0))
     {
         for (const GameObjectDef& def : definitions)
         {
-            bool isSelected = def.name == m_selecteDefName;
+            bool isSelected = def.name == defDraftName;
 
             if (ImGui::Selectable(def.name.c_str(), isSelected))
             {
-                m_selecteDefName = def.name;
-                m_selectedAnimationState = ""; // we need to reset
-                m_selectedAnimationType = ""; // we need to reset
-                m_defDraft = def;
+                // we need to reset the entire draft object
+                m_gameObjectDefDraft = {.def = def, .animTypeOptionSelected = ""};
+                defDraftName = def.name;     // we need to mirror the currently selected object definition
             }
         }
 
         ImGui::EndCombo();
     }
 
-    if (m_selecteDefName.empty()) return; // nothing selected
+    if (defDraftName.empty()) return; // nothing selected
+
+    GameObjectDef& def = m_gameObjectDefDraft.def;
 
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
     ImGui::Indent(5.0f);
 
-    ImGui::InputFloat2("size", &m_defDraft.size.x);
-    if (m_defDraft.body.has_value())
+    ImGui::InputFloat2("size", &def.size.x);
+    if (def.body.has_value())
     {
-        ImGui::Checkbox("gravity", &m_defDraft.body->gravity);
+        ImGui::Checkbox("gravity", &def.body->gravity);
     }
 
-    if (m_defDraft.collider.has_value())
+    if (def.collider.has_value())
     {
-        ImGui::InputFloat2("collider size", &m_defDraft.collider->size.x);
-        ImGui::InputFloat2("collider offset", &m_defDraft.collider->offset.x);
+        ImGui::InputFloat2("collider size", &def.collider->size.x);
+        ImGui::InputFloat2("collider offset", &def.collider->offset.x);
     }
 
     ImGui::Spacing();
-    drawAnimationsManager(ctx, m_defDraft);
+    // do we need to pass the draft object?
+    drawAnimationsManager(ctx, m_gameObjectDefDraft);
 
     if (ImGui::Button("Apply Edit"))
     {
-        std::cout << m_defDraft.animations.at(SpriteMovementState::ATTACKING).frameWidth << "\n";
-        ctx.commands.push(EditorCommand::addObjectDefinition(m_defDraft));
+        ctx.commands.push(EditorCommand::addObjectDefinition(def));
     }
 
     ImGui::Unindent();
 }
 
-void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDef& def)
+void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDefDraft& defDraft)
 {
     // animations manager per selected definition name
     //  - we are interested by the definitions animation state
     //  - we have to take the const reference to the definiton, so build up a editable state to send as a game command
 
+    GameObjectDef& def = defDraft.def;
     if (ImGui::BeginListBox("animation id"))
     {
         for (const auto&[state, anim] : def.animations)
         {
             std::string stateString(toString(state));
-            bool isSelected = stateString == m_selectedAnimationState;
+            bool isSelected = stateString == defDraft.animTypeOptionSelected;
 
             if (ImGui::Selectable(stateString.c_str(), isSelected))
             {
-                m_selectedAnimationState = stateString;
-                m_selectedAnimationType = "";
+                // we have this draft object with the animTypeSelected string as we want to remember which option
+                // the user has selected but without changing anything
+                defDraft.animTypeOptionSelected = stateString;
             }
         }
         ImGui::EndListBox();
     }
 
     // for now - lets select a animation and it views it live data
-    std::optional<SpriteMovementState> stateEnum = fromString<SpriteMovementState>(m_selectedAnimationState);
+    std::optional<SpriteMovementState> stateEnum = fromString<SpriteMovementState>(defDraft.animTypeOptionSelected);
     if (!stateEnum.has_value()) return;
 
     SpriteAnimation& currentAnimation = def.animations.at(stateEnum.value());
@@ -326,27 +330,19 @@ void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDef& def)
         "CONTINOUS"
     };
 
-
-    if (m_selectedAnimationType == "")
-    {
-        m_selectedAnimationType = std::string(toString(currentAnimation.animationType));
-    }
+    const std::string& currentAnimationType = std::string(toString(currentAnimation.animationType));
     if (ImGui::BeginListBox("animation type"))
     {
         for (const auto& opt : animTypeOpt)
         {
-            bool isSelected = opt == m_selectedAnimationType;
+            bool isSelected = opt == currentAnimationType;
             if (ImGui::Selectable(opt, isSelected))
             {
-                std::cout << opt << "\n";
-                m_selectedAnimationType = opt;
+                currentAnimation.animationType = fromString<AnimationType>(opt).value();
             }
         }
         ImGui::EndListBox();
     }
-    currentAnimation.animationType = fromString<AnimationType>(m_selectedAnimationType).value();
-    //std::cout << "currentAnimation frameWdith: " << currentAnimation.frameHeight << "\n";
-    // need to add animation type
 }
 
 void UIManager::drawAssetManager(EditorContext &ctx)
