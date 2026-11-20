@@ -1,4 +1,5 @@
 #include "ui_manager.h"
+#include "collision.h"
 #include "editor_command.h"
 #include "editor_state.h"
 #include "entity.h"
@@ -247,6 +248,7 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
             {
                 m_selecteDefName = def.name;
                 m_selectedAnimationState = ""; // we need to reset
+                m_selectedAnimationType = ""; // we need to reset
                 m_defDraft = def;
             }
         }
@@ -299,6 +301,7 @@ void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDef& def)
             if (ImGui::Selectable(stateString.c_str(), isSelected))
             {
                 m_selectedAnimationState = stateString;
+                m_selectedAnimationType = "";
             }
         }
         ImGui::EndListBox();
@@ -316,6 +319,32 @@ void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDef& def)
     ImGui::InputInt("sheet rows", &currentAnimation.rows);
     ImGui::InputInt("sheet columns", &currentAnimation.columns);
     ImGui::InputFloat("frame duration", &currentAnimation.frameDuration);
+
+    // Animation Type
+    static std::array<const char*, 2> animTypeOpt =  {
+        "SINGULAR",
+        "CONTINOUS"
+    };
+
+
+    if (m_selectedAnimationType == "")
+    {
+        m_selectedAnimationType = std::string(toString(currentAnimation.animationType));
+    }
+    if (ImGui::BeginListBox("animation type"))
+    {
+        for (const auto& opt : animTypeOpt)
+        {
+            bool isSelected = opt == m_selectedAnimationType;
+            if (ImGui::Selectable(opt, isSelected))
+            {
+                std::cout << opt << "\n";
+                m_selectedAnimationType = opt;
+            }
+        }
+        ImGui::EndListBox();
+    }
+    currentAnimation.animationType = fromString<AnimationType>(m_selectedAnimationType).value();
     //std::cout << "currentAnimation frameWdith: " << currentAnimation.frameHeight << "\n";
     // need to add animation type
 }

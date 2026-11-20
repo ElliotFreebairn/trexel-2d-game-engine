@@ -46,5 +46,6 @@ private:
 
     std::string m_selecteDefName;
     std::string m_selectedAnimationState;
+    std::string m_selectedAnimationType;
     GameObjectDef m_defDraft;
 };

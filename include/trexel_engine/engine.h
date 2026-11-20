@@ -53,8 +53,8 @@ class Engine {
         bool m_fireWasDown = false;
         bool m_fireQueued = false;
 
-        static constexpr int SCREEN_WIDTH = 1280;
-        static constexpr int SCREEN_HEIGHT = 720;
+        static constexpr int SCREEN_WIDTH = 1920;
+        static constexpr int SCREEN_HEIGHT = 1080;
         static constexpr int VIEWPORT_WIDTH = 800;
         static constexpr int VIEWPORT_HEIGHT = 600;
 };
