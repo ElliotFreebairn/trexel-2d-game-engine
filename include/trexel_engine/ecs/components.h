@@ -58,8 +58,8 @@ struct Visual
     void fields(F&& f)
     {
         f("textureId", textureId);
-        f("sprite", sprite);
-        f("colour", sprite);
+        //f("sprite", sprite);
+        f("colour", colour);
         // animation should probably be a component or std::optional
         // f("animation", animation)
         f("visible", visible);

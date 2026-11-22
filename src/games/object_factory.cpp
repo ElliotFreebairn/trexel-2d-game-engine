@@ -70,6 +70,10 @@ GameObjectDef parseDefinition(const json& defJson)
     def.visual.textureId = defJson.value("textureId", "");
     def.transform.size = vec2FromJson(defJson.at("size"));
     def.visual.layer = defJson.value("layer", 0);
+    if (defJson.contains("colour"))
+    {
+        def.visual.colour = vec3FromJson(defJson.at("colour"));
+    }
 
     if (defJson.contains("collider"))
     {

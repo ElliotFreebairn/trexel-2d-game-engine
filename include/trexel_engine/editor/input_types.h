@@ -18,6 +18,11 @@ void drawField(const char *name, glm::vec2& v)
     ImGui::DragFloat2(name, &v.x, 0.1f);
 }
 
+void drawField(const char *name, glm::vec3& v)
+{
+    ImGui::DragFloat3(name, &v.x, 0.1f);
+}
+
 void drawField(const char *name, double& v)
 {
     ImGui::InputDouble(name, &v);
@@ -33,6 +38,7 @@ void drawField(const char* name, bool& v)
     ImGui::Checkbox(name, &v);
 }
 
+// STRING
 void drawField(const char* name, std::string& v)
 {
     char buf[256];
@@ -43,6 +49,7 @@ void drawField(const char* name, std::string& v)
     }
 }
 
+// FLIP
 void drawField(const char *name, Flip& v)
 {
     const char* items[] = { "None", "Horizontal", "Verticlal", "Both" };
@@ -51,6 +58,19 @@ void drawField(const char *name, Flip& v)
     {
         v = static_cast<Flip>(i);
     }
+}
+
+// SPRITE
+// how do we deal with this struct in a struct concept?
+
+
+template <typename T>
+void drawField(const char* name, std::optional<T>& v)
+{
+    // we really should allow for the case where the current value is null but allow for creation!
+    if (!v.has_value()) return;
+
+    drawField(name, v.value());
 }
 
 // how do we deal with the std::optional?

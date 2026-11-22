@@ -285,6 +285,7 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
     //  a way to loop over each of a game_object_defs potential components and check if they are not null?
     drawComponent("transform component", def.transform);
     drawComponent("health", def.health);
+    drawComponent("visual", def.visual);
 
     if (ImGui::Button("Apply Edit"))
     {
