@@ -3,3 +3,8 @@ build/
 data/definitions/*
 
 imgui.ini
+
+# INCLUDES
+include/glm/*
+include/imgui/*
+include/nlhomann/*
