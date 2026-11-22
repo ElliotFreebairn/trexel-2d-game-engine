@@ -19,6 +19,15 @@ struct Transform
     glm::vec2 size {0.0f};
     double angle = 0.0;
     Flip flip = Flip::NONE;
+
+    template <typename F>
+    void fields(F&& f)
+    {
+        f("position", position);
+        f("size", size);
+        f("angle", angle);
+        f("flip", flip);
+    }
 };
 
 struct Body
@@ -26,6 +35,14 @@ struct Body
     glm::vec2 velocity {0.0f};
     bool gravity = false;
     bool grounded = false; // written only by physicsSystem
+
+    template <typename F>
+    void fields(F&& f)
+    {
+        f("velocity", velocity);
+        f("gravity", gravity);
+        f("grounded", grounded);
+    }
 };
 
 struct Visual
@@ -35,6 +52,13 @@ struct Visual
     std::optional<glm::vec3> colour;
     bool visible = true;
     int layer = 0; // higher draws on top; ties broken by spawn order
+
+    template <typename F>
+    void fields(F&& f)
+    {
+        f("textureId", textureId);
+        // figure out what to do with std::optional?
+    }
 };
 
 // Which prefab (definition) built this. Used for saving and the editor

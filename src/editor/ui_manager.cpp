@@ -1,5 +1,6 @@
 #include "ui_manager.h"
 #include "collision.h"
+#include "components.h"
 #include "editor_command.h"
 #include "editor_state.h"
 #include "entity.h"
@@ -11,6 +12,7 @@
 #include "imgui_impl_sdlrenderer2.h"
 #include "asset_manager.h"
 #include "imgui_stdlib.h"
+#include "input_types.h"
 #include "property.h"
 #include "file_tree_widget.h"
 #include "sprite.h"
@@ -263,7 +265,7 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
     ImGui::Indent(5.0f);
 
-    ImGui::InputFloat2("size", &def.size.x);
+    ImGui::InputFloat2("object size", &def.size.x);
     if (def.body.has_value())
     {
         ImGui::Checkbox("gravity", &def.body->gravity);

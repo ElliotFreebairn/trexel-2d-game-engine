@@ -53,6 +53,7 @@ void GameRenderer::render(SDL_Renderer* renderer, Game* game, const TextureManag
     const std::vector<RenderCommand> renderables = game->getRenderables();
     for (const RenderCommand& cmd : renderables)
     {
+        // add a check if the size is defined, if not don't spawn the operator
         SDL_Rect rect = {
             static_cast<int>(cmd.position.x),
             static_cast<int>(cmd.position.y),

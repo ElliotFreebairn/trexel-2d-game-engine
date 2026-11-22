@@ -36,6 +36,8 @@ struct GameObjectDef
     std::unordered_map<SpriteMovementState, SpriteAnimation> animations;
 
     // Optional components
+    std::optional<Transform>   transform;
+    std::optional<Visual>      visual;
     std::optional<Collider>    collider;
     std::optional<Body>        body;
     std::optional<Movement>    movement;
