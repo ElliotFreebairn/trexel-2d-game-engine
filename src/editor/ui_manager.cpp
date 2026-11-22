@@ -265,7 +265,7 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
     ImGui::Indent(5.0f);
 
-    ImGui::InputFloat2("object size", &def.size.x);
+    ImGui::InputFloat2("object size", &def.transform.size.x);
     if (def.body.has_value())
     {
         ImGui::Checkbox("gravity", &def.body->gravity);
@@ -298,7 +298,7 @@ void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDefDraft& de
     GameObjectDef& def = defDraft.def;
     if (ImGui::BeginListBox("animation id"))
     {
-        for (const auto&[state, anim] : def.animations)
+        for (const auto&[state, anim] : def.visual.animations)
         {
             std::string stateString(toString(state));
             bool isSelected = stateString == defDraft.animTypeOptionSelected;
@@ -317,7 +317,7 @@ void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDefDraft& de
     std::optional<SpriteMovementState> stateEnum = fromString<SpriteMovementState>(defDraft.animTypeOptionSelected);
     if (!stateEnum.has_value()) return;
 
-    SpriteAnimation& currentAnimation = def.animations.at(stateEnum.value());
+    SpriteAnimation& currentAnimation = def.visual.animations.at(stateEnum.value());
 
     ImGui::InputText("animation id", &currentAnimation.textureID);
     ImGui::InputInt("frame width", &currentAnimation.frameWidth);

@@ -67,16 +67,16 @@ GameObjectDef parseDefinition(const json& defJson)
 {
     GameObjectDef def;
     def.name = defJson.at("name").get<std::string>();
-    def.textureId = defJson.value("textureId", "");
-    def.size = vec2FromJson(defJson.at("size"));
-    def.layer = defJson.value("layer", 0);
+    def.visual.textureId = defJson.value("textureId", "");
+    def.transform.size = vec2FromJson(defJson.at("size"));
+    def.visual.layer = defJson.value("layer", 0);
 
     if (defJson.contains("collider"))
     {
         const json& cJson = defJson.at("collider");
 
         Collider collider;
-        collider.size = cJson.contains("size") ? vec2FromJson(cJson.at("size")) : def.size;
+        collider.size = cJson.contains("size") ? vec2FromJson(cJson.at("size")) : def.transform.size;
         collider.offset = cJson.contains("offset") ? vec2FromJson(cJson.at("offset")) : glm::vec2(0.0f);
         collider.isSolid = cJson.value("solid", true);
 
@@ -101,8 +101,8 @@ GameObjectDef parseDefinition(const json& defJson)
 
             // each frame is the size of the object
             // ADD CHECK TO SEE IF FRAMEWIDTH AND/OR FRAMEHEIGHT ARE CUSTOMISED!
-            spriteAnimation.frameWidth = static_cast<int>(def.size.x);
-            spriteAnimation.frameHeight = static_cast<int>(def.size.y);
+            spriteAnimation.frameWidth = static_cast<int>(def.transform.size.x);
+            spriteAnimation.frameHeight = static_cast<int>(def.transform.size.y);
 
             // each frame can be defined by a generic frame speed or overriden in the state
             spriteAnimation.frameDuration = animation.value("frameSpeed", 0.2);
@@ -113,7 +113,7 @@ GameObjectDef parseDefinition(const json& defJson)
                 // we should fail here
                 throw std::runtime_error("Uknown animation state");
             }
-            def.animations[*state] = spriteAnimation;
+            def.visual.animations[*state] = spriteAnimation;
         }
     }
 
@@ -164,8 +164,8 @@ GameObjectDef parseDefinition(const json& defJson)
 
     if (def.attack)
     {
-        auto it = def.animations.find(SpriteMovementState::ATTACKING);
-        if (it != def.animations.end() && def.attack->triggerFrame >= it->second.columns)
+        auto it = def.visual.animations.find(SpriteMovementState::ATTACKING);
+        if (it != def.visual.animations.end() && def.attack->triggerFrame >= it->second.columns)
         {
             std::cerr << "ObjectFactory: \"" << def.name << "\" attack triggerFrame " << def.attack->triggerFrame
                       << " is never reached, ATTACKING has frames 0-" << it->second.columns - 1 << "\n";
@@ -183,9 +183,9 @@ json parseDefinition(const GameObjectDef& def)
 {
     json saved;
     saved["name"] = def.name;
-    saved["textureId"] = def.textureId.empty() ? "" : def.textureId;
-    saved["size"] = vec2ToJson(def.size);
-    if (def.layer != 0) saved["layer"] = def.layer;
+    saved["textureId"] = def.visual.textureId.empty() ? "" : def.visual.textureId;
+    saved["size"] = vec2ToJson(def.transform.size);
+    if (def.visual.layer != 0) saved["layer"] = def.visual.layer;
 
     // components - optional definitions
     if (def.collider.has_value())
@@ -198,18 +198,18 @@ json parseDefinition(const GameObjectDef& def)
         saved["collider"] = collider;
     }
 
-    if (def.animations.size() > 0)
+    if (def.visual.animations.size() > 0)
     {
         json animations;
-        for (const auto&[state, animation] : def.animations)
+        for (const auto&[state, animation] : def.visual.animations)
         {
             json st;
             st["textureId"] = animation.textureID;
             st["frames"] = animation.columns;
             st["rows"] = animation.rows;
             st["type"] = toString(animation.animationType);
-            st["frameWidth"] = animation.frameWidth != - 1 ? animation.frameWidth : def.size.x; // frameWidth is custom
-            st["frameHeight"] = animation.frameHeight != - 1 ? animation.frameHeight : def.size.y; // frameHieght is custom
+            st["frameWidth"] = animation.frameWidth != - 1 ? animation.frameWidth : def.transform.size.x; // frameWidth is custom
+            st["frameHeight"] = animation.frameHeight != - 1 ? animation.frameHeight : def.transform.size.y; // frameHieght is custom
             st["frameDuration"] = animation.frameDuration;
             st["state"] = toString(state);
             animations["states"] += st;
@@ -339,16 +339,16 @@ EntityId ObjectFactory::spawn(Registry& reg, const std::string& defName, glm::ve
 
     // every entity has a prefab, transform and visual component
     reg.add<Prefab>(e, {def->name});
-    reg.add<Transform>(e, {.position = position, .size = def->size});
+    reg.add<Transform>(e, {.position = position, .size = def->transform.size});
 
     Visual visual;
-    visual.textureId = def->textureId;
-    visual.colour = def->colour;
-    visual.layer = def->layer;
-    if (!def->animations.empty())
+    visual.textureId = def->visual.textureId;
+    visual.colour = def->visual.colour;
+    visual.layer = def->visual.layer;
+    if (!def->visual.animations.empty())
     {
         visual.sprite = Sprite();
-        for (const auto& [state, animation] : def->animations)
+        for (const auto& [state, animation] : def->visual.animations)
         {
             visual.sprite->addAnimation(state, animation);
         }

@@ -50,6 +50,7 @@ struct Visual
     std::string textureId;
     std::optional<Sprite> sprite;
     std::optional<glm::vec3> colour;
+    std::unordered_map<SpriteMovementState, SpriteAnimation> animations;
     bool visible = true;
     int layer = 0; // higher draws on top; ties broken by spawn order
 

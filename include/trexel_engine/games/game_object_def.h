@@ -28,16 +28,11 @@ struct GameObjectDef
 {
     std::string name;
 
-    // Always present: becomes Transform + Visual
-    glm::vec2 size {0.0f};
-    std::string textureId;
-    std::optional<glm::vec3> colour;
-    int layer = 0;
-    std::unordered_map<SpriteMovementState, SpriteAnimation> animations;
+    // Always present
+    Transform transform;
+    Visual visual;
 
     // Optional components
-    std::optional<Transform>   transform;
-    std::optional<Visual>      visual;
     std::optional<Collider>    collider;
     std::optional<Body>        body;
     std::optional<Movement>    movement;

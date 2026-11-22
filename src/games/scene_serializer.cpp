@@ -33,13 +33,13 @@ void SceneSerializer::save(Scene& scene, const std::string& path)
         json j = json::object();
         j["def"] = prefab.name;
         j["position"] = vec2ToJson(t->position);
-        if (!def || t->size != def->size) j["size"] = vec2ToJson(t->size);
+        if (!def || t->size != def->transform.size) j["size"] = vec2ToJson(t->size);
         if (t->angle != 0.0) j["angle"] = t->angle;
 
         if (const Visual* v = reg.get<Visual>(e))
         {
             if (!v->visible) j["visible"] = false;
-            if (def && v->textureId != def->textureId) j["textureId"] = v->textureId;
+            if (def && v->textureId != def->visual.textureId) j["textureId"] = v->textureId;
         }
         if (const Health* h = reg.get<Health>(e); h && def && def->health && h->current != def->health->current)
         {
