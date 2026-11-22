@@ -5,6 +5,7 @@
 #include "../utilities/common.h"
 
 #include <cstdio>
+#include <optional>
 #include <string>
 
 void drawField(const char *name, float& v)
@@ -52,6 +53,7 @@ void drawField(const char *name, Flip& v)
     }
 }
 
+// how do we deal with the std::optional?
 template <typename T>
 void drawComponent(const char* label, T& component)
 {
@@ -62,4 +64,13 @@ void drawComponent(const char* label, T& component)
           drawField(name, value);
         });
     }
+}
+
+template <typename T>
+void drawComponent(const char *label, std::optional<T>& component)
+{
+    // is this how we want to deal with the failure case?
+    if (!component.has_value()) return;
+
+    drawComponent(label, component.value());
 }

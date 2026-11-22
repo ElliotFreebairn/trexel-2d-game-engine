@@ -281,6 +281,11 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
     // do we need to pass the draft object?
     drawAnimationsManager(ctx, m_gameObjectDefDraft);
 
+    // components manager?
+    //  a way to loop over each of a game_object_defs potential components and check if they are not null?
+    drawComponent("transform component", def.transform);
+    drawComponent("health", def.health);
+
     if (ImGui::Button("Apply Edit"))
     {
         ctx.commands.push(EditorCommand::addObjectDefinition(def));
