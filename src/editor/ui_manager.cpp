@@ -280,13 +280,20 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
 
     ImGui::Spacing();
     // do we need to pass the draft object?
-    ImGui::Text("Animations");
-    drawAnimationsManager(ctx, m_gameObjectDefDraft);
+    if (ImGui::CollapsingHeader("Animations"))
+    {
+        drawAnimationsManager(ctx, m_gameObjectDefDraft);
+    }
 
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
     // components manager?
     //  a way to loop over each of a game_object_defs potential components and check if they are not null?
-    ImGui::Text("ECS Components");
-    drawComponents(def);
+    if (ImGui::CollapsingHeader("ECS componenets"))
+    {
+        ImGui::Indent(5.0f);
+        ImGui::Dummy(ImVec2(0.0f, 2.5f));
+        drawComponents(def);
+    }
 
     if (ImGui::Button("Apply Edit"))
     {
