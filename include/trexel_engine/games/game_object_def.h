@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ability_registry.h"
 #include "collision.h"
 #include "ecs/components.h"
 #include "sprite.h"
@@ -9,16 +8,6 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
-
-// The attack a definition has, e.g. the archer's bow
-struct AbilityDef
-{
-    std::string name;
-    float cooldown = 0.4f;
-    int triggerFrame = 0; // frame of the ATTACKING animation where the ability fires
-
-    AbilityRegistry::Maker make; // resolved from name when loaded, never saved
-};
 
 /*
  * Everything needed to spawn an entity, loaded from data/definitions/objects.json

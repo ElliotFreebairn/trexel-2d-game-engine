@@ -17,6 +17,7 @@
 #include "file_tree_widget.h"
 #include "sprite.h"
 
+#include <cstdio>
 #include <glm/glm.hpp>
 #include <stdexcept>
 #include <filesystem>
@@ -250,7 +251,7 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
             if (ImGui::Selectable(def.name.c_str(), isSelected))
             {
                 // we need to reset the entire draft object
-                m_gameObjectDefDraft = {.def = def, .animTypeOptionSelected = ""};
+                m_gameObjectDefDraft = {.def = def, .animTypeOptionSelected = "", .componentSelected = ""};
                 defDraftName = def.name;     // we need to mirror the currently selected object definition
             }
         }
@@ -279,13 +280,13 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
 
     ImGui::Spacing();
     // do we need to pass the draft object?
+    ImGui::Text("Animations");
     drawAnimationsManager(ctx, m_gameObjectDefDraft);
 
     // components manager?
     //  a way to loop over each of a game_object_defs potential components and check if they are not null?
-    drawComponent("transform component", def.transform);
-    drawComponent("health", def.health);
-    drawComponent("visual", def.visual);
+    ImGui::Text("ECS Components");
+    drawComponents(def);
 
     if (ImGui::Button("Apply Edit"))
     {
@@ -293,6 +294,65 @@ void UIManager::drawDefinitionsManager(EditorContext &ctx)
     }
 
     ImGui::Unindent();
+}
+
+void UIManager::drawComponents(GameObjectDef& def)
+{
+    drawComponent("transform", def.transform);
+    drawComponent("visual", def.visual);
+    drawComponent("collider", def.collider);
+    drawComponent("body", def.body);
+    drawComponent("movement", def.movement);
+    drawComponent("attack", def.attack);
+    drawComponent("health", def.health);
+    drawComponent("projectile", def.projectile);
+    drawComponent("damageOnHit", def.damageOnHit);
+
+    // a drop-box
+    // transform component
+    //std::vector<std::string> componentLabels =
+    //{
+    //    "transform",
+    //    "visual",
+    //    "collider",
+    //    "body",
+    //    "movement",
+    //    "attack",
+    //    "health",
+    //    "projectile",
+    //    "damageOnHit"
+    //};
+
+    ////std::cout << std::string(m_gameObjectDefDraft);
+    //if (ImGui::BeginCombo("ecs components", m_gameObjectDefDraft.componentSelected.c_str(), 0))
+    //{
+    //    for (const std::string& label : componentLabels)
+    //    {
+    //        bool isSelected = label == m_gameObjectDefDraft.componentSelected;
+    //        if (ImGui::Selectable(label.c_str(), isSelected))
+    //        {
+    //            std::cout << "activated\n";
+    //            m_gameObjectDefDraft.componentSelected = label;
+    //        }
+    //    }
+
+    //    ImGui::EndCombo();
+    //}
+
+    //// we need a switch case - very very dumb implementation right now! make this more generic
+    ////printf("%s\n", m_gameObjectDefDraft.componentSelected.c_str());
+    //if (m_gameObjectDefDraft.componentSelected.empty()) return;
+    //std::string selectedComponentLabel = m_gameObjectDefDraft.componentSelected;
+
+    //if      (selectedComponentLabel == "transform")     drawComponent(selectedComponentLabel.c_str(), def.transform);
+    //else if (selectedComponentLabel == "visual")        drawComponent(selectedComponentLabel.c_str(), def.visual);
+    //else if (selectedComponentLabel == "collider")      drawComponent(selectedComponentLabel.c_str(), def.collider);
+    //else if (selectedComponentLabel == "body")          drawComponent(selectedComponentLabel.c_str(), def.body);
+    //else if (selectedComponentLabel == "movement")      drawComponent(selectedComponentLabel.c_str(), def.movement);
+    //else if (selectedComponentLabel == "attack")        drawComponent(selectedComponentLabel.c_str(), def.attack);
+    //else if (selectedComponentLabel == "health")        drawComponent(selectedComponentLabel.c_str(), def.health);
+    //else if (selectedComponentLabel == "projectile")    drawComponent(selectedComponentLabel.c_str(), def.projectile);
+    //else if (selectedComponentLabel == "damageOnHit")   drawComponent(selectedComponentLabel.c_str(), def.damageOnHit);
 }
 
 void UIManager::drawAnimationsManager(EditorContext &ctx, GameObjectDefDraft& defDraft)

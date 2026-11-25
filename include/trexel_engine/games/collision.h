@@ -9,13 +9,6 @@ struct AABB
 };
 
 // Used directly as a component
-struct Collider
-{
-    bool isSolid = true;
-    glm::vec2 size {0.0f, 0.0f};
-    glm::vec2 offset {0.0f, 0.0f};
-};
-
 /*
  * Gets recorded by the physicsSystem the reaction systems read this afterwards
  *

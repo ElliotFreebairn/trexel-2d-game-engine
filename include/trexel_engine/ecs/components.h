@@ -5,11 +5,13 @@
 #include "../games/entity.h"
 #include "../sprite/sprite.h"
 #include "../utilities/common.h"
+#include "../ability_registry.h"
 
 #include <glm/glm.hpp>
 #include <memory>
 #include <optional>
 #include <string>
+
 
 // --- CORE (engine) ---
 
@@ -116,6 +118,21 @@ struct Movement
     }
 };
 
+struct Collider
+{
+    bool isSolid = true;
+    glm::vec2 size {0.0f, 0.0f};
+    glm::vec2 offset {0.0f, 0.0f};
+
+    template <typename F>
+    void fields(F&& f)
+    {
+        f("isSolid", isSolid);
+        f("size", size);
+        f("offset", offset);
+    }
+};
+
 struct Attack
 {
     std::shared_ptr<IAbility> ability; // abilities are stateless so can be shared
@@ -138,6 +155,23 @@ struct Attack
         f("timer", timer);
         f("active", active);
         f("triggered", triggered);
+    }
+};
+
+struct AbilityDef
+{
+    std::string name;
+    float cooldown = 0.4f;
+    int triggerFrame = 0; // frame of the ATTACKING animation where the ability fires
+
+    AbilityRegistry::Maker make; // resolved from name when loaded, never saved
+
+    template <typename F>
+    void fields(F&& f)
+    {
+        f("name", name);
+        f("cooldown", cooldown);
+        f("triggerFrame", triggerFrame);
     }
 };
 

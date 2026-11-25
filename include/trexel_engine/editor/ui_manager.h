@@ -15,6 +15,12 @@ struct GameObjectDefDraft
     GameObjectDef def;
 
     std::string animTypeOptionSelected;
+    std::string componentSelected;
+
+    operator std::string() const
+    {
+        return def.name + "\n" + animTypeOptionSelected + "\n" + componentSelected;
+    }
 };
 
 class UIManager
@@ -49,6 +55,7 @@ private:
     void drawViewport(EditorContext& ctx, SDL_Texture* world_texture);
     void drawMainEditorWindow(EditorContext& ctx);
     void drawAnimationsManager(EditorContext& ctx, GameObjectDefDraft& draft);
+    void drawComponents(GameObjectDef& def);
 
     ImVec2 m_viewportSize = ImVec2(0.0f, 0.0f);
 
